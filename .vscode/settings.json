@@ -1,0 +1,4 @@
+{
+    "npm.enableScriptExplorer": true,
+    "npm.packageManager": "yarn"
+}

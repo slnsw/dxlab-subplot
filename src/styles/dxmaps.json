@@ -1,0 +1,31 @@
+{
+  "version": 8,
+  "name": "DXMaps",
+  "metadata": {"maputnik:renderer": "mbgljs"},
+  "sources": {
+    "mapbox": {"type": "vector", "url": "mapbox://mapbox.mapbox-streets-v8"}
+  },
+  "sprite": "",
+  "glyphs": "https://orangemug.github.io/font-glyphs/glyphs/{fontstack}/{range}.pbf",
+  "layers": [
+    {
+      "id": "Background",
+      "type": "background",
+      "source": "mapbox",
+      "layout": {},
+      "paint": {"background-color": "rgba(232, 229, 216, 1)"}
+    },
+    {
+      "id": "water",
+      "type": "fill",
+      "source": "mapbox",
+      "source-layer": "water",
+      "paint": {
+        "fill-color": "rgba(114, 192, 195, 1)",
+        "fill-outline-color": "rgba(142, 182, 157, 1)"
+      }
+    }
+  ],
+  "id": "74dpxhi7a",
+  "owner": "DXLab"
+}

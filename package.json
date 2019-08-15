@@ -3,15 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0",
+    "@loaders.gl/core": "^1.2.1",
+    "axios": "^0.19.0",
+    "deck.gl": "^7.2.0",
+    "lodash": "^4.17.15",
+    "luma.gl": "^7.2.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-map-gl": "^5.0.8",
+    "react-map-gl-geocoder": "^2.0.9",
     "react-scripts": "3.1.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "echo": " echo $(node --version) && exit 0"
   },
   "eslintConfig": {
     "extends": "react-app"

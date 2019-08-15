@@ -1,25 +1,43 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useState} from 'react';
+import { MapExplorer } from './components/MapExplorer';
+
 import './App.css';
 
+// Data vizualization and info layers
+import {LandmarksLayer} from './components/layers/LandmarksLayer';
+import {SearchResultLayer} from './components/layers/SearchResultLayer';
+
+
+
 function App() {
+
+  // Temporal - Begin
+  const [state, setstate] = useState({
+    around: null
+  });
+
+  const onResult = (event)  => {
+    setstate({
+      around: event.result.geometry
+    })
+  };
+  // Temporal - End
+
+  const layers = [
+    new LandmarksLayer({}),
+    new SearchResultLayer({
+      data: state.around
+    })
+  ];
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <React.Fragment>
+        <MapExplorer 
+          layers={layers}
+          onResult={onResult}
+        ></MapExplorer>
+    </React.Fragment>
   );
 }
 
