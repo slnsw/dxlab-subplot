@@ -6,21 +6,24 @@ import {GeoJsonLayer} from '@deck.gl/layers';
 export class SearchResultLayer extends CompositeLayer {
 
 
-    searchResultLayer() {
+    roiAreaLayer() {
         return new GeoJsonLayer({
-            id: "search-result",
+            id: "roi-area",
             data:  this.props.data,
-            getFillColor: [255, 0, 0, 128],
-            getRadius: 1000,
-            pointRadiusMinPixels: 10,
-            pointRadiusMaxPixels: 10
+            getFillColor: [0, 0, 0, 50],
+            getRadius: (d) => { 
+                const {properties:{zoom}} = d; 
+                return 2000; //+ (500 * ( 20 - zoom)); // * (20 - zoom); 
+            },
+            // pointRadiusMinPixels: 10,
+            // pointRadiusMaxPixels: 10
           });
     }
     
  
     
     renderLayers() { 
-        return this.searchResultLayer();
+        return this.roiAreaLayer();
     }
 
 }

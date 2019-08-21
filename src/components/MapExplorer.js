@@ -20,12 +20,15 @@ export class MapExplorer extends Component {
             latitude: -33.8589,
             longitude: 151.2101,
             bearing: -163,
-            pitch: 60,
+            pitch: 60, 
             zoom: 16,
-            reuseMaps: true
+            reuseMaps: true 
         },
     }
 
+    componentDidMount() {
+        this.handleOnViewChange(this.state.viewState);
+      }
 
     handleOnResult(event) {
         const {onResult} = this.props;
@@ -34,13 +37,25 @@ export class MapExplorer extends Component {
         }
     }
 
+    handleOnViewChange(viewState) {
+        const {onViewChange} = this.props;
+        if (onViewChange) {
+            onViewChange(viewState);
+        }
+    }
+
     onViewStateSearchChange(viewState) {
-        this.setState({
+        this.onViewStateChange({
             viewState: {
             ...this.state.viewState,
             ...viewState,
             }
         });
+    }
+
+    onViewStateChange({viewState}) {
+        this.setState({viewState});
+        this.handleOnViewChange(viewState);
     }
 
     render() {
@@ -55,7 +70,7 @@ export class MapExplorer extends Component {
                     layers={layers}
                     viewState={viewState}
                     controller={MapController}
-                    onViewStateChange={({viewState}) => this.setState({viewState})}
+                    onViewStateChange={this.onViewStateChange.bind(this)}
                 >
 
                     <InteractiveMap 

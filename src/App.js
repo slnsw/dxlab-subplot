@@ -5,28 +5,59 @@ import './App.css';
 
 // Data vizualization and info layers
 import {LandmarksLayer} from './components/layers/LandmarksLayer';
+import {FootprintMapsLayer} from './components/layers/FootprintMapsLayer';
 import {SearchResultLayer} from './components/layers/SearchResultLayer';
 
-
+// Temporal
+import { MapDataService } from './share/services';
 
 function App() {
 
   // Temporal - Begin
   const [state, setstate] = useState({
-    around: null
+    around: null,
+    roiArea: null
   });
 
+  const dataService = new MapDataService();
+
   const onResult = (event)  => {
-    setstate({
-      around: event.result.geometry
+// 
+  };
+
+  const onViewChange = ({latitude, longitude, zoom})  => {
+    const geometry = {
+      type: 'Point',
+      coordinates: [longitude, latitude]
+    }
+
+    const data = dataService.fetch({
+      around: geometry,
+      aroundRadius: 2000 //300 * (20 - zoom)
     })
+
+    setstate({
+      roiArea: {
+        type: 'Feature',
+        geometry: geometry,
+        properties: {
+            'zoom': zoom,
+        }
+      },
+      mapData: data
+    });
+
+
   };
   // Temporal - End
 
   const layers = [
     new LandmarksLayer({}),
     new SearchResultLayer({
-      data: state.around
+      data: state.roiArea
+    }),
+    new FootprintMapsLayer({
+      data: state.mapData,
     })
   ];
 
@@ -36,6 +67,7 @@ function App() {
         <MapExplorer 
           layers={layers}
           onResult={onResult}
+          onViewChange={onViewChange}
         ></MapExplorer>
     </React.Fragment>
   );

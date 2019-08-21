@@ -1,15 +1,40 @@
 
-import {CompositeLayer} from 'deck.gl';
+import { CompositeLayer } from 'deck.gl';
+import { PolygonLayer } from '@deck.gl/layers';
 
-import {GeoJsonLayer} from '@deck.gl/layers'; 
-    
-export class FooprintMapsLayer extends CompositeLayer {
+// Temp
+import { MapDataService } from '../../share/services'
 
 
-    renderLayers() { 
-        return [];
+
+export class FootprintMapsLayer extends CompositeLayer {
+
+    mapPoints() {
+        const service = new MapDataService();
+        const data = service.getFootprint(this.props.data);
+
+        return new PolygonLayer({
+            id: 'footprint-layer',
+            data: data,
+            extruded: false,
+            stroked: false,
+            getLineWidth: 0,
+            getPolygon: (d) => d,
+            getFillColor: (d) => {
+                // const alpha = mapValue(d.year, this.state.year_from, this.state.year_to, 0, 255);
+                return [0, 0, 0, 100];
+            },
+        });
+
     }
+
+
+
+    renderLayers() {
+        return [this.mapPoints()];
+    }
+
 
 }
 
-FooprintMapsLayer.layerName = 'FooprintMapsLayer';
+FootprintMapsLayer.layerName = 'FootprintMapsLayer';
