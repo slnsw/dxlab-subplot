@@ -1,74 +1,48 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { MapExplorer } from './components/MapExplorer';
 
 import './App.css';
 
-// Data vizualization and info layers
-import {LandmarksLayer} from './components/layers/LandmarksLayer';
-import {FootprintMapsLayer} from './components/layers/FootprintMapsLayer';
-import {SearchResultLayer} from './components/layers/SearchResultLayer';
+import { MapsProvider } from './context/MapsProvider'
 
-// Temporal
-import { MapDataService } from './share/services';
+// Data vizualization and info layers
+import { LandmarksLayer } from './components/layers/LandmarksLayer';
+import { FootprintMapsLayer } from './components/layers/FootprintMapsLayer';
+import { SearchResultLayer } from './components/layers/SearchResultLayer';
+
 
 function App() {
 
-  // Temporal - Begin
-  const [state, setstate] = useState({
-    around: null,
-    roiArea: null
-  });
-
-  const dataService = new MapDataService();
-
-  const onResult = (event)  => {
-// 
-  };
-
-  const onViewChange = ({latitude, longitude, zoom})  => {
-    const geometry = {
-      type: 'Point',
-      coordinates: [longitude, latitude]
-    }
-
-    const data = dataService.fetch({
-      around: geometry,
-      aroundRadius: 2000 //300 * (20 - zoom)
-    })
-
-    setstate({
-      roiArea: {
-        type: 'Feature',
-        geometry: geometry,
-        properties: {
-            'zoom': zoom,
-        }
+  const initial = {
+      years: {
+        from: 1884,
+        to: 1950
       },
-      mapData: data
-    });
+      assetIds: null,
+      around: null,
+      aroundRadius: 2000,
+  }
 
+  // Note: DeckGL creates a custom React context for managing layers data
+  // For that reason I am force to Initialize layers inside of the map explorer
+  // them inject the custom MapContext. 
 
-  };
-  // Temporal - End
-
+  // MapExplorer layers structure. [ Layer class, {props} ]
+  // TODO: define a prop structure for this.
   const layers = [
-    new LandmarksLayer({}),
-    new SearchResultLayer({
-      data: state.roiArea
-    }),
-    new FootprintMapsLayer({
-      data: state.mapData,
-    })
+    [LandmarksLayer, {}],
+    [SearchResultLayer, {}],
+    [FootprintMapsLayer, {}]
   ];
 
 
   return (
     <React.Fragment>
-        <MapExplorer 
+      <MapsProvider {...initial}>
+        <MapExplorer
           layers={layers}
-          onResult={onResult}
-          onViewChange={onViewChange}
         ></MapExplorer>
+      </MapsProvider>
     </React.Fragment>
   );
 }

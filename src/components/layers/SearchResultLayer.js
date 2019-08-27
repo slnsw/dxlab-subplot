@@ -7,13 +7,15 @@ export class SearchResultLayer extends CompositeLayer {
 
 
     roiAreaLayer() {
+        const {mapContext:[mapState]} = this.props;
+        const {aroundRadius, around} = mapState;
         return new GeoJsonLayer({
             id: "roi-area",
-            data:  this.props.data,
+            data:  around,
             getFillColor: [0, 0, 0, 50],
             getRadius: (d) => { 
                 const {properties:{zoom}} = d; 
-                return 2000; //+ (500 * ( 20 - zoom)); // * (20 - zoom); 
+                return aroundRadius; //+ (500 * ( 20 - zoom)); // * (20 - zoom); 
             },
             // pointRadiusMinPixels: 10,
             // pointRadiusMaxPixels: 10
