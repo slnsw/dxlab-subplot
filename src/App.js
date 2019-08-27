@@ -9,6 +9,8 @@ import { MapsProvider } from './context/MapsProvider'
 import { LandmarksLayer } from './components/layers/LandmarksLayer';
 import { FootprintMapsLayer } from './components/layers/FootprintMapsLayer';
 import { SearchResultLayer } from './components/layers/SearchResultLayer';
+import { MapsDistributionLayer } from './components/layers/MapsDistributionLayer';
+import { MapsBitmapLayer } from './components/layers/MapsBitmapLayer';
 
 
 function App() {
@@ -20,7 +22,7 @@ function App() {
       },
       assetIds: null,
       around: null,
-      aroundRadius: 2000,
+      aroundRadius: 2000, 
   }
 
   // Note: DeckGL creates a custom React context for managing layers data
@@ -30,11 +32,13 @@ function App() {
   // MapExplorer layers structure. [ Layer class, {props} ]
   // TODO: define a prop structure for this.
   const layers = [
-    [LandmarksLayer, {}],
     [SearchResultLayer, {}],
-    [FootprintMapsLayer, {}]
+    // [MapsDistributionLayer, {}],
+    [FootprintMapsLayer, {}],
+    // [MapsBitmapLayer, {name: 'crop', suffix: '_crop_800'}],
+    [MapsBitmapLayer, {name: 'edge', suffix: '_edge_800'}],
+    [LandmarksLayer, {}],
   ];
-
 
   return (
     <React.Fragment>

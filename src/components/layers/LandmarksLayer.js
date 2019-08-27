@@ -19,7 +19,7 @@ export class LandmarksLayer extends CompositeLayer {
                     position: [ 151.2149685, -33.857158999999996 ], 
                     orientation: [0, 0, 90],
                     translation: [28, 38, 0],
-                    color: [125, 125, 125, 125]
+                    color: [0, 0, 0, 125]
                 },
                 useTexture: false,
                 sizeScale: 1
@@ -42,7 +42,7 @@ export class LandmarksLayer extends CompositeLayer {
                     orientation: [0, -28, 90],
                     translation: [10, 0, 0],
                     scale: [.5, 1, 1.1],
-                    color: [125, 125, 125, 125]
+                    color: [0, 0, 0, 125]
                 },
                 useTexture: false,
                 sizeScale: 80
@@ -54,7 +54,7 @@ export class LandmarksLayer extends CompositeLayer {
                     position: [151.18594000000002, -33.868849999999995], 
                     orientation: [0, 0, 90],
                     translation: [-150, 30, 0],
-                    color: [125, 125, 125, 125]
+                    color: [0, 0, 0, 125]
                 },
                 useTexture: false,
                 sizeScale: 8

@@ -2,6 +2,10 @@ import union from '@turf/union';
 import cleanCoords from '@turf/clean-coords';
 import { get } from 'lodash';
 
+import { easeCubicIn } from 'd3-ease';
+import { interpolate } from 'd3-interpolate';
+import { scaleLinear } from 'd3-scale';
+
 export class MergeGeoJsonPolygon {
 
     cache = null;
@@ -32,4 +36,22 @@ export class MergeGeoJsonPolygon {
     }
 
 
+}
+
+
+export function easeInterpolate(ease) {
+  return function (a, b) {
+      var i = interpolate(a, b);
+      return function (t) {
+          return i(ease(t));
+      };
+  };
+}
+
+
+export function interpolateScale(value, to, from) {
+  return scaleLinear()
+      .domain([from, to])
+      .range([0, (to - from)])
+      .interpolate(easeInterpolate(easeCubicIn))(value);
 }

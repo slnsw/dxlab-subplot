@@ -69,3 +69,7 @@ export function fetchData(...params) {
   // Catch any errors we hit and update the app
   //.catch(error => this.setState({ error, isLoading: false }));
 }
+
+export const fetchData2 = async (...params) => {
+  return await fetchData(...params); 
+}

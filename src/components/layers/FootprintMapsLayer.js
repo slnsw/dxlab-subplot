@@ -10,15 +10,7 @@ export class FootprintMapsLayer extends CompositeLayer {
 
 
     mergeMapFootprint(data) {
-        data = data.map((m) => {
-          // Change eleveation base on year
-          // m.cutline.coordinates[0] = m.cutline.coordinates[0].map((c: any) => {
-          //   //const elv = 20 *  mapValue(m.year, this.state.year_from, this.state.year_to, 0, this.state.year_to - this.state.year_from);
-          //   c.push(0);
-          //   return c;
-    
-          // });
-    
+        data = data.map((m) => {    
           const polygon = cloneDeep(m.cutline);
           polygon['properties'] = pick(m, ['year', 'title', 'asset_id']);
     
@@ -32,12 +24,15 @@ export class FootprintMapsLayer extends CompositeLayer {
       }
 
 
-    mapPoints() {
-        const {mapContext:[mapState]} = this.props;
-        let data = mapState.data.then((data) => {
-            const parse = this.mergeMapFootprint(data);
-            return parse;
-        });
+    buildLayer() {
+        // const {mapContext:[mapState]} = this.props;
+        // let data = mapState.data.then((data) => {
+        //     const parse = this.mergeMapFootprint(data);
+        //     return parse;
+        // });
+
+        let { data } = this.props;
+        data = this.mergeMapFootprint(data);
 
         return new PolygonLayer({
             id: 'footprint-layer',
@@ -57,7 +52,7 @@ export class FootprintMapsLayer extends CompositeLayer {
 
 
     renderLayers() {
-        return [this.mapPoints()];
+        return [this.buildLayer()];
     }
 
 

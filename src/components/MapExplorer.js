@@ -79,7 +79,14 @@ export class MapExplorer extends Component {
 
     render() {
         const layers = [
-            ...this.props.layers.map(([L, props]) => { return new L({mapContext: this.context, ...props}) }), 
+            ...this.props.layers.map(([L, props]) => { 
+                let data = this.context[0].data;
+                props = {
+                    data: data,
+                    ...props
+                }
+                return new L({mapContext: this.context, ...props}) 
+            }), 
         ]
 
         const { viewState } = this.state;
