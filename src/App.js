@@ -17,12 +17,12 @@ function App() {
 
   const initial = {
       years: {
-        from: 1884,
+        from: 1880,
         to: 1950
       },
       assetIds: null,
       around: null,
-      aroundRadius: 2000, 
+      aroundRadius: 1000, 
   }
 
   // Note: DeckGL creates a custom React context for managing layers data
@@ -30,15 +30,18 @@ function App() {
   // them inject the custom MapContext. 
 
   // MapExplorer layers structure. [ Layer class, {props} ]
+  // view == main or minimap or all
   // TODO: define a prop structure for this.
   const layers = [
-    [SearchResultLayer, {}],
-    // [MapsDistributionLayer, {}],
-    [FootprintMapsLayer, {}],
-    // [MapsBitmapLayer, {name: 'crop', suffix: '_crop_800'}],
-    [MapsBitmapLayer, {name: 'edge', suffix: '_edge_800'}],
-    [LandmarksLayer, {}],
+    [SearchResultLayer, { view: 'main'}],
+    [LandmarksLayer, { view: 'all'}],
+    // [MapsDistributionLayer, { view: 'all'}],
+    [FootprintMapsLayer, { view: 'all'}],
+    [MapsBitmapLayer, {name: 'crop', suffix: '_crop_800', view: 'main'}],
+    // [MapsBitmapLayer, {name: 'edge', suffix: '_edge_800', view: 'main'}],
+
   ];
+
 
   return (
     <React.Fragment>

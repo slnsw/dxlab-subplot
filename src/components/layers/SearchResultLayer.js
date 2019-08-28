@@ -12,7 +12,7 @@ export class SearchResultLayer extends CompositeLayer {
         return new GeoJsonLayer({
             id: "roi-area",
             data:  around,
-            getFillColor: [0, 0, 0, 50],
+            getFillColor: [0, 0, 0, 30],
             getRadius: (d) => { 
                 const {properties:{zoom}} = d; 
                 return aroundRadius; //+ (500 * ( 20 - zoom)); // * (20 - zoom); 
