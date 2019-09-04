@@ -2,7 +2,8 @@ import { fetchData } from '../share/services';
 
 export function mapsReducer(state, action) { 
     switch (action.type) {
-        case 'GET_MAPS_DUMMY': {
+        case 'HIGHLIGHT_MAP': {
+            console.log(action.state);
             return { count: state.count + 1 }
         }
 

@@ -161,7 +161,7 @@ export class MapExplorer extends Component {
             new MapView({
                 id: 'minimap',
                 x: '68%',
-                y: '2%',
+                y: '45%',
                 width: '30%',
                 height: '50%',
                 clear: true,

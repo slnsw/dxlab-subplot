@@ -28,7 +28,8 @@ export function fetchData(...params) {
   } = params;
 
   const query = {
-    'valid': true
+    'valid': true,
+    'colored': true
   } // This flag should be apply in the server directly
 
   if (from && to) {

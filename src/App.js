@@ -10,6 +10,7 @@ import { LandmarksLayer } from './components/layers/LandmarksLayer';
 import { FootprintMapsLayer } from './components/layers/FootprintMapsLayer';
 import { SearchResultLayer } from './components/layers/SearchResultLayer';
 import { MapsDistributionLayer } from './components/layers/MapsDistributionLayer';
+import { MapsPoligonLayer } from './components/layers/MapsPoligonLayer';
 import { MapsBitmapLayer } from './components/layers/MapsBitmapLayer';
 
 
@@ -22,7 +23,7 @@ function App() {
       },
       assetIds: null,
       around: null,
-      aroundRadius: 1000, 
+      aroundRadius: 2000, 
   }
 
   // Note: DeckGL creates a custom React context for managing layers data
@@ -33,11 +34,12 @@ function App() {
   // view == main or minimap or all
   // TODO: define a prop structure for this.
   const layers = [
-    [SearchResultLayer, { view: 'main'}],
+    [SearchResultLayer, { view: 'all'}],
     [LandmarksLayer, { view: 'all'}],
-    // [MapsDistributionLayer, { view: 'all'}],
-    [FootprintMapsLayer, { view: 'all'}],
+    [MapsDistributionLayer, { view: 'minimap'}],
+    [FootprintMapsLayer, { view: 'main'}],
     [MapsBitmapLayer, {name: 'crop', suffix: '_crop_800', view: 'main'}],
+    // [MapsPoligonLayer, { view:'minimap'}]
     // [MapsBitmapLayer, {name: 'edge', suffix: '_edge_800', view: 'main'}],
 
   ];
