@@ -16,6 +16,7 @@ import { View, MapView } from '@deck.gl/core';
 
 import DatGui, {DatNumber, DatString, DatBoolean } from 'react-dat-gui';
 
+
 // Geocoder, execute geo-search around sydney
 const proximity = { longitude: 151.21065829636484, latitude: -33.86631790142455 }
 const mapRef = React.createRef();

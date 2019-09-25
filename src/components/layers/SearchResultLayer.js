@@ -7,10 +7,10 @@ export class SearchResultLayer extends CompositeLayer {
 
 
     roiAreaLayer() {
-        const {mapContext:[mapState]} = this.props;
+        const {id, mapContext:[mapState]} = this.props;
         const {aroundRadius, around} = mapState;
         return new GeoJsonLayer({
-            id: "roi-area",
+            id: `${id}-roi-area`,
             data:  around,
             getFillColor: [0, 0, 0, 30],
             getRadius: (d) => { 

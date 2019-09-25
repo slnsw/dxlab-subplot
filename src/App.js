@@ -10,7 +10,7 @@ import { LandmarksLayer } from './components/layers/LandmarksLayer';
 import { FootprintMapsLayer } from './components/layers/FootprintMapsLayer';
 import { SearchResultLayer } from './components/layers/SearchResultLayer';
 import { MapsDistributionLayer } from './components/layers/MapsDistributionLayer';
-import { MapsPoligonLayer } from './components/layers/MapsPoligonLayer';
+import { MapsPolygonLayer } from './components/layers/MapsPolygonLayer';
 import { MapsBitmapLayer } from './components/layers/MapsBitmapLayer';
 
 
@@ -19,7 +19,7 @@ function App() {
   const initial = {
       years: {
         from: 1880,
-        to: 1950
+        to: 1884
       },
       assetIds: null,
       around: null,
@@ -35,12 +35,12 @@ function App() {
   // TODO: define a prop structure for this.
   const layers = [
     [SearchResultLayer, { view: 'all'}],
-    [LandmarksLayer, { view: 'all'}],
-    [MapsDistributionLayer, { view: 'minimap'}],
-    [FootprintMapsLayer, { view: 'main'}],
-    [MapsBitmapLayer, {name: 'crop', suffix: '_crop_800', view: 'main'}],
-    // [MapsPoligonLayer, { view:'minimap'}]
-    // [MapsBitmapLayer, {name: 'edge', suffix: '_edge_800', view: 'main'}],
+    // [LandmarksLayer, { view: 'all'}],
+    // [MapsDistributionLayer, { view: 'all', onClick : (info) => { console.log(info)} }],
+    // [FootprintMapsLayer, { view: 'main'}],
+    [MapsPolygonLayer, { view:'all',  onClick : (info) => { console.log(info)} }],
+    // [MapsBitmapLayer, { id:'crop', name: 'crop', suffix: '_crop_800', view: 'main'}],
+    // [MapsBitmapLayer, { id:'edge', name: 'edge', suffix: '_edge_800', view: 'minimap'}],
 
   ];
 

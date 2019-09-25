@@ -2,41 +2,38 @@
 import { CompositeLayer } from 'deck.gl';
 import { PolygonLayer } from '@deck.gl/layers';
 
-import { pick, cloneDeep } from 'lodash';
 import { MergeGeoJsonPolygon } from '../../share/utils';
 
 
 export class FootprintMapsLayer extends CompositeLayer { 
 
 
-    mergeMapFootprint(data) {
-        data = data.map((m) => {    
-          const polygon = cloneDeep(m.cutline);
-          polygon['properties'] = pick(m, ['year', 'title', 'asset_id']);
+    updateState({props, changeFlags}) {
+        if(changeFlags.dataChanged){        
+            const  { data } = props;
+
+            // Only merget cutline polygon data
+            const cutlines = data.map((m) => m.cutline); 
+
+            // Merge polygons
+            const merge = new MergeGeoJsonPolygon();
+            merge.setData(cutlines);
+
+            // Get only coordinates
+            const footprintData = merge.getCoordinates();
+            this.setState({footprintData});
+        }
     
-          return m.cutline;
-        });
-    
-        const merge = new MergeGeoJsonPolygon();
-        merge.setData(data);
-        return merge.getCoordinates();
-    
-      }
+    }
 
 
-    buildLayer() {
-        // const {mapContext:[mapState]} = this.props;
-        // let data = mapState.data.then((data) => {
-        //     const parse = this.mergeMapFootprint(data);
-        //     return parse;
-        // });
-
-        let { data } = this.props;
-        data = this.mergeMapFootprint(data);
+    footprintLayer() {
+        const { id } = this.props;
+        const {footprintData } = this.state
 
         return new PolygonLayer({
-            id: 'footprint-layer',
-            data: data,
+            id: `${id}-footprint-layer`,
+            data: footprintData,
             extruded: false,
             stroked: false,
             getLineWidth: 0,
@@ -52,7 +49,7 @@ export class FootprintMapsLayer extends CompositeLayer {
 
 
     renderLayers() {
-        return [this.buildLayer()];
+        return [this.footprintLayer()];
     }
 
 

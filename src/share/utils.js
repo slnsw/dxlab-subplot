@@ -13,19 +13,28 @@ export class MergeGeoJsonPolygon {
     setData(data) {
         if(data.length > 0) {
             let merge = undefined;
-
             data.forEach((p) => {
-              if (merge) {
-                merge = union(merge, p);
-              }else{
-                merge = p;
-              }
+              merge = this.append(p)
             });
-
-
-            merge = cleanCoords(merge)
             this.cache = merge
         }
+    }
+
+    /**
+     * Merge polygon into cache polygon data
+     * @param {*} polygon 
+     */
+    append(polygon) {
+      let merge = this.cache;
+      if (merge) {
+        merge = union(merge, polygon);
+      }else{
+        merge = polygon;
+      }
+      merge = cleanCoords(merge);
+      this.cache = merge
+      return merge;
+      
     }
 
     getPolygon() {

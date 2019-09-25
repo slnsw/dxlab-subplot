@@ -1,6 +1,6 @@
 
 import { CompositeLayer } from 'deck.gl';
-import { PolygonLayer, GeoJsonLayer } from '@deck.gl/layers';
+import { GeoJsonLayer } from '@deck.gl/layers';
 
 import { chain, pick, get, set, zipObject, cloneDeep } from 'lodash';
 import { MergeGeoJsonPolygon, interpolateScale } from '../../share/utils';
@@ -13,118 +13,125 @@ import { color } from 'd3-color'
 export class MapsDistributionLayer extends CompositeLayer {
 
 
-    groupLayerByYear(data) {
-        const { mapContext: [mapState] } = this.props;
-        const {years: {from, to}} = mapState;
+    updateState({ props, changeFlags }) {
+        if (changeFlags.dataChanged) {
 
-        const grouped = chain(data)
-            .groupBy("year")
-            .toPairs()
-            .map((current) => {
-                return zipObject(["year", "maps"], current);
-            })
-            .value();
+            // Group data by year
+            const { data, mapContext: [mapState] } = props;
+            const { years: { from, to } } = mapState;
 
+            const groupData = data.reduce((result, m) => {
+                const elevation = interpolateScale(parseInt(m.year), to, from) * 10;
+                let grp = get(result, m.year, {});
 
-        return grouped.map((m, inx) => {
-            const merge = new MergeGeoJsonPolygon();
-            const yearElevationScale = interpolateScale(parseInt(m.year), to, from) * 10;  // 50 *  inx;
+                // Append maps to data. MANY NOT NECESSARY
+                let maps = get(grp, 'maps', []);
+                maps.push(m);
+                grp['maps'] = maps;
 
-            //console.log(inx, yearElevationScale, yearScale(m.year), yearScale(inx));
+                // Append map cutline to merged polygon data
+                let merge = get(grp, 'merge', new MergeGeoJsonPolygon());
+                grp['merge'] = merge;
+                if (m.cutline) {
+                    merge.append(m.cutline);
+                }
 
-            merge.setData(m.maps.map((i) => {
-                return cloneDeep(i.cutline); 
-            }));
+                // Finally update the GeoJson feature structure
+                let geoJson = merge.getPolygon();
+                if (geoJson.type === 'Polygon'){
+                    geoJson = {
+                        type: 'feature',
+                        geometry: geoJson,
+                    }
 
-            const polygon = merge.getPolygon();
-            polygon['properties'] = {
-                'year': m.year,
-                'elevation': yearElevationScale
-            };
+                }
 
-            // const mergePolygon = merge.getCoordinates().map((coords) => {
-            //     return [coords[0].map((coord) => {
-            //         if (coord.push && yearElevationScale) { // :P hack fix me
-            //             coord.push(yearElevationScale);
-            //         }
+                grp['polygon'] = {
+                    ...geoJson,
+                    properties: {
+                        'year': m.year,
+                        'count': maps.length,
+                        'elevation': elevation
+                    }
+                };
 
-            //         return coord;
-            //     })];
-            // });
+                // Update result
+                result[m.year] = grp;
 
+                return result;
+            }, {});
 
-            // console.log(m.year, polygon);
+            const features = Object.keys(groupData).map((year) => {
+                let item = groupData[year];
+                return  item.polygon;
+            });
 
+            const featureCollection = this.getSubLayerRow({ 
+                'type': 'FeatureCollection',
+                'features': features
+    
+            });
 
+            this.setState({ featureCollection });
+            this.setState({ groupData });
 
-            // console.log(elv, polygon.geometry.coordinates);
-
-            return {
-                'year': m.year,
-                'polygon': polygon
-            };
-        });
-
+            
+        }
     }
 
-    buildLayers(data) {
-        const { mapContext: [mapState] } = this.props;
-        const {years: {from, to}} = mapState;
+    
+
+    buildLayers() {
+        const { id, mapContext: [mapState] } = this.props;
+        const { years: { from, to } } = mapState;
+        const { featureCollection } = this.state;
 
         // const yearScale = scaleLinear().domain([this.state.year_from, this.state.year_to]).range(["brown", "steelblue"]); 
         const yearColorScale = scaleLinear([from, to], ["gold", "limegreen"]);
-        const yearColorAlpha = scaleLinear([from, to], [255, 100]);
-        
-        // Group data by year
-        const groupedData = this.groupLayerByYear(data);
+        // const yearColorAlpha = scaleLinear([from, to], [255, 100]);
 
-        const layers = groupedData.map((m) => {
 
-            if( m.polygon.geometry) {
-                return new PolygonLayer({
-                    id: 'footprint-' + m.year + '-layer',
-                    data: m.polygon.geometry.coordinates,
-                    pickable: true,
-                    filled: true,
-                    // autoHighlight: true,
-                    opacity: 1,
-                    visible: 1,
-                    extruded: false,
-                    // getPolygon: (d: any) =>  { console.log(d.polygon.geometry.coordinates); return d.polygon.geometry.coordinates},
-                    getPolygon: (d) => d,
-                    getElevation: (d) => m.polygon.properties.elevation,
-                    getFillColor: (d) => {
-                        let c = color(yearColorScale(m.year));
-                        if (c) {
-                            c = [c.r, c.g, c.b, yearColorAlpha(m.year)];
-                        }
-                        return c;
-                    },
-                    onHover: (info) => {
-                        console.log(info);
-                        this.setState({
-                            hoveredObject: {
-                                'year': get(info.object, 'year', '0')
-                            },
-                            pointerX: info.x,
-                            pointerY: info.y
-                        })
+        if (featureCollection.features.length > 0) {
+            // Build grouped year layers
+            return new GeoJsonLayer({
+                id: `${id}-years-footprint-layer`,
+                data: featureCollection,
+                extruded: false,
+                stroked: true,
+                pickable: true,
+                autoHighlight: true,
+                getLineWidth: 1,
+                getFillColor: (d) => {
+                    // const alpha = mapValue(d.year, this.state.year_from, this.state.year_to, 0, 255);
+                    let c = color(yearColorScale(d.properties.year));
+                    if (c) {
+                        c = [c.r, c.g, c.b];
                     }
-                });
-            }
-            
-            return null; 
-            
-        });
+                    return c;
+                },
+                getElevation: (d) => d.properties.elevation,
+                // onClick: (info) => {
+                //         console.log(info);
+                //         // this.setState({
+                //         //     hoveredObject: {
+                //         //         'year': get(info.object, 'year', '0')
+                //         //     },
+                //         //     pointerX: info.x,
+                //         //     pointerY: info.y
+                //         // })
+                // }
+            });
 
-        return layers;
+        }
 
     }
 
+    // getPickingInfo({info, sourceLayer}) {
+    //     console.log('compositive', info);
+    // }
 
     renderLayers() {
-        const { data } = this.props;
-        return this.buildLayers(data);
+        return this.buildLayers();
     }
 
 
