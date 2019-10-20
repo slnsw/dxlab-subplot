@@ -2,7 +2,7 @@ export function fetchData(...params) {
 
   params = {
     years: {
-      from: 1884,
+      from: 1880,
       to: 1950
     },
     assetIds: null,
@@ -29,7 +29,7 @@ export function fetchData(...params) {
 
   const query = {
     'valid': true,
-    'colored': true
+    // 'colored': true
   } // This flag should be apply in the server directly
 
   if (from && to) {

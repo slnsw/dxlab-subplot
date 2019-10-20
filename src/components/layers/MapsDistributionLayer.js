@@ -90,7 +90,6 @@ export class MapsDistributionLayer extends CompositeLayer {
         const yearColorScale = scaleLinear([from, to], ["gold", "limegreen"]);
         // const yearColorAlpha = scaleLinear([from, to], [255, 100]);
 
-
         if (featureCollection.features.length > 0) {
             // Build grouped year layers
             return new GeoJsonLayer({

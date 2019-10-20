@@ -1,257 +1,88 @@
-import 'react-dat-gui/build/react-dat-gui.css';
-import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css";
 
 import React, { Component } from 'react';
-import DeckGL from '@deck.gl/react';
-import { MapController } from 'deck.gl';
-import { InteractiveMap } from 'react-map-gl';
-import Geocoder from "react-map-gl-geocoder";
-
-// Custom mapbox style
-import MAP_STYLE from '../styles/dxmaps_v2.json';
-
 import { MapDataContext } from '../context/MapsContext';
 
-import { View, MapView } from '@deck.gl/core';
-
-import DatGui, {DatNumber, DatString, DatBoolean } from 'react-dat-gui';
+import { MapViewer } from './MapViewer';
 
 
-// Geocoder, execute geo-search around sydney
-const proximity = { longitude: 151.21065829636484, latitude: -33.86631790142455 }
-const mapRef = React.createRef();
+// UI Components
+import { ModalWindow } from './modal/ModalWindow';
+import { getImageUrl } from '../share/utils'; 
+
+// Data vizualization and info layers
+import { LandmarksLayer } from './layers/LandmarksLayer';
+import { FootprintMapsLayer } from './layers/FootprintMapsLayer';
+import { SearchResultLayer } from './layers/SearchResultLayer';
+import { MapsDistributionLayer } from './layers/MapsDistributionLayer';
+import { MapsPolygonLayer } from './layers/MapsPolygonLayer';
+import { MapsBitmapLayer } from './layers/MapsBitmapLayer';
+import { MapsLabelLayer } from './layers/MapsLabelLayer';
+
 
 export class MapExplorer extends Component {
 
     state = {
-        viewState: {
-            // latitude: -33.8589,
-            // longitude: 151.2101,
-            // bearing: -163,
-            // pitch: 60,
-            // zoom: 16,
-            // reuseMaps: true,
-            main: {
-                latitude: -33.8589,
-                longitude: 151.2101,
-                bearing: -163,
-                pitch: 60,
-                zoom: 16,
-                reuseMaps: true,
-            },
-            minimap: {
-                latitude: -33.8589,
-                longitude: 151.2101,
-                zoom: 14,
-                pitch: 0,
-                bearing: -163,
-                reuseMaps: true,
-            }
-        },
+        showModal: false,
+        modalData: {}
     }
 
 
-    componentDidMount() {
-        this.handleOnViewChange(this.state.viewState);
-    }
-
-    handleOnResult(event) {
-        const { onResult } = this.props;
-        if (onResult) {
-            onResult(event);
-        }
-    }
-
-    handleOnViewChange(viewState) {
-        const { main: { latitude, longitude, zoom } } = viewState;
+    /**
+     * Open a modal window to display map detail data
+     * @param {*} info 
+     */
+    showMapDetail({object}) {
         const [mapState, dispatch] = this.context;
 
-
-        const around = {
-            type: 'Feature',
-            geometry: {
-                type: 'Point',
-                coordinates: [longitude, latitude]
-            },
-            properties: {
-                'zoom': zoom,
-                'radius': mapState.aroundRadius
-            }
+        let {properties : {title, imageUrl, asset_id}} = object;
+        if (!imageUrl) {
+            imageUrl = getImageUrl(asset_id, '_crop_800')
         }
 
-        dispatch({ type: 'GET_MAPS_AROUND', state: { around } });
-
-        const { onViewChange } = this.props;
-        if (onViewChange) {
-            onViewChange(viewState);
-        }
-    }
-
-    onViewStateSearchChange(viewState) {
-        this.onViewStateChange({
-            viewState: {
-                ...this.state.viewState,
-                ...viewState,
-            }
-        });
-    }
-
-    onViewStateChange({ viewState, viewId }) {
-        // Single view implemenation
-        // this.setState({ viewState });
-        // this.handleOnViewChange(viewState);
-
-        // main and minimap view implementation
         this.setState({
-            viewState: {
-                main: {
-                    ...viewState,
-                    // bearing: -163,
-                    zoom: viewState.zoom + 2,
-                    pitch: 60
-                },
-                minimap: viewState
-            }
-        }, () => {
-            this.handleOnViewChange(this.state.viewState);
+            modalData : {title, imageUrl, asset_id},
+            selectedMap: object,
+            showModal: true
         });
+
+        // Update map context to keep track with the selected map
+        dispatch({ type: 'HIGHLIGHT_MAP', state: { highlightMap : asset_id } });
     }
-
-    handleUpdate(state) {
-        this.handleOnViewChange(state)        
-    };
-
-    getParent(layer) {
-        let parent = layer.parent;
-        if (parent.parent) {
-            parent = this.getParent(parent);
-        }
-        return parent
-    }
-
-    layerViewVisibility({ layer, viewport }) {
-        let container = this.getParent(layer);
-        if (container) {
-            const { view } = container.props
-            // console.log('p', view);/
-            if (viewport.id === view || view === 'all') {
-                return true;
-            }
-        }
-
-        return false;
-    };
+    
 
     render() {
+        // Note: DeckGL creates a custom React context for managing layers data
+        // For that reason I am force to Initialize layers inside of the map explorer
+        // them inject the custom MapContext. 
+    
+        // MapExplorer layers structure. [ Layer class, {props} ]
+        // view == main or minimap or all
+        // TODO: define a prop structure for this.
         const layers = [
-            ...this.props.layers.map(([L, props]) => {
-                let data = this.context[0].data;
-                props = {
-                    data: data,
-                    ...props
-                }
-                return new L({ mapContext: this.context, ...props })
-            }),
-        ]
-
-        const views = [
-            new MapView({
-                id: 'main',
-                controller: false
-            }),
-            new MapView({
-                id: 'minimap',
-                x: '68%',
-                y: '45%',
-                width: '30%',
-                height: '50%',
-                clear: true,
-                controller: {
-                    // maxZoom: 11,
-                    // minZoom: 11,
-                    // dragRotate: false,
-                    // keyboard: false
-                }
-            })
+            [SearchResultLayer, { view: 'all'}],
+            // [LandmarksLayer, { view: 'all'}], 
+            // [MapsDistributionLayer, { view: 'minimap', onClick : (info) => { console.log(info)} }],
+            [FootprintMapsLayer, { view: 'main'}],
+            [MapsPolygonLayer, { view:'minimap',  onClick : this.showMapDetail.bind(this)}],
+            [MapsLabelLayer, {view: 'all'}],
+            // [MapsBitmapLayer, { id:'crop', name: 'crop', suffix: '_crop_800', view: 'main', onClick : this.showMapDetail.bind(this)}],
+            // [MapsBitmapLayer, { id:'edge', name: 'edge', suffix: '_edge_800', view: 'minimap'}], 
+    
         ];
-
-        const { viewState } = this.state;
+        
+        const { showModal, modalData} = this.state;
 
         return (
             <React.Fragment>
-                <DeckGL
-                    layerFilter={this.layerViewVisibility.bind(this)}
-                    views={views}
+                <ModalWindow 
+                    isOpen={showModal}
+                    onRequestClose={() => this.setState({showModal : false})}
+                    {...modalData}
+                />
+                <MapViewer
                     layers={layers}
-                    viewState={viewState}
-                    // controller={MapController}
-                    onViewStateChange={this.onViewStateChange.bind(this)}
-                >
-
-                    <InteractiveMap
-                        mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
-                        mapStyle={MAP_STYLE}
-                        preventStyleDiffing={true}
-                        ref={mapRef}
-                    >
-                        <Geocoder
-                            mapRef={mapRef}
-                            onResult={this.handleOnResult.bind(this)}
-                            placeholder="Lookup address"
-                            countries="au"
-                            proximity={proximity}
-                            onViewportChange={this.onViewStateSearchChange.bind(this)}
-                            mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
-                            position="top-left"
-                        />
-                    </InteractiveMap>
-
-                    <View id="minimap">
-
-                        <InteractiveMap
-                            mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
-                            // mapStyle="mapbox://styles/mapbox/dark-v9"
-                            preventStyleDiffing={true}
-                            ref={mapRef}
-                        >
-
-
-                        </InteractiveMap>
-                    </View>
-                </DeckGL>
-
-                {/* <DatGui data={{
-                    ...this.state,
-                    ...this.context[0]
-                }} 
-                    onUpdate={this.handleUpdate.bind(this)}
-                >
-                    <DatNumber path='viewState.main.latitude' label='latitude' min={-360} max={360} step={.0001} />
-                    <DatNumber path='viewState.main.longitude' label='longitude' min={-360} max={360} step={.0001} />
-
-                    <DatNumber path='viewState.main.pitch' label='pitch' min={0} max={60} step={.5} />
-                    <DatNumber path='viewState.main.bearing' label='bearing' min={0} max={180} step={.5} />
-                    <DatNumber path='viewState.main.zoom' label='zoom' min={12} max={24} step={.5} />
-
-                    <DatNumber path='years.from' label='From year' min={1880} max={1959} step={1} />
-                    <DatNumber path='years.to' label='To year' min={1880} max={1959} step={1} />
-
-                    <DatNumber path='aroundRadius' label='Around radius' min={50} max={3000} step={1} />    
-
-                    <DatString path='hoveredObject.title' label='Select title' />
-                    <DatString path='hoveredObject.asset_id' label='Select asset_id' />
-                    <DatString path='asset_ids' label='Asset ids' />
-                    <DatBoolean path='filter_year' label="Filter year" />
-                    <DatBoolean path='show_map_center' label="Show map center" />
-                    <DatBoolean path='show_map_cut_line' label="Show map cutline" />
-
-                    <DatBoolean path='has_color' label="Show colored maps" />
-                    <DatBoolean path='has_cutline_crop' label="Show maps with cutline" />
-
-                </DatGui> */}
+                ></MapViewer>
             </React.Fragment>
-
-
         )
     }
 }

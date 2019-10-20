@@ -30,7 +30,7 @@ export class MapsPolygonLayer extends CompositeLayer {
                 'features': features
     
             }
-
+            
             this.setState({feature, elev: 0});
 
         }

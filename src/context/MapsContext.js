@@ -9,7 +9,6 @@ export function useMaps() {
     throw new Error(`useMaps must be used within a MapDataContext`)
   }
 
-  console.log(context);
 
   const [state, dispatch] = context;
 

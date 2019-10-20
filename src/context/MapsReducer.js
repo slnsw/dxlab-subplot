@@ -3,8 +3,11 @@ import { fetchData } from '../share/services';
 export function mapsReducer(state, action) { 
     switch (action.type) {
         case 'HIGHLIGHT_MAP': {
-            console.log(action.state);
-            return { count: state.count + 1 }
+            // Update state with given highlight map data
+            return {
+                ...state,
+                ...action.state
+            };
         }
 
         case 'GET_MAPS_AROUND': {

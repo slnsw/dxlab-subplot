@@ -1,6 +1,13 @@
+@import url('https://fonts.googleapis.com/css?family=Bitter|Roboto+Slab&display=swap');
+
+* {
+  font-family: 'Roboto Slab', serif;
+  /* font-family: 'Bitter', serif; */
+}
+
 body {
   width: 100vw;
-  height: 100vh;
+  height: 100vh; 
   margin: 0;
 }
 
