@@ -60,11 +60,11 @@ export class MapExplorer extends Component {
         // TODO: define a prop structure for this.
         const layers = [
             [SearchResultLayer, { view: 'all'}],
-            // [LandmarksLayer, { view: 'all'}], 
+            [LandmarksLayer, { view: 'all'}], 
             // [MapsDistributionLayer, { view: 'minimap', onClick : (info) => { console.log(info)} }],
-            [FootprintMapsLayer, { view: 'main'}],
-            [MapsPolygonLayer, { view:'minimap',  onClick : this.showMapDetail.bind(this)}],
-            [MapsLabelLayer, {view: 'all'}],
+            // [FootprintMapsLayer, { view: 'main'}],
+            // [MapsPolygonLayer, { view:'minimap',  onClick : this.showMapDetail.bind(this)}],
+            // [MapsLabelLayer, {view: 'all'}],
             // [MapsBitmapLayer, { id:'crop', name: 'crop', suffix: '_crop_800', view: 'main', onClick : this.showMapDetail.bind(this)}],
             // [MapsBitmapLayer, { id:'edge', name: 'edge', suffix: '_edge_800', view: 'minimap'}], 
     
