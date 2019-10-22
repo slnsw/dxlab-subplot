@@ -98,6 +98,7 @@ export class LandmarksLayer extends CompositeLayer {
  
     
     renderLayers() { 
+        console.log(GLTFScenegraphLoader);
         return this.models().map((conf) => {
             return this.loadModel(conf)
         });

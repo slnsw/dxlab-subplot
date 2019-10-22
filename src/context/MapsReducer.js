@@ -28,6 +28,7 @@ export function mapsReducer(state, action) {
                 data
             };
         }
+
         default: {
             throw new Error(`Unsupported action type: ${action.type}`);
         }

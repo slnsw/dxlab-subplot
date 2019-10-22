@@ -1,40 +1,53 @@
-import React, { useState } from 'react';
-import { MapExplorer } from './components/MapExplorer';
-
 import './App.css';
 
+import React from 'react';
+import { MapExplorer } from './components/MapExplorer';
+
 import { MapsProvider } from './context/MapsProvider'
+import { SocketProvider } from './context/SocketContext'
 
-// Data vizualization and info layers
-import { LandmarksLayer } from './components/layers/LandmarksLayer';
-import { FootprintMapsLayer } from './components/layers/FootprintMapsLayer';
-import { SearchResultLayer } from './components/layers/SearchResultLayer';
-import { MapsDistributionLayer } from './components/layers/MapsDistributionLayer';
-import { MapsPolygonLayer } from './components/layers/MapsPolygonLayer';
-import { MapsBitmapLayer } from './components/layers/MapsBitmapLayer';
-
+import { Route, Switch, BrowserRouter } from 'react-router-dom'
 
 function App() {
 
   const initial = {
-      years: {
-        from: 1880,
-        to: 1950
-      },
-      assetIds: null,
-      around: null,
-      aroundRadius: 2000, 
-  }  
-  
-
+    years: {
+      from: 1880,
+      to: 1886
+    },
+    assetIds: null,
+    around: null,
+    aroundRadius: 2000,
+  }
 
 
 
   return (
     <React.Fragment>
-      <MapsProvider {...initial}>
-        <MapExplorer/>
-      </MapsProvider>
+      <BrowserRouter>
+        <SocketProvider>
+          <MapsProvider {...initial}>
+
+            <Switch>
+              <Route exact path="/">
+
+                <MapExplorer mode='kiosk' />
+              
+              </Route>
+              
+              <Route exact path="/master">
+                <MapExplorer mode='master' />
+              </Route>
+
+              <Route exact path="/slave">
+                <MapExplorer mode='slave' />
+              </Route>
+
+            </Switch>
+
+          </MapsProvider>
+        </SocketProvider>
+      </BrowserRouter>
     </React.Fragment>
   );
 }

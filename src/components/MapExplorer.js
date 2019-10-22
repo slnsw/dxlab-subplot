@@ -1,8 +1,9 @@
 
 import React, { Component } from 'react';
 import { MapDataContext } from '../context/MapsContext';
+import { SocketContext } from '../context/SocketContext';
 
-import { MapViewer } from './MapViewer';
+import { MapViewer } from './MapViewerSingle';
 
 
 // UI Components
@@ -25,8 +26,7 @@ export class MapExplorer extends Component {
         showModal: false,
         modalData: {}
     }
-
-
+ 
     /**
      * Open a modal window to display map detail data
      * @param {*} info 
@@ -60,29 +60,38 @@ export class MapExplorer extends Component {
         // TODO: define a prop structure for this.
         const layers = [
             [SearchResultLayer, { view: 'all'}],
-            // [LandmarksLayer, { view: 'all'}], 
-            // [MapsDistributionLayer, { view: 'minimap', onClick : (info) => { console.log(info)} }],
-            [FootprintMapsLayer, { view: 'main'}],
-            [MapsPolygonLayer, { view:'minimap',  onClick : this.showMapDetail.bind(this)}],
-            [MapsLabelLayer, {view: 'all'}],
-            // [MapsBitmapLayer, { id:'crop', name: 'crop', suffix: '_crop_800', view: 'main', onClick : this.showMapDetail.bind(this)}],
-            // [MapsBitmapLayer, { id:'edge', name: 'edge', suffix: '_edge_800', view: 'minimap'}], 
+            [LandmarksLayer, { view: 'all'}], 
+            // [MapsDistributionLayer, { view: 'master', onClick : (info) => { console.log(info)} }],
+            [FootprintMapsLayer, { view: 'slave'}],
+            [MapsPolygonLayer, { view:'master',  onClick : this.showMapDetail.bind(this)}],
+            // [MapsLabelLayer, {view: 'all'}],
+            // [MapsBitmapLayer, { id:'crop', name: 'crop', suffix: '_crop_800', view: 'slave', onClick : this.showMapDetail.bind(this)}],
+            // [MapsBitmapLayer, { id:'edge', name: 'edge', suffix: '_edge_800', view: 'master'}], 
     
         ];
         
         const { showModal, modalData} = this.state;
 
+        const { mode } = this.props;
+
         return (
-            <React.Fragment>
-                <ModalWindow 
-                    isOpen={showModal}
-                    onRequestClose={() => this.setState({showModal : false})}
-                    {...modalData}
-                />
-                <MapViewer
-                    layers={layers}
-                ></MapViewer>
-            </React.Fragment>
+            <SocketContext.Consumer>
+                {socket => (
+                    <React.Fragment>
+                        <ModalWindow 
+                            isOpen={showModal}
+                            onRequestClose={() => this.setState({showModal : false})}
+                            {...modalData}
+                        />
+                        <MapViewer
+                            mode = {mode}
+                            socketContext = {socket}
+                            layers={layers}
+                        ></MapViewer>
+                    </React.Fragment>
+                )}
+            </SocketContext.Consumer>
+
         )
     }
 }

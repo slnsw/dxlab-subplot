@@ -3,9 +3,9 @@ import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css";
 
 import React, { Component } from 'react';
 import DeckGL from '@deck.gl/react';
-import { MapController } from 'deck.gl';
 import { View, MapView } from '@deck.gl/core';
 import { InteractiveMap } from 'react-map-gl';
+import { MapController } from 'deck.gl';
 import Geocoder from "react-map-gl-geocoder";
 
 // Custom mapbox style
@@ -49,6 +49,21 @@ export class MapViewer extends Component {
 
 
     componentDidMount() {
+        const [, socketDispatch] = this.props.socketContext;
+        socketDispatch({type: 'SOCKET_CONNECT_SERVER'});
+        socketDispatch({type: 'SOCKET_LISTEN', callback:({viewState}) => {
+            console.log(viewState);
+            this.setState({viewState});
+            this.handleOnViewChange(viewState);
+        }});  
+        
+        socketDispatch({type: 'SOCKET_LISTEN_SEARCH', callback:({viewState}) => {
+            console.log(viewState);
+            this.setState({viewState});
+            this.handleOnViewChange(viewState);
+        }});  
+        
+
         this.handleOnViewChange(this.state.viewState);
     }
 
@@ -76,7 +91,7 @@ export class MapViewer extends Component {
             }
         }
 
-        dispatch({ type: 'GET_MAPS_AROUND', state: { around } });
+        // dispatch({ type: 'GET_MAPS_AROUND', state: { around } });
 
         const { onViewChange } = this.props;
         if (onViewChange) {
@@ -99,6 +114,8 @@ export class MapViewer extends Component {
         // this.setState({ viewState });
         // this.handleOnViewChange(viewState);
 
+        const [mapState, dispatch] = this.context;
+
         // main and minimap view implementation
         this.setState({
             viewState: {
@@ -111,8 +128,16 @@ export class MapViewer extends Component {
                 minimap: viewState
             }
         }, () => {
+            const [, socketDispatch] = this.props.socketContext;
+            const newState = this.state.viewState;
+            socketDispatch({ type: 'SOCKET_EMIT', state: {
+                data: { viewState:newState , viewId: viewId}
+            }});
+
             this.handleOnViewChange(this.state.viewState);
         });
+
+
     }
 
     getParent(layer) {
