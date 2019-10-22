@@ -1,6 +1,5 @@
 
 import {CompositeLayer} from 'deck.gl';
-
 import {GeoJsonLayer} from '@deck.gl/layers'; 
     
 export class SearchResultLayer extends CompositeLayer {
@@ -14,9 +13,7 @@ export class SearchResultLayer extends CompositeLayer {
             data:  around,
             getFillColor: [0, 0, 0, 30],
             getRadius: (d) => { 
-                const {properties:{zoom}} = d; 
-                // console.log(zoom);
-                return aroundRadius; //+ (500 * ( 20 - zoom)); // * (20 - zoom); 
+                return aroundRadius; 
             },
             // pointRadiusMinPixels: 10,
             // pointRadiusMaxPixels: 10

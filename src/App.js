@@ -13,7 +13,7 @@ function App() {
   const initial = {
     years: {
       from: 1880,
-      to: 1890
+      to: 1950
     },
     assetIds: null,
     around: null,

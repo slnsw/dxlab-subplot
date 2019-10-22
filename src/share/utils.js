@@ -65,6 +65,15 @@ export function interpolateScale(value, to, from) {
       .interpolate(easeInterpolate(easeCubicIn))(value);
 }
 
+export function linealScale(value, [domain_from, domain_to ], [range_from, range_to]) {
+    let res = scaleLinear()
+      .domain([domain_from, domain_to ])
+      .range( [range_from, range_to])(value);
+    
+    res = (res < range_from) ? range_from : res;
+    return res;
+}
+
 // Temporal 
 export function getImageUrl(asset_id, suffix) {
   return `${process.env.REACT_APP_STATIC_BASE_URL}/${asset_id}${suffix}.png`;

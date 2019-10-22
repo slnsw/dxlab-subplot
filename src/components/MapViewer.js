@@ -10,7 +10,7 @@ import Geocoder from "react-map-gl-geocoder";
 import MAP_STYLE from '../styles/dxmaps_v2.json';
 
 import { MapDataContext } from '../context/MapsContext';
-
+import { linealScale } from '../share/utils'; 
 
 // Geocoder, execute geo-search around sydney
 const proximity = { longitude: 151.21065829636484, latitude: -33.86631790142455 }
@@ -73,6 +73,9 @@ export class MapViewer extends Component {
         const { latitude, longitude, zoom } = viewState;
         const [mapState, dispatch] = this.context;
 
+        // Calculate "optimal" radius to search
+        const aroundRadius = linealScale(zoom, [15, 12], [800, 4000]);
+
 
         const around = {
             type: 'Feature',
@@ -82,11 +85,11 @@ export class MapViewer extends Component {
             },
             properties: {
                 'zoom': zoom,
-                'radius': mapState.aroundRadius
+                'radius': aroundRadius
             }
         }
 
-        dispatch({ type: 'GET_MAPS_AROUND', state: { around } });
+        dispatch({ type: 'GET_MAPS_AROUND', state: { around, aroundRadius } });
 
         const { onViewChange } = this.props;
         if (onViewChange) {
