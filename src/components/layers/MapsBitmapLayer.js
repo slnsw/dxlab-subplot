@@ -1,7 +1,7 @@
 
 import { CompositeLayer } from 'deck.gl';
 import { BitmapLayer, GeoJsonLayer } from '@deck.gl/layers';
-import { getImageUrl } from '../../share/utils'; 
+import { getImageUrl, interpolateScale} from '../../share/utils'; 
 
 import { pick } from 'lodash';
 
@@ -11,13 +11,21 @@ export class MapsBitmapLayer extends CompositeLayer {
     updateState({props, changeFlags}) {
         if(changeFlags.dataChanged){
             const { data, suffix } = props;
+            const { mapContext:[mapState]} = this.props;
+            const { years:{from , to} } = mapState;
 
             const featuresData = data.reduce(function(result, m) {
                 if (m.has_cutline_crop) {
                     const elevation = 50;
+                    // const elevation = interpolateScale(parseInt(m.year), to, from) * 50; 
+                    //  mapValue(m.year, this.state.year_from, this.state.year_to, 0, this.state.year_to - this.state.year_from);
                     const bounds = m.bbox_coord.coordinates[0].map((c) => {
-                        //const elv = 50; // *  mapValue(m.year, this.state.year_from, this.state.year_to, 0, this.state.year_to - this.state.year_from);
-                        //c.push(elevation);
+                        c.push(elevation);
+                        return c;
+                    });
+
+                    m.cutline.coordinates[0].map((c) => {
+                         c.push(elevation);
                         return c;
                     });
     

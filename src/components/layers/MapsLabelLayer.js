@@ -49,8 +49,8 @@ export class MapsLabelLayer extends CompositeLayer {
         layers.push(new TextLayer(this.getSubLayerProps({
             id: `${id}-layer-${name}-label`,
             data: features,
-            pickable: true,
-            billboard: false,
+            pickable: false,
+            billboard: true,
             fontFamily: 'Roboto Slab',
             getPixelOffset: [0, 0],
 

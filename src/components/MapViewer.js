@@ -15,6 +15,7 @@ import { MapDataContext } from '../context/MapsContext';
 // Geocoder, execute geo-search around sydney
 const proximity = { longitude: 151.21065829636484, latitude: -33.86631790142455 }
 const mapRef = React.createRef();
+const geocoderContainerRef = React.createRef();
 
 export class MapViewer extends Component {
 
@@ -156,9 +157,8 @@ export class MapViewer extends Component {
         return false;
     };
 
-    render() {
-
-        const layers = [
+    prepareLayers( ) {
+        return [
             ...this.props.layers.map(([L, props]) => {
                 let data = this.context[0].data;
                 props = {
@@ -168,24 +168,52 @@ export class MapViewer extends Component {
                 return new L({ mapContext: this.context, ...props })
             }),
         ]
+    }
+
+    render() {
+
+        const layers = this.prepareLayers();
 
 
         const { mode } = this.props;
-
         const showSearch = (mode === 'master' || mode === 'kiosk');
         const mapStyle = (mode === 'master') ?  "mapbox://styles/dimago/ck214ikre05wd1coehgmj34en" : MAP_STYLE;
         const mapcontroller = (mode === 'master' || mode === 'kiosk');
-
-
         const viewState  = {
             ...this.state.viewState
         };
 
         viewState.pitch = (mode === 'master') ? 0 : viewState.pitch; 
 
+        const fogStyle = {
+            zIndex: '100',
+            position: 'relative',
+            display: 'block',
+            height: '100vh',
+            width: '100vw',
+            /* background: rgb(2,0,36);
+            background: linear-gradient(0deg, rgba(2,0,36,0) 0%, rgba(9,9,121,.1) 35%, rgba(0,212,255,.8) 100%); */
+          
+            background: 'rgb(0,0,0)',
+            // background: 'linear-gradient(180deg, rgba(0,0,0,.85) 0%, rgba(112,112,122,.1) 25%, rgba(247,247,247,0) 100%)',
+            background: 'radial-gradient(circle, rgba(247,247,247,0) 0%, rgba(112,112,122,.1) 25%,   rgba(0,0,0,1) 100%)',
+            pointerEvents: 'none',
+        }
 
         return (
             <React.Fragment>
+                {/* :P ;( horrible Gecoder needs to be a child of InteractiveMap for that 
+                reason Gecoder provides containerRef to allow render it outside */}
+                <div
+                    ref={geocoderContainerRef}
+                    style={{
+                        height: 50,
+                        position: "absolute",
+                        alignItems: "center",
+                        margin: '10px',
+                        zIndex: 200
+                    }}
+                />
 
                 <DeckGL
                     layerFilter={this.layerViewVisibility.bind(this)}
@@ -196,7 +224,7 @@ export class MapViewer extends Component {
                 >
 
                     <InteractiveMap
-                        // mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
+                        mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
                         mapStyle={mapStyle}
                         preventStyleDiffing={true}
                         ref={mapRef}
@@ -204,6 +232,7 @@ export class MapViewer extends Component {
 
                         {showSearch && <Geocoder
                             mapRef={mapRef}
+                            containerRef={geocoderContainerRef}
                             onResult={this.handleOnResult.bind(this)}
                             placeholder="Lookup address"
                             countries="au"
@@ -216,6 +245,9 @@ export class MapViewer extends Component {
                     </InteractiveMap>
 
                 </DeckGL>
+
+                {/* { mode === "kiosk" || mode === "slave" &&  } */}
+                <div style={fogStyle}></div>
 
             </React.Fragment>
 

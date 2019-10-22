@@ -13,11 +13,11 @@ function App() {
   const initial = {
     years: {
       from: 1880,
-      to: 1886
+      to: 1890
     },
     assetIds: null,
     around: null,
-    aroundRadius: 2000,
+    aroundRadius: 1000,
   }
 
 

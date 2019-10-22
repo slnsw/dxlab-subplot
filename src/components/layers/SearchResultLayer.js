@@ -15,6 +15,7 @@ export class SearchResultLayer extends CompositeLayer {
             getFillColor: [0, 0, 0, 30],
             getRadius: (d) => { 
                 const {properties:{zoom}} = d; 
+                // console.log(zoom);
                 return aroundRadius; //+ (500 * ( 20 - zoom)); // * (20 - zoom); 
             },
             // pointRadiusMinPixels: 10,

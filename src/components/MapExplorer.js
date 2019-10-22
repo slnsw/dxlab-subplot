@@ -64,8 +64,8 @@ export class MapExplorer extends Component {
             // [MapsDistributionLayer, { view: 'master', onClick : (info) => { console.log(info)} }],
             [FootprintMapsLayer, { view: 'slave'}],
             [MapsPolygonLayer, { view:'master',  onClick : this.showMapDetail.bind(this)}],
-            // [MapsLabelLayer, {view: 'all'}],
-            // [MapsBitmapLayer, { id:'crop', name: 'crop', suffix: '_crop_800', view: 'slave', onClick : this.showMapDetail.bind(this)}],
+            [MapsLabelLayer, {view: 'master'}],
+            [MapsBitmapLayer, { id:'crop', name: 'crop', suffix: '_crop_800', view: 'slave', onClick : this.showMapDetail.bind(this)}],
             // [MapsBitmapLayer, { id:'edge', name: 'edge', suffix: '_edge_800', view: 'master'}], 
     
         ];

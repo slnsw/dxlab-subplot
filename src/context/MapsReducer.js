@@ -15,12 +15,12 @@ export function mapsReducer(state, action) {
             const { geometry, properties:{radius} } = around;
  
             // Get data
-            const data = [];
-            // const data = fetchData({
-            //     ...state,
-            //     around: geometry, 
-            //     aroundRadius: radius
-            // }) 
+            // const data = [];
+            const data = fetchData({
+                ...state,
+                around: geometry, 
+                aroundRadius: radius
+            }) 
 
             // Update state
             return {

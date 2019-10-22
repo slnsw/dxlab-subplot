@@ -68,7 +68,7 @@ export class ModalWindow extends Component {
         return isOpen && (
             <div 
                 ref={this.setContentRef.bind(this)}
-                style={{background: '#000a', position: 'absolute', zIndex: 100, width: '100vw', height: '100vh'}}
+                style={{background: '#000a', position: 'absolute', zIndex: 1000, width: '100vw', height: '100vh'}}
                 tabIndex="-1"
                 onKeyDown={this.onKeyDown.bind(this)}
             >   
