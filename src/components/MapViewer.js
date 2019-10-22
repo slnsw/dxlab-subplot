@@ -3,9 +3,7 @@ import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css";
 
 import React, { Component } from 'react';
 import DeckGL from '@deck.gl/react';
-import { View, MapView } from '@deck.gl/core';
 import { InteractiveMap } from 'react-map-gl';
-import { MapController } from 'deck.gl';
 import Geocoder from "react-map-gl-geocoder";
 
 // Custom mapbox style
@@ -22,60 +20,56 @@ export class MapViewer extends Component {
 
     state = {
         viewState: {
-            // latitude: -33.8589,
-            // longitude: 151.2101,
-            // bearing: -163,
-            // pitch: 60,
-            // zoom: 16,
-            // reuseMaps: true,
-            main: {
-                latitude: -33.8589,
-                longitude: 151.2101,
-                bearing: -163,
-                pitch: 60,
-                zoom: 16,
-                reuseMaps: true,
-            },
-            minimap: {
-                latitude: -33.8589,
-                longitude: 151.2101,
-                zoom: 14,
-                pitch: 0,
-                bearing: -163,
-                reuseMaps: true,
-            }
-        },
+            latitude: -33.8589,
+            longitude: 151.2101,
+            bearing: -163,
+            pitch: 60,
+            zoom: 15,
+            reuseMaps: true,
+        }
+
     }
 
 
     componentDidMount() {
         const [, socketDispatch] = this.props.socketContext;
-        socketDispatch({type: 'SOCKET_CONNECT_SERVER'});
-        socketDispatch({type: 'SOCKET_LISTEN', callback:({viewState}) => {
-            console.log(viewState);
-            this.setState({viewState});
-            this.handleOnViewChange(viewState);
-        }});  
-        
-        socketDispatch({type: 'SOCKET_LISTEN_SEARCH', callback:({viewState}) => {
-            console.log(viewState);
-            this.setState({viewState});
-            this.handleOnViewChange(viewState);
-        }});  
-        
+        socketDispatch({ type: 'SOCKET_CONNECT_SERVER' });
+        socketDispatch({
+            type: 'SOCKET_LISTEN', callback: ({ viewState }) => {
+                this.setState({ viewState });
+                this.handleOnViewChange(viewState);
+            }
+        });
 
+        socketDispatch({
+            type: 'SOCKET_LISTEN_SEARCH', callback: (data) => {
+                console.log('search', data.result.text)
+                // this.setState({ viewState });
+                // console.log(this.geocoder.query(data.result.text));
+            }
+        });
+
+
+    
         this.handleOnViewChange(this.state.viewState);
     }
 
     handleOnResult(event) {
         const { onResult } = this.props;
+        const [, socketDispatch] = this.props.socketContext;
+        socketDispatch({
+            type: 'SOCKET_EMIT_SEARCH', state: {
+                data: event
+            }
+        });
+
         if (onResult) {
             onResult(event);
         }
     }
 
     handleOnViewChange(viewState) {
-        const { main: { latitude, longitude, zoom } } = viewState;
+        const { latitude, longitude, zoom } = viewState;
         const [mapState, dispatch] = this.context;
 
 
@@ -91,7 +85,7 @@ export class MapViewer extends Component {
             }
         }
 
-        // dispatch({ type: 'GET_MAPS_AROUND', state: { around } });
+        dispatch({ type: 'GET_MAPS_AROUND', state: { around } });
 
         const { onViewChange } = this.props;
         if (onViewChange) {
@@ -111,31 +105,30 @@ export class MapViewer extends Component {
 
     onViewStateChange({ viewState, viewId }) {
         // Single view implemenation
-        // this.setState({ viewState });
-        // this.handleOnViewChange(viewState);
 
-        const [mapState, dispatch] = this.context;
-
-        // main and minimap view implementation
-        this.setState({
-            viewState: {
-                main: {
-                    ...viewState,
-                    // bearing: -163,
-                    zoom: viewState.zoom + 2,
-                    pitch: 60
-                },
-                minimap: viewState
-            }
-        }, () => {
+        const onUpdateState = () => {
             const [, socketDispatch] = this.props.socketContext;
-            const newState = this.state.viewState;
-            socketDispatch({ type: 'SOCKET_EMIT', state: {
-                data: { viewState:newState , viewId: viewId}
-            }});
+            const newState = {
+                ...this.state.viewState,
+                zoom: viewState.zoom,
+                pitch: 60
+            }
+            socketDispatch({
+                type: 'SOCKET_EMIT', state: { 
+                    data: { viewState: newState, viewId: viewId }
+                }
+            });
 
             this.handleOnViewChange(this.state.viewState);
-        });
+
+        }
+
+        this.setState({ 
+            viewState : {
+                ...viewState,
+                pitch: 0
+            } 
+        }, onUpdateState);
 
 
     }
@@ -151,8 +144,11 @@ export class MapViewer extends Component {
     layerViewVisibility({ layer, viewport }) {
         let container = this.getParent(layer);
         if (container) {
-            const { view } = container.props
-            if (viewport.id === view || view === 'all') {
+
+            const { view } = container.props;
+            const { mode } = this.props;
+
+            if (view === mode || view === 'all') {
                 return true;
             }
         }
@@ -161,6 +157,7 @@ export class MapViewer extends Component {
     };
 
     render() {
+
         const layers = [
             ...this.props.layers.map(([L, props]) => {
                 let data = this.context[0].data;
@@ -172,70 +169,52 @@ export class MapViewer extends Component {
             }),
         ]
 
-        const views = [
-            new MapView({
-                id: 'main',
-                controller: false
-            }),
-            new MapView({
-                id: 'minimap',
-                x: '68%',
-                y: '45%',
-                width: '30%',
-                height: '50%',
-                clear: true,
-                controller: {
-                    // maxZoom: 11,
-                    // minZoom: 11,
-                    // dragRotate: false,
-                    // keyboard: false
-                }
-            })
-        ];
 
-        const { viewState } = this.state;
+        const { mode } = this.props;
+
+        const showSearch = (mode === 'master' || mode === 'kiosk');
+        const mapStyle = (mode === 'master') ?  "mapbox://styles/dimago/ck214ikre05wd1coehgmj34en" : MAP_STYLE;
+        const mapcontroller = (mode === 'master' || mode === 'kiosk');
+
+
+        const viewState  = {
+            ...this.state.viewState
+        };
+
+        viewState.pitch = (mode === 'master') ? 0 : viewState.pitch; 
+
 
         return (
             <React.Fragment>
 
-               <DeckGL
+                <DeckGL
                     layerFilter={this.layerViewVisibility.bind(this)}
-                    views={views}
                     layers={layers}
                     viewState={viewState}
-                    // controller={MapController}
+                    controller={mapcontroller}
                     onViewStateChange={this.onViewStateChange.bind(this)}
                 >
 
                     <InteractiveMap
-                        mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
-                        mapStyle={MAP_STYLE}
+                        // mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
+                        mapStyle={mapStyle}
                         preventStyleDiffing={true}
                         ref={mapRef}
                     >
+
+                        {showSearch && <Geocoder
+                            mapRef={mapRef}
+                            onResult={this.handleOnResult.bind(this)}
+                            placeholder="Lookup address"
+                            countries="au"
+                            proximity={proximity}
+                            onViewportChange={this.onViewStateSearchChange.bind(this)}
+                            mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
+                            position="top-left"
+                        />}
+
                     </InteractiveMap>
 
-                    <View id="minimap">
-                        <InteractiveMap
-                            mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
-                            // mapStyle="mapbox://styles/mapbox/dark-v9"
-                            preventStyleDiffing={true}
-                            ref={mapRef}
-                        >
-
-                            <Geocoder
-                                mapRef={mapRef}
-                                onResult={this.handleOnResult.bind(this)}
-                                placeholder="Lookup address"
-                                countries="au"
-                                proximity={proximity}
-                                onViewportChange={this.onViewStateSearchChange.bind(this)}
-                                mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
-                                position="top-left"
-                            />
-
-                        </InteractiveMap>
-                    </View>
                 </DeckGL>
 
             </React.Fragment>

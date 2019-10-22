@@ -24,16 +24,16 @@ export class LandmarksLayer extends CompositeLayer {
                 useTexture: false,
                 sizeScale: 1
             },
-            {
-                // sceneURL: 'sydneyTower.glb',
-                name: 'sydney-tower',
-                data: {
-                    position: [151.208757, -33.8704515],
-                    orientation: [0, 180, 90]
-                },
-                useTexture: true,
-                sizeScale: 2000
-            },
+            // {
+            //     sceneURL: 'sydneyTower.glb',
+            //     name: 'sydney-tower',
+            //     data: {
+            //         position: [151.208757, -33.8704515],
+            //         orientation: [0, 180, 90]
+            //     },
+            //     useTexture: true,
+            //     sizeScale: 2000
+            // },
             {
                 sceneURL: 'sydney_bridge.glb',
                 name: 'hardbour-bridge',

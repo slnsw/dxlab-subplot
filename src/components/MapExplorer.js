@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { MapDataContext } from '../context/MapsContext';
 import { SocketContext } from '../context/SocketContext';
 
-import { MapViewer } from './MapViewerSingle';
+import { MapViewer } from './MapViewer';
 
 
 // UI Components
