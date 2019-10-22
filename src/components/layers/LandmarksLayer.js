@@ -1,22 +1,22 @@
 
-import {CompositeLayer} from 'deck.gl';
-import {ScenegraphLayer} from '@deck.gl/mesh-layers'; 
-import {registerLoaders} from '@loaders.gl/core';
-import {GLTFScenegraphLoader} from '@luma.gl/addons';
+import { CompositeLayer } from 'deck.gl';
+import { ScenegraphLayer } from '@deck.gl/mesh-layers';
+import { registerLoaders } from '@loaders.gl/core';
+import { GLTFScenegraphLoader } from '@luma.gl/addons';
 
 // Add the loaders that handle your mesh format here
-registerLoaders([ GLTFScenegraphLoader]);
+registerLoaders([GLTFScenegraphLoader]);
 
-    
+
 export class LandmarksLayer extends CompositeLayer {
 
-    models(year){
+    models(year) {
         return [
             {
                 sceneURL: 'opera_house.glb',
                 name: 'opera-house',
                 data: {
-                    position: [ 151.2149685, -33.857158999999996 ], 
+                    position: [151.2149685, -33.857158999999996],
                     orientation: [0, 0, 90],
                     translation: [28, 38, 0],
                     color: [125, 125, 125, 125]
@@ -28,7 +28,7 @@ export class LandmarksLayer extends CompositeLayer {
                 // sceneURL: 'sydneyTower.glb',
                 name: 'sydney-tower',
                 data: {
-                    position: [151.208757, -33.8704515], 
+                    position: [151.208757, -33.8704515],
                     orientation: [0, 180, 90]
                 },
                 useTexture: true,
@@ -38,7 +38,7 @@ export class LandmarksLayer extends CompositeLayer {
                 sceneURL: 'sydney_bridge.glb',
                 name: 'hardbour-bridge',
                 data: {
-                    position: [151.2106825, -33.8522605], 
+                    position: [151.2106825, -33.8522605],
                     orientation: [0, -28, 90],
                     translation: [10, 0, 0],
                     scale: [.5, 1, 1.1],
@@ -51,7 +51,7 @@ export class LandmarksLayer extends CompositeLayer {
                 sceneURL: 'anzac_bridge.glb',
                 name: 'anzac-bridge',
                 data: {
-                    position: [151.18594000000002, -33.868849999999995], 
+                    position: [151.18594000000002, -33.868849999999995],
                     orientation: [0, 0, 90],
                     translation: [-150, 30, 0],
                     color: [125, 125, 125, 125]
@@ -62,16 +62,16 @@ export class LandmarksLayer extends CompositeLayer {
         ];
     }
 
-    loadModel({sceneURL, name, data:{position, orientation, translation, color, scale}, useTexture, ...args}) {
+    loadModel({ sceneURL, name, data: { position, orientation, translation, color, scale }, useTexture, ...args }) {
         const testScene = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Avocado/glTF-Binary/Avocado.glb';
-        const {id} = this.props;
+        const { id } = this.props;
         sceneURL = (sceneURL) ? `/models/${sceneURL}` : testScene;
         useTexture = useTexture || false;
 
 
         const opts = {
             id: `${id}-landmark-${name}`,
-            data: [{position, orientation, translation, color, scale}],
+            data: [{ position, orientation, translation, color, scale }],
             scenegraph: sceneURL,
 
             // Default use 'args' to override values
@@ -90,15 +90,14 @@ export class LandmarksLayer extends CompositeLayer {
 
             // Override parameters
             ...args
-          }
+        }
 
         return new ScenegraphLayer(opts);
     }
 
- 
-    
-    renderLayers() { 
-        console.log(GLTFScenegraphLoader);
+
+
+    renderLayers() {
         return this.models().map((conf) => {
             return this.loadModel(conf)
         });
