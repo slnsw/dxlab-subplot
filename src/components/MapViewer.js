@@ -10,8 +10,10 @@ import Geocoder from "react-map-gl-geocoder";
 import MAP_STYLE from '../styles/dxmaps_v2.json';
 
 import { MapDataContext } from '../context/MapsContext';
-import { linealScale } from '../share/utils'; 
-import { debounce } from 'lodash'; 
+import { fetchMaps } from '../context/MapsActions';
+import { socketConnect, socketEmit } from '../context/SocketActions';
+import { linealScale } from '../share/utils';
+import { debounce } from 'lodash';
 
 // Geocoder, execute geo-search around sydney
 const proximity = { longitude: 151.21065829636484, latitude: -33.86631790142455 }
@@ -34,37 +36,46 @@ export class MapViewer extends Component {
 
 
     componentDidMount() {
-        const [, socketDispatch] = this.props.socketContext;
-        socketDispatch({ type: 'SOCKET_CONNECT_SERVER' });
-        socketDispatch({
-            type: 'SOCKET_LISTEN', callback: ({ viewState }) => {
-                this.setState({ viewState });
-                console.log('change remote');
-                // this.handleOnViewChange(viewState);
+        const [, dispatch] = this.context;
+        // TODO: Clean up to much going on here!
+        dispatch (socketConnect({
+            listenCallback: ({subject, data}) => {   
+                
+                switch (subject) {
+                    case 'viewchange':
+                        const {viewState} = data;
+                        this.setState({ viewState });
+                        this.handleOnViewChange(viewState);
+                        break;
+                    default:
+                        // nothing;
+                }
             }
-        });
-
-        socketDispatch({
-            type: 'SOCKET_LISTEN_SEARCH', callback: (data) => {
-                console.log('search', data.result.text)
-                // this.setState({ viewState });
-                // console.log(this.geocoder.query(data.result.text));
-            }
-        });
+        }));
 
 
-    
+
+        // socketDispatch({
+        //     type: 'SOCKET_LISTEN_SEARCH', callback: (data) => {
+        //         console.log('search', data.result.text)
+        //         // this.setState({ viewState });
+        //         // console.log(this.geocoder.query(data.result.text));
+        //     }
+        // });
+
+
+
         this.handleOnViewChange(this.state.viewState);
     }
 
     handleOnResult(event) {
         const { onResult } = this.props;
-        const [, socketDispatch] = this.props.socketContext;
-        socketDispatch({
-            type: 'SOCKET_EMIT_SEARCH', state: {
-                data: event
-            }
-        });
+        const [, dispatch] = this.context;
+        // socketDispatch({
+        //     type: 'SOCKET_EMIT_SEARCH', state: {
+        //         data: event
+        //     }
+        // });
 
         if (onResult) {
             onResult(event);
@@ -73,7 +84,6 @@ export class MapViewer extends Component {
 
 
     handleOnViewChange = debounce((viewState) => {
-        console.log('change view');
         const { latitude, longitude, zoom } = viewState;
         const [mapState, dispatch] = this.context;
 
@@ -93,7 +103,9 @@ export class MapViewer extends Component {
             }
         }
 
-        dispatch({ type: 'GET_MAPS_AROUND', state: { around, aroundRadius } });
+        // { type: 'GET_MAPS_AROUND', state: { around, aroundRadius } }
+
+        dispatch(fetchMaps({ around, aroundRadius }));
 
         const { onViewChange } = this.props;
         if (onViewChange) {
@@ -115,27 +127,30 @@ export class MapViewer extends Component {
         // Single view implemenation
 
         const onUpdateState = () => {
-            const [, socketDispatch] = this.props.socketContext;
+            const [, dispatch] = this.context;
             const newState = {
                 ...this.state.viewState,
                 zoom: viewState.zoom,
                 pitch: 60
             }
-            socketDispatch({
-                type: 'SOCKET_EMIT', state: { 
-                    data: { viewState: newState, viewId: viewId }
-                }
-            });
+
+
+            dispatch(
+                socketEmit({
+                    subject:'viewchange', 
+                    data:{ viewState: newState, viewId: viewId }
+                })
+            );
 
             this.handleOnViewChange(this.state.viewState);
 
         }
 
-        this.setState({ 
-            viewState : {
+        this.setState({
+            viewState: {
                 ...viewState,
                 pitch: 0
-            } 
+            }
         }, onUpdateState);
 
 
@@ -164,15 +179,16 @@ export class MapViewer extends Component {
         return false;
     };
 
-    prepareLayers( ) {
+    prepareLayers() {
         return [
             ...this.props.layers.map(([L, props]) => {
-                let data = this.context[0].data;
+                let data = this.context[0].maps.data;
                 props = {
                     data: data,
                     ...props
                 }
-                return new L({ mapContext: this.context, ...props })
+                const [state, dispatch] = this.context;
+                return new L({ contextState: state, dispatch, ...props })
             }),
         ]
     }
@@ -184,13 +200,13 @@ export class MapViewer extends Component {
 
         const { mode } = this.props;
         const showSearch = (mode === 'master' || mode === 'kiosk');
-        const mapStyle = (mode === 'master') ?  "mapbox://styles/dimago/ck214ikre05wd1coehgmj34en" : MAP_STYLE;
+        const mapStyle = (mode === 'master') ? "mapbox://styles/dimago/ck214ikre05wd1coehgmj34en" : MAP_STYLE;
         const mapcontroller = (mode === 'master' || mode === 'kiosk');
-        const viewState  = {
+        const viewState = {
             ...this.state.viewState
         };
 
-        viewState.pitch = (mode === 'master') ? 0 : viewState.pitch; 
+        viewState.pitch = (mode === 'master') ? 0 : viewState.pitch;
 
         const fogStyle = {
             zIndex: '100',
@@ -200,7 +216,7 @@ export class MapViewer extends Component {
             width: '100vw',
             /* background: rgb(2,0,36);
             background: linear-gradient(0deg, rgba(2,0,36,0) 0%, rgba(9,9,121,.1) 35%, rgba(0,212,255,.8) 100%); */
-          
+
             background: 'rgb(0,0,0)',
             // background: 'linear-gradient(180deg, rgba(0,0,0,.85) 0%, rgba(112,112,122,.1) 25%, rgba(247,247,247,0) 100%)',
             background: 'radial-gradient(circle, rgba(247,247,247,0) 0%, rgba(112,112,122,.1) 25%,   rgba(0,0,0,1) 100%)',

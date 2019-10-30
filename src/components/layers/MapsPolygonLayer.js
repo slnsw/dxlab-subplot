@@ -43,8 +43,8 @@ export class MapsPolygonLayer extends CompositeLayer {
     }
 
     buildLayer(data) {
-        const { id, mapContext: [mapState, distpatch] } = this.props;
-        const {years: {from, to}} = mapState;
+        const { id, contextState:{maps} } = this.props;
+        const {years: {from, to}} = maps;
         const yearColorScale = scaleLinear([from, to], ["gold", "limegreen"]);
         
         const {elev} = this.state;

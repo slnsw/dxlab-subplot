@@ -4,15 +4,15 @@ import openSocket from 'socket.io-client';
 
 export class SocketComunication {
 
-    connect(callback) {
+    connect({success}) {
         console.log('Init socket server connection...');
         this.socket = openSocket(`${process.env.REACT_APP_WEBSOCKET}/`);
 
         this.socket.on('dxmap', (data) => {
             this.socket.emit('dxmap_join', { msg: data });
 
-            if (callback) {
-                callback(data);
+            if (success) {
+                success(data);
             }
             
         });

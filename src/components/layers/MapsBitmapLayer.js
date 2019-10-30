@@ -11,8 +11,8 @@ export class MapsBitmapLayer extends CompositeLayer {
     updateState({props, changeFlags}) {
         if(changeFlags.dataChanged){
             const { data, suffix } = props;
-            const { mapContext:[mapState]} = this.props;
-            const { years:{from , to} } = mapState;
+            const { contextState: {maps}} = this.props;
+            const { years:{from , to} } = maps;
 
             if (!data) {
                 return;

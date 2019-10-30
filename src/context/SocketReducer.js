@@ -1,59 +1,37 @@
 import socket from '../share/socket';
 
+export const ActionTypes = {
+    SOCKET_CONNECT_SERVER_REQUEST: 'SOCKET_CONNECT_SERVER_REQUEST',
+    SOCKET_CONNECT_SERVER_SUCCESS: 'SOCKET_CONNECT_SERVER_SUCCESS',
+    SOCKET_CONNECT_SERVER_FAILURE: 'SOCKET_CONNECT_SERVER_FAILURE',
+
+    SOCKET_EMIT: 'SOCKET_EMIT',
+    SOCKET_RECIVED: 'SOCKET_RECIVED',
+    
+}
+
+
 export function socketReducer(state, action) { 
     switch (action.type) {
-        case 'SOCKET_CONNECT_SERVER': {
+        case ActionTypes.SOCKET_CONNECT_SERVER_SUCCESS: {
             return {
                 ...state,
-                socket: socket.connect()
+                socket: action.socket
             };
         }
 
-        case 'SOCKET_EMIT': {
-            const {data} = action.state;
-            socket.emit({data});
-            // Update state
+        case ActionTypes.SOCKET_EMIT: {
+            return state;
+        }
 
+        case ActionTypes.SOCKET_RECIVED: {
             return {
                 ...state,
-                ...action.state
+                [action.subject]: action.data
             };
         }
 
-        case 'SOCKET_EMIT_SEARCH': {
-            const {data} = action.state;
-            socket.emit({event: 'dxmap_search', data});
-            // Update state
-
-            return {
-                ...state,
-                ...action.state
-            };
-        }
-
-        case 'SOCKET_LISTEN': {
-            const {callback} = action;
-            socket.listen({callback});
-            // Update state
-
-            return {
-                ...state,
-            };
-        }
-
-        case 'SOCKET_LISTEN_SEARCH': {
-            const {callback} = action;
-            socket.listen({event: 'dxmap_search', callback});
-            // Update state
-
-            return {
-                ...state,
-            };
-        }
-
-
-        default: {
-            throw new Error(`Unsupported action type: ${action.type}`);
-        }
+        default: 
+            return state;
     }
 }

@@ -1,8 +1,16 @@
 import { fetchData } from '../share/services';
 
+export const ActionTypes = {
+    GET_MAPS_AROUND: 'GET_MAPS_AROUND',
+    SHOW_DETAIL_MAP: 'SHOW_DETAIL_MAP',
+    HIGHLIGHT_MAP: 'HIGHLIGHT_MAP',
+    
+}
+
+
 export function mapsReducer(state, action) { 
     switch (action.type) {
-        case 'HIGHLIGHT_MAP': {
+        case ActionTypes.HIGHLIGHT_MAP: {
             // Update state with given highlight map data
             return {
                 ...state,
@@ -10,28 +18,22 @@ export function mapsReducer(state, action) {
             };
         }
 
-        case 'GET_MAPS_AROUND': {
-            const { around } = action.state;
-            const { geometry, properties:{radius} } = around;
- 
-            // Get data
-            // const data = [];
-            const data = fetchData({
-                ...state,
-                around: geometry, 
-                aroundRadius: radius
-            }) 
-
+        case ActionTypes.GET_MAPS_AROUND: {
             // Update state
             return {
                 ...state,
-                ...action.state,
-                data
+                data: action.data,
+                around: action.around,
+                aroundRadius: action.aroundRadius
             };
         }
 
-        default: {
-            throw new Error(`Unsupported action type: ${action.type}`);
-        }
+        case ActionTypes.SHOW_DETAIL_MAP:
+            return {
+                ...state,
+            }
+
+        default: 
+            return state
     }
 }

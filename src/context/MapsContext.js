@@ -1,24 +1,18 @@
 import React from 'react';
+import { reducer } from './MainReducer';
+import { thunkDispatch } from './utils';
+
 
 export const MapDataContext = React.createContext();
 
+const initialState = {
+    maps: {},
+    comm: {}
+}
 
-export function useMaps() {
-  const context = React.useContext(MapDataContext)
-  if (!context) {
-    throw new Error(`useMaps must be used within a MapDataContext`)
-  }
-
-
-  const [state, dispatch] = context;
-
-  // Common state logic
-  const getMapsData = () => dispatch({ type: 'GET_MAPS' })
-  
-
-  return {
-    state,
-    dispatch,
-    getMapsData,
-  }
+export function MapsProvider(props) {
+    // const [maps, setMaps] = React.useState({from:1886})
+    const [state, dispatch] = React.useReducer(reducer, {...initialState, ...props})
+    const value = React.useMemo(() => [state, thunkDispatch(dispatch, state)], [state])
+    return <MapDataContext.Provider value={value} {...props} />
 }

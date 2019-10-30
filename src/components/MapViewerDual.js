@@ -49,15 +49,15 @@ export class MapViewerDual extends Component {
 
 
     componentDidMount() {
-        const [, socketDispatch] = this.props.socketContext;
-        socketDispatch({type: 'SOCKET_CONNECT_SERVER'});
-        socketDispatch({type: 'SOCKET_LISTEN', callback:({viewState}) => {
+        const [, dispatch] = this.context;
+        dispatch({type: 'SOCKET_CONNECT_SERVER'});
+        dispatch({type: 'SOCKET_LISTEN', callback:({viewState}) => {
             console.log(viewState);
             this.setState({viewState});
             this.handleOnViewChange(viewState);
         }});  
         
-        socketDispatch({type: 'SOCKET_LISTEN_SEARCH', callback:({viewState}) => {
+        dispatch({type: 'SOCKET_LISTEN_SEARCH', callback:({viewState}) => {
             console.log(viewState);
             this.setState({viewState});
             this.handleOnViewChange(viewState);
@@ -128,9 +128,9 @@ export class MapViewerDual extends Component {
                 minimap: viewState
             }
         }, () => {
-            const [, socketDispatch] = this.props.socketContext;
+            const [, dispatch] =this.context;
             const newState = this.state.viewState;
-            socketDispatch({ type: 'SOCKET_EMIT', state: {
+            dispatch({ type: 'SOCKET_EMIT', state: {
                 data: { viewState:newState , viewId: viewId}
             }});
 

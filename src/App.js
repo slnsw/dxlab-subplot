@@ -3,21 +3,25 @@ import './App.css';
 import React from 'react';
 import { MapExplorer } from './components/MapExplorer';
 
-import { MapsProvider } from './context/MapsProvider'
-import { SocketProvider } from './context/SocketContext'
+import { MapsProvider } from './context/MapsContext';
 
-import { Route, Switch, BrowserRouter } from 'react-router-dom'
+import { Route, Switch, BrowserRouter } from 'react-router-dom';
 
 function App() {
 
   const initial = {
-    years: {
-      from: 1880,
-      to: 1950
+    maps: {
+      years: {
+        from: 1880,
+        to: 1950
+      },
+      assetIds: null,
+      around: null,
+      aroundRadius: 1000,
     },
-    assetIds: null,
-    around: null,
-    aroundRadius: 1000,
+    comm: {
+
+    }
   }
 
 
@@ -25,7 +29,6 @@ function App() {
   return (
     <React.Fragment>
       <BrowserRouter>
-        <SocketProvider>
           <MapsProvider {...initial}>
 
             <Switch>
@@ -46,7 +49,6 @@ function App() {
             </Switch>
 
           </MapsProvider>
-        </SocketProvider>
       </BrowserRouter>
     </React.Fragment>
   );

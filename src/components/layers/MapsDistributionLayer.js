@@ -17,12 +17,13 @@ export class MapsDistributionLayer extends CompositeLayer {
         if (changeFlags.dataChanged) {
 
             // Group data by year
-            const { data, mapContext: [mapState] } = props;
-            const { years: { from, to } } = mapState;
+            const { data, contextState: {maps} } = props;
+            const { years: { from, to } } = maps;
 
             if (!data) {
                 return;
             }
+
 
             const groupData = data.reduce((result, m) => {
                 const elevation = interpolateScale(parseInt(m.year), to, from) * 10;
@@ -61,8 +62,9 @@ export class MapsDistributionLayer extends CompositeLayer {
 
                 // Update result
                 result[m.year] = grp;
-
                 return result;
+
+
             }, {});
 
             const features = Object.keys(groupData).map((year) => {
@@ -86,8 +88,8 @@ export class MapsDistributionLayer extends CompositeLayer {
     
 
     buildLayers() {
-        const { id, mapContext: [mapState] } = this.props;
-        const { years: { from, to } } = mapState;
+        const { id, contextState: {maps} } = this.props;
+        const { years: { from, to } } = maps;
         const { featureCollection } = this.state;
 
         // const yearScale = scaleLinear().domain([this.state.year_from, this.state.year_to]).range(["brown", "steelblue"]); 
