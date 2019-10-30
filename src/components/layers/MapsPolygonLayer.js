@@ -17,6 +17,11 @@ export class MapsPolygonLayer extends CompositeLayer {
     updateState({props, changeFlags}) {
         if(changeFlags.dataChanged){
             const { data } = props;
+            
+            if (!data) {
+                return;
+            }
+            
             const features = data.map((m) => {    
                 return {
                     type: 'feature',
@@ -32,6 +37,7 @@ export class MapsPolygonLayer extends CompositeLayer {
             }
             
             this.setState({feature, elev: 0});
+            
 
         }
     }

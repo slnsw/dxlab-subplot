@@ -12,7 +12,10 @@ export class FootprintMapsLayer extends CompositeLayer {
         if(changeFlags.dataChanged){        
             const  { data } = props;
 
-            // Only merget cutline polygon data
+            if (!data) {
+                return;
+            }
+            // Only merge cutline polygon data
             const cutlines = data.map((m) => m.cutline); 
 
             // Merge polygons
@@ -22,6 +25,7 @@ export class FootprintMapsLayer extends CompositeLayer {
             // Get only coordinates
             const footprintData = merge.getCoordinates();
             this.setState({footprintData});
+            
         }
     
     }

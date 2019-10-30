@@ -20,6 +20,10 @@ export class MapsDistributionLayer extends CompositeLayer {
             const { data, mapContext: [mapState] } = props;
             const { years: { from, to } } = mapState;
 
+            if (!data) {
+                return;
+            }
+
             const groupData = data.reduce((result, m) => {
                 const elevation = interpolateScale(parseInt(m.year), to, from) * 10;
                 let grp = get(result, m.year, {});

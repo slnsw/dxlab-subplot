@@ -11,6 +11,7 @@ import MAP_STYLE from '../styles/dxmaps_v2.json';
 
 import { MapDataContext } from '../context/MapsContext';
 import { linealScale } from '../share/utils'; 
+import { debounce } from 'lodash'; 
 
 // Geocoder, execute geo-search around sydney
 const proximity = { longitude: 151.21065829636484, latitude: -33.86631790142455 }
@@ -38,7 +39,8 @@ export class MapViewer extends Component {
         socketDispatch({
             type: 'SOCKET_LISTEN', callback: ({ viewState }) => {
                 this.setState({ viewState });
-                this.handleOnViewChange(viewState);
+                console.log('change remote');
+                // this.handleOnViewChange(viewState);
             }
         });
 
@@ -69,7 +71,9 @@ export class MapViewer extends Component {
         }
     }
 
-    handleOnViewChange(viewState) {
+
+    handleOnViewChange = debounce((viewState) => {
+        console.log('change view');
         const { latitude, longitude, zoom } = viewState;
         const [mapState, dispatch] = this.context;
 
@@ -95,7 +99,7 @@ export class MapViewer extends Component {
         if (onViewChange) {
             onViewChange(viewState);
         }
-    }
+    }, 50);
 
     onViewStateSearchChange(viewState) {
         console.log(viewState)

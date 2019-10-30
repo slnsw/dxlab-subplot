@@ -14,7 +14,10 @@ export class MapsBitmapLayer extends CompositeLayer {
             const { mapContext:[mapState]} = this.props;
             const { years:{from , to} } = mapState;
 
-            const featuresData = data.reduce(function(result, m) {
+            if (!data) {
+                return;
+            }
+            const  featuresData = data.reduce(function(result, m) {
                 if (m.has_cutline_crop) {
                     const elevation = 50;
                     // const elevation = interpolateScale(parseInt(m.year), to, from) * 50; 
@@ -25,7 +28,7 @@ export class MapsBitmapLayer extends CompositeLayer {
                     });
 
                     m.cutline.coordinates[0].map((c) => {
-                         c.push(elevation);
+                        c.push(elevation);
                         return c;
                     });
     
@@ -47,7 +50,7 @@ export class MapsBitmapLayer extends CompositeLayer {
                     result.push(feature);
                 }
                 return result;
-              }, []);
+            }, []);
 
             const feature = { 
                 'type': 'FeatureCollection',
@@ -56,6 +59,7 @@ export class MapsBitmapLayer extends CompositeLayer {
             }
 
             this.setState({feature});
+            
         }
     }
 

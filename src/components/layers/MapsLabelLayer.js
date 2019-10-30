@@ -10,6 +10,10 @@ export class MapsLabelLayer extends CompositeLayer {
         if(changeFlags.dataChanged){
             const { data } = props;
 
+            if (!data) {
+                return;
+            }
+
             const featuresData = data.reduce(function(result, m) {
                 if (m.has_cutline_crop) {
 
