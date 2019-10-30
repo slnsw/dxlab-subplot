@@ -13,7 +13,7 @@ import { MapDataContext } from '../context/MapsContext';
 import { fetchMaps } from '../context/MapsActions';
 import { socketConnect, socketEmit } from '../context/SocketActions';
 import { linealScale } from '../share/utils';
-import { debounce } from 'lodash';
+import { debounce, keys, pick, filter, includes } from 'lodash';
 
 // Geocoder, execute geo-search around sydney
 const proximity = { longitude: 151.21065829636484, latitude: -33.86631790142455 }
@@ -44,8 +44,13 @@ export class MapViewer extends Component {
                 switch (subject) {
                     case 'viewchange':
                         const {viewState} = data;
-                        this.setState({ viewState });
-                        this.handleOnViewChange(viewState);
+
+                        // Remove transitions let update the position via messages
+                        const ks = filter(keys(viewState), (k) => !includes(['transitionInterpolator', 'transitionDuration'], k));
+                        const cleanState = pick(viewState, ks);
+
+                        this.setState({ viewState: cleanState });
+                        this.handleOnViewChange(cleanState); 
                         break;
                     default:
                         // nothing;
@@ -53,29 +58,11 @@ export class MapViewer extends Component {
             }
         }));
 
-
-
-        // socketDispatch({
-        //     type: 'SOCKET_LISTEN_SEARCH', callback: (data) => {
-        //         console.log('search', data.result.text)
-        //         // this.setState({ viewState });
-        //         // console.log(this.geocoder.query(data.result.text));
-        //     }
-        // });
-
-
-
         this.handleOnViewChange(this.state.viewState);
     }
 
     handleOnResult(event) {
         const { onResult } = this.props;
-        const [, dispatch] = this.context;
-        // socketDispatch({
-        //     type: 'SOCKET_EMIT_SEARCH', state: {
-        //         data: event
-        //     }
-        // });
 
         if (onResult) {
             onResult(event);
@@ -85,7 +72,7 @@ export class MapViewer extends Component {
 
     handleOnViewChange = debounce((viewState) => {
         const { latitude, longitude, zoom } = viewState;
-        const [mapState, dispatch] = this.context;
+        const [, dispatch] = this.context;
 
         // Calculate "optimal" radius to search
         const aroundRadius = linealScale(zoom, [15, 12], [800, 4000]);
@@ -102,8 +89,6 @@ export class MapViewer extends Component {
                 'radius': aroundRadius
             }
         }
-
-        // { type: 'GET_MAPS_AROUND', state: { around, aroundRadius } }
 
         dispatch(fetchMaps({ around, aroundRadius }));
 

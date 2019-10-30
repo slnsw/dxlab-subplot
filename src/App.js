@@ -13,7 +13,7 @@ function App() {
     maps: {
       years: {
         from: 1880,
-        to: 1950
+        to: 1890
       },
       assetIds: null,
       around: null,
