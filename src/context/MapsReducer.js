@@ -1,5 +1,3 @@
-import { fetchData } from '../share/services';
-
 export const ActionTypes = {
     GET_MAPS_AROUND: 'GET_MAPS_AROUND',
     SHOW_DETAIL_MAP: 'SHOW_DETAIL_MAP',
@@ -23,8 +21,7 @@ export function mapsReducer(state, action) {
             return {
                 ...state,
                 data: action.data,
-                around: action.around,
-                aroundRadius: action.aroundRadius
+                ...action
             };
         }
 

@@ -13,3 +13,9 @@
 
   pointer-events: none;
 } 
+
+.rc-slider {
+  position: absolute !important;
+  bottom: 40px;
+  z-index: 2000;
+}

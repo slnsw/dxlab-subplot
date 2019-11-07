@@ -6,7 +6,10 @@ import { thunkDispatch } from './utils';
 export const MapDataContext = React.createContext();
 
 const initialState = {
-    maps: {},
+    maps: {
+        data: [],
+        filter: {}
+    },
     comm: {}
 }
 

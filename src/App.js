@@ -11,13 +11,14 @@ function App() {
 
   const initial = {
     maps: {
-      years: {
-        from: 1880,
-        to: 1890
-      },
-      assetIds: null,
-      around: null,
-      aroundRadius: 1000,
+      data: [],
+      filter: {
+        fromYear: 1880,
+        toYear: 1980,
+        assetIds: null,
+        around: null,
+        aroundRadius: null
+      }
     },
     comm: {
 

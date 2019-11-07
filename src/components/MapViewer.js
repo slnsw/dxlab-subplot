@@ -1,5 +1,6 @@
 import 'react-dat-gui/build/react-dat-gui.css';
 import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css";
+import 'rc-slider/assets/index.css';
 
 import React, { Component } from 'react';
 import DeckGL from '@deck.gl/react';
@@ -14,6 +15,9 @@ import { fetchMaps } from '../context/MapsActions';
 import { socketConnect, socketEmit } from '../context/SocketActions';
 import { linealScale } from '../share/utils';
 import { debounce, keys, pick, filter, includes } from 'lodash';
+
+// import { Range } from 'rc-slider';
+
 
 // Geocoder, execute geo-search around sydney
 const proximity = { longitude: 151.21065829636484, latitude: -33.86631790142455 }
@@ -90,7 +94,7 @@ export class MapViewer extends Component {
             }
         }
 
-        dispatch(fetchMaps({ around, aroundRadius }));
+        dispatch(fetchMaps({ around }));
 
         const { onViewChange } = this.props;
         if (onViewChange) {
@@ -99,7 +103,6 @@ export class MapViewer extends Component {
     }, 50);
 
     onViewStateSearchChange(viewState) {
-        console.log(viewState)
         this.onViewStateChange({
             viewState: {
                 ...this.state.viewState,
@@ -112,18 +115,17 @@ export class MapViewer extends Component {
         // Single view implemenation
 
         const onUpdateState = () => {
-            const [, dispatch] = this.context;
+            const [state, dispatch] = this.context;
             const newState = {
                 ...this.state.viewState,
                 zoom: viewState.zoom,
                 pitch: 60
             }
 
-
             dispatch(
                 socketEmit({
                     subject:'viewchange', 
-                    data:{ viewState: newState, viewId: viewId }
+                    data:{ viewState: newState, filter: state.maps.filter }
                 })
             );
 
@@ -208,6 +210,9 @@ export class MapViewer extends Component {
             pointerEvents: 'none',
         }
 
+        const [state, dispatch] = this.context;
+        const {maps: { filter }} = state;
+
         return (
             <React.Fragment>
                 {/* :P ;( horrible Gecoder needs to be a child of InteractiveMap for that 
@@ -256,6 +261,19 @@ export class MapViewer extends Component {
 
                 {/* { mode === "kiosk" || mode === "slave" &&  } */}
                 <div style={fogStyle}></div>
+{/* 
+                { mode === "kiosk" || mode === "master" &&  
+                    <Range 
+                        min={1880} 
+                        max={1950} 
+                        defaultValue={[from, to]} 
+                        tipFormatter={value => `${value}%`} 
+                        pushable
+                        onChange={([from, to]) => {
+                            dispatch(fetchMaps({from, to }));
+                        }}/>
+                } */}
+                
 
             </React.Fragment>
 

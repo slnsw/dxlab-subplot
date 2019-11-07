@@ -21,6 +21,7 @@ import { MapsLabelLayer } from './layers/MapsLabelLayer';
 import { showDetailMap } from '../context/MapsActions';
 
 
+
 export class MapExplorer extends Component {
 
     state = {
@@ -61,18 +62,19 @@ export class MapExplorer extends Component {
         // view == main or minimap or all
         // TODO: define a prop structure for this.
         const layers = [
-            [SearchResultLayer, { view: 'all' }],
-            [LandmarksLayer, { view: 'all' }],
+            // [SearchResultLayer, { view: 'all' }],
+            // [LandmarksLayer, { view: 'all' }],
             // [MapsDistributionLayer, { view: 'master', onClick : (info) => { console.log(info)} }],
-            [FootprintMapsLayer, { view: 'slave' }],
-            [MapsPolygonLayer, { view: 'master', onClick: this.showMapDetail.bind(this) }],
+            // [FootprintMapsLayer, { view: 'slave' }],
+            // [MapsPolygonLayer, { view: 'master', onClick: this.showMapDetail.bind(this) }],
             // [MapsLabelLayer, {view: 'master'}],
-            [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: '_crop_800', view: 'slave', onClick: this.showMapDetail.bind(this) }],
+            // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: '_crop_800', view: 'slave', onClick: this.showMapDetail.bind(this) }],
             // [MapsBitmapLayer, { id:'edge', name: 'edge', suffix: '_edge_800', view: 'slave'}], 
 
         ];
 
         const { showModal, modalData } = this.state;
+        // const {  }
 
         const { mode } = this.props;
 
@@ -87,6 +89,7 @@ export class MapExplorer extends Component {
                     mode={mode}
                     layers={layers}
                 ></MapViewer>
+
             </React.Fragment>
         )
     }
