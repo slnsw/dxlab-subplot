@@ -11,8 +11,6 @@ export class MapsBitmapLayer extends CompositeLayer {
     updateState({props, changeFlags}) {
         if(changeFlags.dataChanged){
             const { data, suffix } = props;
-            const { contextState: {maps}} = this.props;
-            const { years:{from , to} } = maps;
 
             if (!data) {
                 return;
@@ -20,7 +18,9 @@ export class MapsBitmapLayer extends CompositeLayer {
             const  featuresData = data.reduce(function(result, m) {
                 if (m.has_cutline_crop) {
                     const elevation = 50;
-                    // const elevation = interpolateScale(parseInt(m.year), to, from) * 50; 
+                    //  const { filter} = this.props;
+                    //  const { fromYear, toYear } = filter;
+                    //  const elevation = interpolateScale(parseInt(m.year), toYear, fromYear) * 50; 
                     //  mapValue(m.year, this.state.year_from, this.state.year_to, 0, this.state.year_to - this.state.year_from);
                     const bounds = m.bbox_coord.coordinates[0].map((c) => {
                         c.push(elevation);
@@ -33,7 +33,7 @@ export class MapsBitmapLayer extends CompositeLayer {
                     });
     
                     const info = pick(m, ['year', 'title', 'asset_id'])
-                    const image = getImageUrl(m.asset_id, suffix);
+                    const image = getImageUrl(m.asset_id, suffix, '400,');
 
                     const feature = {
                         type: 'feature',
@@ -68,7 +68,8 @@ export class MapsBitmapLayer extends CompositeLayer {
         const { id, name } = this.props;
         const { feature : { features } } = this.state; 
 
-        const layers = features.map(({properties: {asset_id, imageBounds, imageUrl}}) => {           
+        const layers = features.map(({properties: {asset_id, imageBounds, imageUrl}}) => {   
+            // console.log(JSON.stringify(imageBounds));        
             return new BitmapLayer(this.getSubLayerProps({
                     id: `${id}-bitmap-layer-${name}-${asset_id}`,
                     bounds: imageBounds,

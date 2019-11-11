@@ -17,6 +17,7 @@ import { MapsDistributionLayer } from './layers/MapsDistributionLayer';
 import { MapsPolygonLayer } from './layers/MapsPolygonLayer';
 import { MapsBitmapLayer } from './layers/MapsBitmapLayer';
 import { MapsLabelLayer } from './layers/MapsLabelLayer';
+import { TileImagesLayer } from './layers/TileImagesLayer'
 
 import { showDetailMap } from '../context/MapsActions';
 
@@ -34,7 +35,7 @@ export class MapExplorer extends Component {
      * @param {*} info 
      */
     showMapDetail({ object }) {
-        const [mapState, dispatch] = this.context;
+        const [, dispatch] = this.context;
 
         let { properties: { title, imageUrl, asset_id } } = object;
         if (!imageUrl) {
@@ -64,13 +65,13 @@ export class MapExplorer extends Component {
         const layers = [
             // [SearchResultLayer, { view: 'all' }],
             // [LandmarksLayer, { view: 'all' }],
-            // [MapsDistributionLayer, { view: 'master', onClick : (info) => { console.log(info)} }],
+            // [MapsDistributionLayer, { view: 'master', onClick : this.showMapDetail.bind(this) }],
             // [FootprintMapsLayer, { view: 'slave' }],
-            // [MapsPolygonLayer, { view: 'master', onClick: this.showMapDetail.bind(this) }],
+            [MapsPolygonLayer, { view: 'master', onClick: this.showMapDetail.bind(this) }],
             // [MapsLabelLayer, {view: 'master'}],
-            // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: '_crop_800', view: 'slave', onClick: this.showMapDetail.bind(this) }],
+            // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: '.tif', view: 'slave', onClick: this.showMapDetail.bind(this) }],
             // [MapsBitmapLayer, { id:'edge', name: 'edge', suffix: '_edge_800', view: 'slave'}], 
-
+            // [TileImagesLayer, {view: 'all'}]
         ];
 
         const { showModal, modalData } = this.state;

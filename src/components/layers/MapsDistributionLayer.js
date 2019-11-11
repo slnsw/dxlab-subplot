@@ -17,8 +17,8 @@ export class MapsDistributionLayer extends CompositeLayer {
         if (changeFlags.dataChanged) {
 
             // Group data by year
-            const { data, contextState: {maps} } = props;
-            const { years: { from, to } } = maps;
+            const { data, filter} = props;
+            const { fromYear, toYear } = filter;
 
             if (!data) {
                 return;
@@ -26,7 +26,7 @@ export class MapsDistributionLayer extends CompositeLayer {
 
 
             const groupData = data.reduce((result, m) => {
-                const elevation = interpolateScale(parseInt(m.year), to, from) * 10;
+                const elevation = interpolateScale(parseInt(m.year), toYear, fromYear) * 10;
                 let grp = get(result, m.year, {});
 
                 // Append maps to data. MANY NOT NECESSARY
@@ -88,12 +88,12 @@ export class MapsDistributionLayer extends CompositeLayer {
     
 
     buildLayers() {
-        const { id, contextState: {maps} } = this.props;
-        const { years: { from, to } } = maps;
+        const { id, filter } = this.props;
+        const { fromYear, toYear } = filter;
         const { featureCollection } = this.state;
 
         // const yearScale = scaleLinear().domain([this.state.year_from, this.state.year_to]).range(["brown", "steelblue"]); 
-        const yearColorScale = scaleLinear([from, to], ["gold", "limegreen"]);
+        const yearColorScale = scaleLinear([fromYear, toYear], ["gold", "limegreen"]);
         // const yearColorAlpha = scaleLinear([from, to], [255, 100]);
 
         if (featureCollection.features.length > 0) {

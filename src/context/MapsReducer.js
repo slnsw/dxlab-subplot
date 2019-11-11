@@ -21,7 +21,7 @@ export function mapsReducer(state, action) {
             return {
                 ...state,
                 data: action.data,
-                ...action
+                filter: action.filter
             };
         }
 

@@ -75,6 +75,8 @@ export function linealScale(value, [domain_from, domain_to ], [range_from, range
 }
 
 // Temporal 
-export function getImageUrl(asset_id, suffix) {
-  return `${process.env.REACT_APP_STATIC_BASE_URL}/${asset_id}${suffix}.png?c=324343`;
+export function getImageUrl(asset_id, suffix='.tif', size='800,', format='default') {
+  // return `${process.env.REACT_APP_STATIC_BASE_URL}/${asset_id}${suffix}.png?c=324343`;
+  const url = `${process.env.REACT_APP_STATIC_BASE_URL}${asset_id}${suffix}/full/${size}/0/${format}.png`;
+  return url;
 }

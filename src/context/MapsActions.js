@@ -2,34 +2,29 @@ import { ActionTypes } from './MapsReducer';
 import { fetchData } from '../share/services';
 import { pickBy, get, identity } from 'lodash';
 
-export function fetchMaps({around, aroundRadius, fromYear, toYear, assetIds}) {
+export function getMaps({around, fromYear, toYear, assetIds}) {
 
     return (dispatch, state) => {
-        const { geometry, properties:{radius} } = around;
+        const radius = get(around, 'properties.radius', null);
 
-        console.log(geometry);
- 
         // Get data
         // const data = [];
         const filter = pickBy({
             ...state.maps.filter,
-            ...(around && {around: get(around, 'geometry', null)}),
-            ...(aroundRadius && {aroundRadius}),
+            ...(around && {around}),
+            ...(radius && {aroundRadius: radius}),
             ...(fromYear && {fromYear}),
             ...(toYear && {toYear}),
             ...(assetIds && {assetIds})
         }, identity);
 
-        console.log(filter);
-
         fetchData(filter)
             .then((data) => {
                 dispatch({
                     type: ActionTypes.GET_MAPS_AROUND,
-                    maps: {
-                        data,
-                        filter
-                    }
+                    data,
+                    // data: [],
+                    filter
                 })
             })
             .catch(console.log);

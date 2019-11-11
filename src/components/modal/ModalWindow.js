@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import { MapDataContext } from '../../context/MapsContext';
+import Zoomable from './Zoomable';
 
 export class ModalWindow extends Component {
 
@@ -27,11 +28,11 @@ export class ModalWindow extends Component {
 
         if ( isOpen && !stateOpen ) {
             this.setState({ isOpen });
-            this.closeTimer = setTimeout(() => {
+            // this.closeTimer = setTimeout(() => {
 
-                this.requestClose();
-                clearTimeout(this.closeTimer);
-            }, 6000);
+            //     this.requestClose();
+            //     clearTimeout(this.closeTimer);
+            // }, 6000);
 
         }
     }
@@ -61,10 +62,7 @@ export class ModalWindow extends Component {
     }
 
     render () {
-        // const [mapState, dispatch] = this.context;
-        // const { around } = mapState; 
-        // console.log(around);
-        const {title, imageUrl, isOpen, asset_id} = this.props;
+        const {title, isOpen, asset_id} = this.props;
         return isOpen && (
             <div 
                 ref={this.setContentRef.bind(this)}
@@ -74,8 +72,8 @@ export class ModalWindow extends Component {
             >   
                 <h4 style={{color: '#fff', textAlign:'center'}}>  <span>{asset_id}</span> {title} </h4>
                 <button onClick={this.requestClose.bind(this)} style={{ padding: '20px'}}>Close</button>
-                <img src={imageUrl} alt="" width="auto" height="auto" style={{maxHeight: '80vh', naxWidht: '800px', textAlign: 'center'}}/>
-                 
+                {/* <img src={imageUrl} alt="" width="auto" height="auto" style={{maxHeight: '80vh', naxWidht: '800px', textAlign: 'center'}}/> */}
+                 <Zoomable assetId={asset_id}/>
             </div>
         );
     }

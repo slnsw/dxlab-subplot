@@ -5,9 +5,13 @@ import {GeoJsonLayer} from '@deck.gl/layers';
 export class SearchResultLayer extends CompositeLayer {
 
 
-    roiAreaLayer() {
-        const {id, contextState: {maps}} = this.props;
-        const {aroundRadius, around} = maps;
+    searchAreaLayer() {
+        const {id, filter} = this.props;
+        if (!filter) {
+            return ;
+        }
+        const {aroundRadius, around} = filter;
+
         return new GeoJsonLayer({
             id: `${id}-roi-area`,
             data:  around,
@@ -23,7 +27,7 @@ export class SearchResultLayer extends CompositeLayer {
  
     
     renderLayers() { 
-        return this.roiAreaLayer();
+        return this.searchAreaLayer();
     }
 
 }

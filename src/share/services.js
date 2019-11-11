@@ -1,4 +1,4 @@
-export function fetchData({around, aroundRadius, fromYear, toYear, assetIds}) {
+export function fetchData( {around, aroundRadius, fromYear, toYear, assetIds}) {
 
   const query = {
     'valid': true,
@@ -13,6 +13,7 @@ export function fetchData({around, aroundRadius, fromYear, toYear, assetIds}) {
 
   }
 
+  // assetIds = 'a1367540'; 
   if (assetIds) {
     let ids = assetIds.split(',').map((e) => {
       return e.trim();
@@ -23,10 +24,11 @@ export function fetchData({around, aroundRadius, fromYear, toYear, assetIds}) {
   }
 
   if (around) {
+    const {geometry} = around;
     query['center'] = {
       '$near': {
-        '$geometry': around,
-        '$maxDistance': aroundRadius
+        '$geometry': geometry,
+        '$maxDistance': (aroundRadius && 800)
       }
     };
   }

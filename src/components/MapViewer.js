@@ -11,7 +11,7 @@ import Geocoder from "react-map-gl-geocoder";
 import MAP_STYLE from '../styles/dxmaps_v2.json';
 
 import { MapDataContext } from '../context/MapsContext';
-import { fetchMaps } from '../context/MapsActions';
+import { getMaps } from '../context/MapsActions';
 import { socketConnect, socketEmit } from '../context/SocketActions';
 import { linealScale } from '../share/utils';
 import { debounce, keys, pick, filter, includes } from 'lodash';
@@ -38,6 +38,21 @@ export class MapViewer extends Component {
 
     }
 
+
+    fogStyle = {
+        zIndex: '100',
+        position: 'relative',
+        display: 'block',
+        height: '100vh',
+        width: '100vw',
+        /* background: rgb(2,0,36);
+        background: linear-gradient(0deg, rgba(2,0,36,0) 0%, rgba(9,9,121,.1) 35%, rgba(0,212,255,.8) 100%); */
+
+        background: 'rgb(0,0,0)',
+        // background: 'linear-gradient(180deg, rgba(0,0,0,.85) 0%, rgba(112,112,122,.1) 25%, rgba(247,247,247,0) 100%)',
+        background: 'radial-gradient(circle, rgba(247,247,247,0) 0%, rgba(112,112,122,.1) 25%,   rgba(0,0,0,1) 100%)',
+        pointerEvents: 'none',
+    }
 
     componentDidMount() {
         const [, dispatch] = this.context;
@@ -94,13 +109,13 @@ export class MapViewer extends Component {
             }
         }
 
-        dispatch(fetchMaps({ around }));
+        dispatch(getMaps({ around }));
 
         const { onViewChange } = this.props;
         if (onViewChange) {
             onViewChange(viewState);
         }
-    }, 50);
+    }, 10);
 
     onViewStateSearchChange(viewState) {
         this.onViewStateChange({
@@ -170,9 +185,11 @@ export class MapViewer extends Component {
         return [
             ...this.props.layers.map(([L, props]) => {
                 let data = this.context[0].maps.data;
+                let filter = this.context[0].maps.filter;
                 props = {
-                    data: data,
-                    ...props
+                    ...props,
+                    data,
+                    filter
                 }
                 const [state, dispatch] = this.context;
                 return new L({ contextState: state, dispatch, ...props })
@@ -195,20 +212,7 @@ export class MapViewer extends Component {
 
         viewState.pitch = (mode === 'master') ? 0 : viewState.pitch;
 
-        const fogStyle = {
-            zIndex: '100',
-            position: 'relative',
-            display: 'block',
-            height: '100vh',
-            width: '100vw',
-            /* background: rgb(2,0,36);
-            background: linear-gradient(0deg, rgba(2,0,36,0) 0%, rgba(9,9,121,.1) 35%, rgba(0,212,255,.8) 100%); */
 
-            background: 'rgb(0,0,0)',
-            // background: 'linear-gradient(180deg, rgba(0,0,0,.85) 0%, rgba(112,112,122,.1) 25%, rgba(247,247,247,0) 100%)',
-            background: 'radial-gradient(circle, rgba(247,247,247,0) 0%, rgba(112,112,122,.1) 25%,   rgba(0,0,0,1) 100%)',
-            pointerEvents: 'none',
-        }
 
         const [state, dispatch] = this.context;
         const {maps: { filter }} = state;
@@ -260,7 +264,7 @@ export class MapViewer extends Component {
                 </DeckGL>
 
                 {/* { mode === "kiosk" || mode === "slave" &&  } */}
-                <div style={fogStyle}></div>
+                <div style={this.fogStyle}></div>
 {/* 
                 { mode === "kiosk" || mode === "master" &&  
                     <Range 
@@ -270,7 +274,7 @@ export class MapViewer extends Component {
                         tipFormatter={value => `${value}%`} 
                         pushable
                         onChange={([from, to]) => {
-                            dispatch(fetchMaps({from, to }));
+                            dispatch(getMaps({from, to }));
                         }}/>
                 } */}
                 
