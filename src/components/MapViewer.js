@@ -56,7 +56,7 @@ export class MapViewer extends Component {
 
     componentDidMount() {
         const [, dispatch] = this.context;
-        // TODO: Clean up to much going on here!
+        // TODO: Clean up too much going on here!
         dispatch (socketConnect({
             listenCallback: ({subject, data}) => {   
                 

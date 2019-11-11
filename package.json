@@ -16,6 +16,7 @@
     "deck.gl": "^7.3.3",
     "lodash": "^4.17.15",
     "luma.gl": "^7.3.2",
+    "node-sass": "^4.13.0",
     "openseadragon": "^2.4.1",
     "rc-slider": "^8.7.1",
     "react": "^16.8.6",
