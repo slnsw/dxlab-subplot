@@ -22,8 +22,10 @@
     "react": "^16.8.6",
     "react-dat-gui": "^3.0.0",
     "react-dom": "^16.8.6",
+    "react-idle-timer": "^4.2.12",
     "react-map-gl": "^5.0.8",
     "react-map-gl-geocoder": "^2.0.9",
+    "react-modal": "^3.11.1",
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.1.0",
     "socket.io-client": "^2.3.0"

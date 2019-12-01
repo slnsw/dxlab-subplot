@@ -80,7 +80,6 @@ export class MapExplorer extends Component {
 
         return (
             <React.Fragment>
-                ( <h1>Loadding.......</h1>)
                 <ModalWindow
                     isOpen={showModal}
                     onRequestClose={() => this.setState({ showModal: false })}

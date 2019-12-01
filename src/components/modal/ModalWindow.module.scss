@@ -1,11 +1,15 @@
 .modalWindow {
-    background: #000a;
+
     position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    width: 100vw;
-    height: 100vh;
+    background-color: #000a;
+    top: 40px;
+    left: 40px;
+    right: 40px;
+    bottom: 40px;
+
+    &:focus{
+        outline:0;
+     }
 
     .modalTitle {
         color: #fff;
@@ -14,8 +18,17 @@
 
     .zoomable {
         width: 50vw;
-        height: 80%;
+        height: 90%;
     }
 
 }
 
+.modalOverlay {
+    background-color: #000a;
+    z-index: 3000;  
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
