@@ -49,9 +49,8 @@ export class MapExplorer extends Component {
         });
 
         // Update map context to keep track with the selected map
-        // dispatch({ type: 'HIGHLIGHT_MAP', state: { highlightMap : asset_id } });
         dispatch(showDetailMap({ asset_id }))
-    }
+    };
 
 
     render() {
@@ -81,6 +80,7 @@ export class MapExplorer extends Component {
 
         return (
             <React.Fragment>
+                ( <h1>Loadding.......</h1>)
                 <ModalWindow
                     isOpen={showModal}
                     onRequestClose={() => this.setState({ showModal: false })}

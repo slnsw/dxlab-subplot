@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import { MapDataContext } from '../../context/MapsContext';
 import Zoomable from './Zoomable';
 
+import styles from './ModalWindow.module.scss';
+
 export class ModalWindow extends Component {
 
     static defaultProps = {
@@ -64,16 +66,16 @@ export class ModalWindow extends Component {
     render () {
         const {title, isOpen, asset_id} = this.props;
         return isOpen && (
-            <div 
+            <div className={styles.modalWindow}
                 ref={this.setContentRef.bind(this)}
-                style={{background: '#000a', position: 'absolute', zIndex: 1000, width: '100vw', height: '100vh'}}
                 tabIndex="-1"
                 onKeyDown={this.onKeyDown.bind(this)}
             >   
-                <h4 style={{color: '#fff', textAlign:'center'}}>  <span>{asset_id}</span> {title} </h4>
+                <h4 className={styles.modalTitle}>  <span>{asset_id}</span> {title} </h4>
                 <button onClick={this.requestClose.bind(this)} style={{ padding: '20px'}}>Close</button>
-                {/* <img src={imageUrl} alt="" width="auto" height="auto" style={{maxHeight: '80vh', naxWidht: '800px', textAlign: 'center'}}/> */}
-                 <Zoomable assetId={asset_id}/>
+                <div className={styles.zoomable}>  
+                    <Zoomable assetId={asset_id}/> 
+                </div>
             </div>
         );
     }

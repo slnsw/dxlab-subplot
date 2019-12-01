@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
 import OSD from 'openseadragon';
 
+import styles from './Zoomable.module.scss'
+
 export default class Zoomable extends Component {
 
     render() {
         let { id } = this.props
         return (
             <React.Fragment>
-                <div className="ocd-div" ref={node => { this.el = node; }}>
+                <div className={styles.openseadragon} ref={node => { this.el = node; }}>
                     <div className="navigator-wrapper c-shadow">
                         <div id="navigator"></div>
                     </div>
-                    <div className="openseadragon" id={id} style={{ 'width': '100vw', 'height': '80vh' }}></div>
+                    <div className={styles.container} id={id}></div>
                 </div>
             </React.Fragment>
         )
@@ -59,7 +61,7 @@ export default class Zoomable extends Component {
                 "height": 4493,
                 "width": 6495,
                 "@context": "http://iiif.io/api/image/2/context.json",
-                "@id": `${process.env.REACT_APP_STATIC_BASE_URL}${assetId}_crop.png`
+                "@id": `${process.env.REACT_APP_STATIC_BASE_URL}${assetId}.tif`
             }
             ]
         })

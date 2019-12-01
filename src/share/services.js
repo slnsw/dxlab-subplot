@@ -2,6 +2,7 @@ export function fetchData( {around, aroundRadius, fromYear, toYear, assetIds}) {
 
   const query = {
     'valid': true,
+    'has_similar': true
     // 'colored': true
   } // This flag should be apply in the server directly
 

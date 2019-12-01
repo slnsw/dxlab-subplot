@@ -18,16 +18,24 @@ export function getMaps({around, fromYear, toYear, assetIds}) {
             ...(assetIds && {assetIds})
         }, identity);
 
+        dispatch({
+            type: ActionTypes.MAPS_DATA_REQUEST,
+        });
+
         fetchData(filter)
             .then((data) => {
                 dispatch({
-                    type: ActionTypes.GET_MAPS_AROUND,
+                    type: ActionTypes.MAPS_DATA_COMPLETE,
                     data,
-                    // data: [],
                     filter
                 })
             })
-            .catch(console.log);
+            .catch((error) => {
+                dispatch({
+                    type: ActionTypes.MAPS_DATA_FAIL,
+                    error
+                })
+            });
     }
 }
 

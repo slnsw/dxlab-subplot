@@ -17,6 +17,7 @@ import { linealScale } from '../share/utils';
 import { debounce, keys, pick, filter, includes } from 'lodash';
 
 // import { Range } from 'rc-slider';
+import styles from './MapViewer.module.scss';
 
 
 // Geocoder, execute geo-search around sydney
@@ -36,22 +37,6 @@ export class MapViewer extends Component {
             reuseMaps: true,
         }
 
-    }
-
-
-    fogStyle = {
-        zIndex: '100',
-        position: 'relative',
-        display: 'block',
-        height: '100vh',
-        width: '100vw',
-        /* background: rgb(2,0,36);
-        background: linear-gradient(0deg, rgba(2,0,36,0) 0%, rgba(9,9,121,.1) 35%, rgba(0,212,255,.8) 100%); */
-
-        background: 'rgb(0,0,0)',
-        // background: 'linear-gradient(180deg, rgba(0,0,0,.85) 0%, rgba(112,112,122,.1) 25%, rgba(247,247,247,0) 100%)',
-        background: 'radial-gradient(circle, rgba(247,247,247,0) 0%, rgba(112,112,122,.1) 25%,   rgba(0,0,0,1) 100%)',
-        pointerEvents: 'none',
     }
 
     componentDidMount() {
@@ -204,7 +189,7 @@ export class MapViewer extends Component {
 
         const { mode } = this.props;
         const showSearch = (mode === 'master' || mode === 'kiosk');
-        const mapStyle = (mode === 'master') ? "mapbox://styles/dimago/ck214ikre05wd1coehgmj34en" : MAP_STYLE;
+        const mapStyle = (mode === 'master') ? `${process.env.REACT_APP_MAPBOX_STYLE}` : MAP_STYLE;
         const mapcontroller = (mode === 'master' || mode === 'kiosk');
         const viewState = {
             ...this.state.viewState
@@ -264,7 +249,7 @@ export class MapViewer extends Component {
                 </DeckGL>
 
                 {/* { mode === "kiosk" || mode === "slave" &&  } */}
-                <div style={this.fogStyle}></div>
+                <div className={styles.fog}></div>
 {/* 
                 { mode === "kiosk" || mode === "master" &&  
                     <Range 

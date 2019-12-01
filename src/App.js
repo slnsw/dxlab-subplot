@@ -1,11 +1,12 @@
 import './App.scss';
 
 import React from 'react';
-import { MapExplorer } from './components/MapExplorer';
+import { Route, Switch, BrowserRouter } from 'react-router-dom';
 
+import { MapExplorer } from './components/MapExplorer';
 import { MapsProvider } from './context/MapsContext';
 
-import { Route, Switch, BrowserRouter } from 'react-router-dom';
+
 
 function App() {
 
@@ -30,26 +31,24 @@ function App() {
   return (
     <React.Fragment>
       <BrowserRouter>
-          <MapsProvider {...initial}>
+        <MapsProvider {...initial}>
 
-            <Switch>
-              <Route exact path="/">
+          <Switch>
+            <Route exact path="/">
+              <MapExplorer mode='kiosk' />
+            </Route>
 
-                <MapExplorer mode='kiosk' />
-              
-              </Route>
-              
-              <Route exact path="/master">
-                <MapExplorer mode='master' />
-              </Route>
+            <Route exact path="/master">
+              <MapExplorer mode='master' />
+            </Route>
 
-              <Route exact path="/slave">
-                <MapExplorer mode='slave' />
-              </Route>
+            <Route exact path="/slave">
+              <MapExplorer mode='slave' />
+            </Route>
 
-            </Switch>
+          </Switch>
 
-          </MapsProvider>
+        </MapsProvider>
       </BrowserRouter>
     </React.Fragment>
   );

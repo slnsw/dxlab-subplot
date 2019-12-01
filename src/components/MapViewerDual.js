@@ -91,7 +91,7 @@ export class MapViewerDual extends Component {
             }
         }
 
-        // dispatch({ type: 'GET_MAPS_AROUND', state: { around } });
+        // dispatch({ type: 'GET_MAPS_SUCCESS', state: { around } });
 
         const { onViewChange } = this.props;
         if (onViewChange) {

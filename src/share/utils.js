@@ -8,41 +8,41 @@ import { scaleLinear } from 'd3-scale';
 
 export class MergeGeoJsonPolygon {
 
-    cache = null;
+  cache = null;
 
-    setData(data) {
-        if(data.length > 0) {
-            let merge = undefined;
-            data.forEach((p) => {
-              merge = this.append(p)
-            });
-            this.cache = merge
-        }
-    }
-
-    /**
-     * Merge polygon into cache polygon data
-     * @param {*} polygon 
-     */
-    append(polygon) {
-      let merge = this.cache;
-      if (merge) {
-        merge = union(merge, polygon);
-      }else{
-        merge = polygon;
-      }
-      merge = cleanCoords(merge);
+  setData(data) {
+    if (data.length > 0) {
+      let merge = undefined;
+      data.forEach((p) => {
+        merge = this.append(p)
+      });
       this.cache = merge
-      return merge;
-      
     }
+  }
 
-    getPolygon() {
-        return this.cache;
+  /**
+   * Merge polygon into cache polygon data
+   * @param {*} polygon 
+   */
+  append(polygon) {
+    let merge = this.cache;
+    if (merge) {
+      merge = union(merge, polygon);
+    } else {
+      merge = polygon;
     }
-    getCoordinates() {
-        return get(this.cache, 'geometry.coordinates', []);
-    }
+    merge = cleanCoords(merge);
+    this.cache = merge
+    return merge;
+
+  }
+
+  getPolygon() {
+    return this.cache;
+  }
+  getCoordinates() {
+    return get(this.cache, 'geometry.coordinates', []);
+  }
 
 
 }
@@ -50,33 +50,32 @@ export class MergeGeoJsonPolygon {
 
 export function easeInterpolate(ease) {
   return function (a, b) {
-      var i = interpolate(a, b);
-      return function (t) {
-          return i(ease(t));
-      };
+    var i = interpolate(a, b);
+    return function (t) {
+      return i(ease(t));
+    };
   };
 }
 
 
 export function interpolateScale(value, to, from) {
   return scaleLinear()
-      .domain([from, to])
-      .range([0, (to - from)])
-      .interpolate(easeInterpolate(easeCubicIn))(value);
+    .domain([from, to])
+    .range([0, (to - from)])
+    .interpolate(easeInterpolate(easeCubicIn))(value);
 }
 
-export function linealScale(value, [domain_from, domain_to ], [range_from, range_to]) {
-    let res = scaleLinear()
-      .domain([domain_from, domain_to ])
-      .range( [range_from, range_to])(value);
-    
-    res = (res < range_from) ? range_from : res;
-    return res;
+export function linealScale(value, [domain_from, domain_to], [range_from, range_to]) {
+  let res = scaleLinear()
+    .domain([domain_from, domain_to])
+    .range([range_from, range_to])(value);
+
+  res = (res < range_from) ? range_from : res;
+  return res;
 }
 
 // Temporal 
-export function getImageUrl(asset_id, suffix='.tif', size='800,', format='default') {
-  // return `${process.env.REACT_APP_STATIC_BASE_URL}/${asset_id}${suffix}.png?c=324343`;
+export function getImageUrl(asset_id, suffix = '.tif', size = '800,', format = 'default') {
   const url = `${process.env.REACT_APP_STATIC_BASE_URL}${asset_id}${suffix}/full/${size}/0/${format}.png`;
   return url;
 }

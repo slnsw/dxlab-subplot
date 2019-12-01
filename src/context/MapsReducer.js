@@ -1,34 +1,25 @@
 export const ActionTypes = {
-    GET_MAPS_AROUND: 'GET_MAPS_AROUND',
-    SHOW_DETAIL_MAP: 'SHOW_DETAIL_MAP',
-    HIGHLIGHT_MAP: 'HIGHLIGHT_MAP',
+    MAPS_DATA_REQUEST: 'MAPS_DATA_REQUEST',
+    MAPS_DATA_COMPLETE: 'MAPS_DATA_COMPLETE',
+    MAPS_DATA_FAIL: 'MAPS_DATA_FAIL',
+
+    MAPS_DETAIL_REQUEST: 'MAPS_DETAIL_REQUEST',
+    MAPS_DETAIL_COMPLETE: 'MAPS_DETAIL_COMPLETE',
+    MAPS_DETAIL_FAIL: 'MAPS_DETAIL_FAIL',    
     
 }
 
 
 export function mapsReducer(state, action) { 
     switch (action.type) {
-        case ActionTypes.HIGHLIGHT_MAP: {
-            // Update state with given highlight map data
-            return {
-                ...state,
-                ...action.state
-            };
-        }
 
-        case ActionTypes.GET_MAPS_AROUND: {
-            // Update state
+        case ActionTypes.MAPS_DATA_COMPLETE: {
             return {
                 ...state,
                 data: action.data,
                 filter: action.filter
             };
         }
-
-        case ActionTypes.SHOW_DETAIL_MAP:
-            return {
-                ...state,
-            }
 
         default: 
             return state
