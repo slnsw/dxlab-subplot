@@ -101,7 +101,7 @@ export class MapsDistributionLayer extends CompositeLayer {
             return new GeoJsonLayer({
                 id: `${id}-years-footprint-layer`,
                 data: featureCollection,
-                extruded: false,
+                extruded: true,
                 stroked: true,
                 pickable: true,
                 autoHighlight: true,

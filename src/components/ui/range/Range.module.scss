@@ -1,8 +1,19 @@
 .range {
-    z-index: 5000;
-    overflow: hidden;
+    z-index: 3000;
+    // overflow: hidden;
     position: absolute;
     color: white;
     top: 40px;
     left: 10px;
+    // pointer-events: none;
+
+}
+
+.slider {
+    position: absolute !important;
+    right: 80px;
+    top: 10%;
+    // height: 80%;
+    height: 80vh;
+    z-index: 3001;
 }
