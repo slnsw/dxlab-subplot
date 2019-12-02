@@ -62,15 +62,15 @@ export class MapExplorer extends Component {
         // view == main or minimap or all
         // TODO: define a prop structure for this.
         const layers = [
-            // [SearchResultLayer, { view: 'all' }],
-            // [LandmarksLayer, { view: 'all' }],
-            // [MapsDistributionLayer, { view: 'master', onClick : this.showMapDetail.bind(this) }],
-            // [FootprintMapsLayer, { view: 'slave' }],
+            [SearchResultLayer, { view: 'all' }],
+            [LandmarksLayer, { view: 'all' }], 
+            [MapsDistributionLayer, { view: 'master', onClick : this.showMapDetail.bind(this) }],
+            [FootprintMapsLayer, { view: 'slave' }],
             [MapsPolygonLayer, { view: 'master', onClick: this.showMapDetail.bind(this) }],
-            // [MapsLabelLayer, {view: 'master'}],
-            // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: '.tif', view: 'slave', onClick: this.showMapDetail.bind(this) }],
-            // [MapsBitmapLayer, { id:'edge', name: 'edge', suffix: '_edge_800', view: 'slave'}], 
-            // [TileImagesLayer, {view: 'all'}]
+            [MapsLabelLayer, {view: 'master'}],
+            [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: '.tif', view: 'slave', onClick: this.showMapDetail.bind(this) }],
+            [MapsBitmapLayer, { id:'edge', name: 'edge', suffix: '_edge_800', view: 'slave'}], 
+            [TileImagesLayer, {view: 'all'}]
         ];
 
         const { showModal, modalData } = this.state;

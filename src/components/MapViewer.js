@@ -41,26 +41,31 @@ export class MapViewer extends Component {
 
     componentDidMount() {
         const [, dispatch] = this.context;
+        const {mode} = this.props;
         // TODO: Clean up too much going on here!
-        dispatch (socketConnect({
-            listenCallback: ({subject, data}) => {   
-                
-                switch (subject) {
-                    case 'viewchange':
-                        const {viewState} = data;
 
-                        // Remove transitions let update the position via messages
-                        const ks = filter(keys(viewState), (k) => !includes(['transitionInterpolator', 'transitionDuration'], k));
-                        const cleanState = pick(viewState, ks);
+        if (mode !== 'kiosk') {
+            dispatch(socketConnect({
+                listenCallback: ({ subject, data }) => {
 
-                        this.setState({ viewState: cleanState });
-                        this.handleOnViewChange(cleanState); 
-                        break;
-                    default:
+                    switch (subject) {
+                        case 'viewchange':
+                            const { viewState } = data;
+
+                            // Remove transitions let update the position via messages
+                            const ks = filter(keys(viewState), (k) => !includes(['transitionInterpolator', 'transitionDuration'], k));
+                            const cleanState = pick(viewState, ks);
+
+                            this.setState({ viewState: cleanState });
+                            this.handleOnViewChange(cleanState);
+                            break;
+
+                        default:
                         // nothing;
+                    }
                 }
-            }
-        }));
+            }));
+        }
 
         this.handleOnViewChange(this.state.viewState);
     }
@@ -113,6 +118,7 @@ export class MapViewer extends Component {
 
     onViewStateChange({ viewState, viewId }) {
         // Single view implemenation
+        const { mode } = this.props;
 
         const onUpdateState = () => {
             const [state, dispatch] = this.context;
@@ -124,8 +130,8 @@ export class MapViewer extends Component {
 
             dispatch(
                 socketEmit({
-                    subject:'viewchange', 
-                    data:{ viewState: newState, filter: state.maps.filter }
+                    subject: 'viewchange',
+                    data: { viewState: newState, filter: state.maps.filter }
                 })
             );
 
@@ -136,7 +142,7 @@ export class MapViewer extends Component {
         this.setState({
             viewState: {
                 ...viewState,
-                pitch: 0
+                ...( mode === 'slave' && {pitch: 0})
             }
         }, onUpdateState);
 
@@ -158,7 +164,7 @@ export class MapViewer extends Component {
             const { view } = container.props;
             const { mode } = this.props;
 
-            if (view === mode || view === 'all') {
+            if (view === mode || view === 'all' || mode === 'kiosk') {
                 return true;
             }
         }
@@ -200,7 +206,7 @@ export class MapViewer extends Component {
 
 
         const [state, dispatch] = this.context;
-        const {maps: { filter }} = state;
+        const { maps: { filter } } = state;
 
         return (
             <React.Fragment>
@@ -250,7 +256,7 @@ export class MapViewer extends Component {
 
                 {/* { mode === "kiosk" || mode === "slave" &&  } */}
                 <div className={styles.fog}></div>
-{/* 
+                {/* 
                 { mode === "kiosk" || mode === "master" &&  
                     <Range 
                         min={1880} 
@@ -262,7 +268,7 @@ export class MapViewer extends Component {
                             dispatch(getMaps({from, to }));
                         }}/>
                 } */}
-                
+
 
             </React.Fragment>
 

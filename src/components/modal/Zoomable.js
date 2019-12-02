@@ -20,51 +20,36 @@ export default class Zoomable extends Component {
     }
 
     initSeaDragon() {
-        let { id, assetId } = this.props
-        this.viewer = OSD({
-            id: id,
-            visibilityRatio: 1.0,
-            constrainDuringPan: false,
-            defaultZoomLevel: 1,
-            minZoomLevel: 1,
-            maxZoomLevel: 10,
-            showNavigator: true,
-            tileSources: [{
-                "profile": [
-                    "http://iiif.io/api/image/2/level2.json",
-                    {
-                        "supports": [
-                            "canonicalLinkHeader",
-                            "profileLinkHeader",
-                            "mirroring",
-                            "rotationArbitrary",
-                            "sizeAboveFull"
-                        ],
-                        "qualities": [
-                            "default",
-                            "color",
-                            "gray",
-                            "bitonal"
-                        ],
-                        "formats": [
-                            "jpg",
-                            "png",
-                            "gif",
-                            "webp"
+        const { assetId } = this.props
+        fetch(`${process.env.REACT_APP_STATIC_BASE_URL}${assetId}.tif/info.json`)
+            .then((response) => response.json())
+            .then((info) => {
+                // Temporal solution until I implement an updated version of 
+                // Loris or I use another IIIF server 
+                info['@id'] = `${process.env.REACT_APP_STATIC_BASE_URL}${assetId}.tif`;
+                
+                // Create an instance of OSD
+                const { id } = this.props;
+                try {
+                    this.viewer = OSD({
+                        id: id,
+                        visibilityRatio: 1.0,
+                        constrainDuringPan: false,
+                        defaultZoomLevel: 1,
+                        minZoomLevel: 1,
+                        maxZoomLevel: 10,
+                        showNavigator: true,
+                        tileSources: [
+                            info
                         ]
-                    }
-                ],
-                "protocol": "http://iiif.io/api/image",
-                "sizes": [
+                    })
+                } catch (error) {
+                    console.warn(error);
+                }
 
-                ],
-                "height": 4493,
-                "width": 6495,
-                "@context": "http://iiif.io/api/image/2/context.json",
-                "@id": `${process.env.REACT_APP_STATIC_BASE_URL}${assetId}.tif`
-            }
-            ]
-        })
+        
+            })
+
 
 
     }
