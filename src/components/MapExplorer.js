@@ -6,7 +6,8 @@ import { MapViewer } from './MapViewer';
 
 
 // UI Components
-import { ModalWindow } from './modal/ModalWindow';
+import { ModalWindow } from './ui/modal/ModalWindow';
+import { Range } from './ui/range/Range';
 import { getImageUrl } from '../share/utils';
 
 // Data vizualization and info layers
@@ -64,13 +65,13 @@ export class MapExplorer extends Component {
         const layers = [
             [SearchResultLayer, { view: 'all' }],
             [LandmarksLayer, { view: 'all' }], 
-            [MapsDistributionLayer, { view: 'master', onClick : this.showMapDetail.bind(this) }],
+            // [MapsDistributionLayer, { view: 'master', onClick : this.showMapDetail.bind(this) }],
             [FootprintMapsLayer, { view: 'slave' }],
             [MapsPolygonLayer, { view: 'master', onClick: this.showMapDetail.bind(this) }],
-            [MapsLabelLayer, {view: 'master'}],
-            [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: '.tif', view: 'slave', onClick: this.showMapDetail.bind(this) }],
-            [MapsBitmapLayer, { id:'edge', name: 'edge', suffix: '_edge_800', view: 'slave'}], 
-            [TileImagesLayer, {view: 'all'}]
+            // [MapsLabelLayer, {view: 'master'}],
+            // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: '.tif', view: 'slave', onClick: this.showMapDetail.bind(this) }],
+            // [MapsBitmapLayer, { id:'edge', name: 'edge', suffix: '_edge_800', view: 'slave'}], 
+            // [TileImagesLayer, {view: 'all'}]
         ];
 
         const { showModal, modalData } = this.state;
@@ -85,10 +86,16 @@ export class MapExplorer extends Component {
                     onRequestClose={() => this.setState({ showModal: false })}
                     {...modalData}
                 />
+                
+                <Range></Range>
+
                 <MapViewer
                     mode={mode}
                     layers={layers}
                 ></MapViewer>
+
+
+
 
             </React.Fragment>
         )

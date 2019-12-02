@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { MapDataContext } from '../../context/MapsContext';
+import { MapDataContext } from '../../../context/MapsContext';
 
 import IdleTimer from 'react-idle-timer'
 import ReactModal from 'react-modal';
@@ -48,16 +48,6 @@ export class ModalWindow extends Component {
                     isOpen={isOpen}
                     onRequestClose={this.handleCloseModal}
                     ariaHideApp={false}
-                    // contentLabel="Inline Styles Modal Example"
-                    // style={{
-                    //     overlay: {
-                    //         backgroundColor: 'papayawhip',
-                    //         zIndex: 2000
-                    //     },
-                    //     content: {
-                    //         color: 'lightsteelblue'
-                    //     }
-                    // }}
                     className={styles.modalWindow}
                     overlayClassName={styles.modalOverlay}
                 >
