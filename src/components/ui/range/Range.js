@@ -20,10 +20,13 @@ export class Range extends Component {
             return;
         }
 
-        return data.reduce((result, m) => {
-            let count = get(result, m.year, 0);
-            // Update result
-            result[m.year] = count + 1;
+        return data.reduce((result, it) => {
+            const year = it.properties.year;
+            if (year) {
+                const count = get(result, year, 0);
+                // Update result
+                result[year] = count + 1;
+            }
             return result;
 
 
@@ -37,6 +40,7 @@ export class Range extends Component {
         const grps = this.countByYear();
         const fromYear = get(state, 'maps.filter.fromYear', 0);
         const toYear = get(state, 'maps.filter.toYear', 0);
+
         return (
             <React.Fragment>
                 <div className={styles.range}>

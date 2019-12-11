@@ -243,6 +243,7 @@ export class MapViewer extends Component {
                 >
 
                     <InteractiveMap
+                        reuseMaps
                         mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
                         mapStyle={mapStyle}
                         preventStyleDiffing={true}
