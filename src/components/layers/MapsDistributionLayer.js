@@ -12,12 +12,11 @@ import { color } from 'd3-color'
 
 export class MapsDistributionLayer extends CompositeLayer {
 
-
     updateState({ props, changeFlags }) {
         if (changeFlags.dataChanged) {
 
             // Group data by year
-            const { data, filter} = props;
+            const { data, filter } = props;
             const { fromYear, toYear } = filter;
 
             if (!data) {
@@ -25,25 +24,25 @@ export class MapsDistributionLayer extends CompositeLayer {
             }
 
 
-            const groupData = data.reduce((result, m) => {
-                const elevation = interpolateScale(parseInt(m.year), toYear, fromYear) * 10;
-                let grp = get(result, m.year, {});
+            const groupData = data.reduce((result, { properties, geometry }) => {
+                const elevation = interpolateScale(parseInt(properties.year), toYear, fromYear) * 10;
+                let grp = get(result, properties.year, {});
 
                 // Append maps to data. MANY NOT NECESSARY
                 let maps = get(grp, 'maps', []);
-                maps.push(m);
+                maps.push({ properties, geometry });
                 grp['maps'] = maps;
 
                 // Append map cutline to merged polygon data
                 let merge = get(grp, 'merge', new MergeGeoJsonPolygon());
                 grp['merge'] = merge;
-                if (m.cutline) {
-                    merge.append(m.cutline);
+                if (geometry) {
+                    merge.append(geometry);
                 }
 
                 // Finally update the GeoJson feature structure
                 let geoJson = merge.getPolygon();
-                if (geoJson.type === 'Polygon'){
+                if (geoJson.type === 'Polygon') {
                     geoJson = {
                         type: 'feature',
                         geometry: geoJson,
@@ -54,38 +53,38 @@ export class MapsDistributionLayer extends CompositeLayer {
                 grp['polygon'] = {
                     ...geoJson,
                     properties: {
-                        'year': m.year,
+                        'year': properties.year,
                         'count': maps.length,
                         'elevation': elevation
                     }
                 };
 
                 // Update result
-                result[m.year] = grp;
+                result[properties.year] = grp
                 return result;
-
 
             }, {});
 
             const features = Object.keys(groupData).map((year) => {
                 let item = groupData[year];
-                return  item.polygon;
+                return item.polygon;
             });
 
-            const featureCollection = this.getSubLayerRow({ 
+            const featureCollection = this.getSubLayerRow({
                 'type': 'FeatureCollection',
                 'features': features
-    
+
             });
+
 
             this.setState({ featureCollection });
             this.setState({ groupData });
 
-            
+
         }
     }
 
-    
+
 
     buildLayers() {
         const { id, filter } = this.props;
@@ -96,12 +95,14 @@ export class MapsDistributionLayer extends CompositeLayer {
         const yearColorScale = scaleLinear([fromYear, toYear], ["gold", "limegreen"]);
         // const yearColorAlpha = scaleLinear([from, to], [255, 100]);
 
+
         if (featureCollection.features.length > 0) {
+
             // Build grouped year layers
             return new GeoJsonLayer({
                 id: `${id}-years-footprint-layer`,
                 data: featureCollection,
-                extruded: true,
+                extruded: false,
                 stroked: true,
                 pickable: true,
                 autoHighlight: true,

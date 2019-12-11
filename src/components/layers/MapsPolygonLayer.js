@@ -22,17 +22,9 @@ export class MapsPolygonLayer extends CompositeLayer {
                 return;
             }
             
-            const features = data.map((m) => {    
-                return {
-                    type: 'feature',
-                    geometry: m.cutline, 
-                    properties: pick(m, ['year', 'title', 'asset_id'])
-                };
-            });
-    
             const feature = { 
                 'type': 'FeatureCollection',
-                'features': features
+                'features': data
     
             }
             

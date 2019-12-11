@@ -39,3 +39,19 @@ export function fetchData( {around, aroundRadius, fromYear, toYear, assetIds}) {
     // We get the API response and receive data in JSON format...
     .then(response => response.json())
 }
+
+export function loadData() {
+  const query = {
+    // 'properties.year': {'$lt': 1880}
+  }
+  return fetch(`${process.env.REACT_APP_DATA_URL}?query=${JSON.stringify(query)}`)
+  // We get the API response and receive data in JSON format...
+  .then(response => response.json())
+  // TODO: Wrap response around FeatureCollection extructure
+  // .then(data => { 
+  //   return {
+  //       'type': 'FeatureCollection',
+  //       'features': data
+  //   }
+  // }) 
+}

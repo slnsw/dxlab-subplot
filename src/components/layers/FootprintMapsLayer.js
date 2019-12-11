@@ -16,7 +16,7 @@ export class FootprintMapsLayer extends CompositeLayer {
                 return;
             }
             // Only merge cutline polygon data
-            const cutlines = data.map((m) => m.cutline); 
+            const cutlines = data.map(({geometry}) => geometry); 
 
             // Merge polygons
             const merge = new MergeGeoJsonPolygon();

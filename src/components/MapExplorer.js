@@ -65,12 +65,12 @@ export class MapExplorer extends Component {
         const layers = [
             [SearchResultLayer, { view: 'all' }],
             [LandmarksLayer, { view: 'all' }], 
-            // [MapsDistributionLayer, { view: 'master', onClick : this.showMapDetail.bind(this) }],
-            [FootprintMapsLayer, { view: 'slave' }],
-            [MapsPolygonLayer, { view: 'master', onClick: this.showMapDetail.bind(this) }],
+            // [MapsDistributionLayer, { view: 'master' }],
+            // [FootprintMapsLayer, { view: 'slave' }],
+            // [MapsPolygonLayer, { view: 'master', onClick: this.showMapDetail.bind(this) }],
             // [MapsLabelLayer, {view: 'master'}],
-            // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: '.tif', view: 'slave', onClick: this.showMapDetail.bind(this) }],
-            // [MapsBitmapLayer, { id:'edge', name: 'edge', suffix: '_edge_800', view: 'slave'}], 
+            // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: '_crop.png', view: 'slave', onClick: this.showMapDetail.bind(this) }],
+            // [MapsBitmapLayer, { id: 'edge', name: 'edge', suffix: '_edge.png', view: 'slave', onClick: this.showMapDetail.bind(this) }],
             // [TileImagesLayer, {view: 'all'}]
         ];
 

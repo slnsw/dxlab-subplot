@@ -14,28 +14,9 @@ export class MapsLabelLayer extends CompositeLayer {
                 return;
             }
 
-            const featuresData = data.reduce(function(result, m) {
-                if (m.has_cutline_crop) {
-
-                    const info = pick(m, ['year', 'title', 'asset_id'])
-                    const feature = {
-                        type: 'feature',
-                        geometry: m.cutline,
-                        properties: {   
-                            ...info,
-                            centroid: m.cutline_centroid
-                        }
-                    }
-
-                    // console.log(feature);
-                    result.push(feature);
-                }
-                return result;
-              }, []);
-
             const feature = { 
                 'type': 'FeatureCollection',
-                'features': featuresData
+                'features': data
     
             }
 

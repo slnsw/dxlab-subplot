@@ -27,11 +27,20 @@ export class MergeGeoJsonPolygon {
   append(polygon) {
     let merge = this.cache;
     if (merge) {
+      // Clean coordinates to get a better render.
+      // However there are invalid coordinates comming from the 
+      // original data. To avoid loose the entry allow bypass 
+      // the polygon with messy data.
+      try {
+        polygon = cleanCoords(polygon);
+      } catch (error) {
+        // ignore
+      }
       merge = union(merge, polygon);
     } else {
       merge = polygon;
     }
-    merge = cleanCoords(merge);
+    // merge = cleanCoords(merge);
     this.cache = merge
     return merge;
 

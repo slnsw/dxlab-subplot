@@ -81,7 +81,7 @@ export class MapViewer extends Component {
 
     handleOnViewChange = debounce((viewState) => {
         const { latitude, longitude, zoom } = viewState;
-        const [, dispatch] = this.context;
+        const [state, dispatch] = this.context;
 
         // Calculate "optimal" radius to search
         const aroundRadius = linealScale(zoom, [15, 12], [800, 4000]);
@@ -99,7 +99,9 @@ export class MapViewer extends Component {
             }
         }
 
-        dispatch(getMaps({ around }));
+        if (state.maps.data.length === 0) {
+            dispatch(getMaps({ around }));
+        }
 
         const { onViewChange } = this.props;
         if (onViewChange) {
@@ -173,20 +175,29 @@ export class MapViewer extends Component {
     };
 
     prepareLayers() {
-        return [
-            ...this.props.layers.map(([L, props]) => {
-                let data = this.context[0].maps.data;
-                let filter = this.context[0].maps.filter;
-                props = {
-                    ...props,
-                    data,
-                    filter
-                }
-                const [state, dispatch] = this.context;
-                return new L({ contextState: state, dispatch, ...props })
-            }),
-        ]
+        const data = this.context[0].maps.data;
+        const filter = this.context[0].maps.filter;
+        if (data.length > 0) {
+            return [
+                ...this.props.layers.map(([L, props]) => {
+                    props = {
+                        ...props,
+                        data,
+                        filter
+                    }
+                    const [state, dispatch] = this.context;
+                    return new L({ contextState: state, dispatch, ...props })
+                }),
+            ]
+        } else {
+            return [];
+        }
     }
+
+    componentDidCatch(error, errorInfo) {
+        // You can also log the error to an error reporting service
+        console.log(error, errorInfo);
+      }
 
     render() {
 
