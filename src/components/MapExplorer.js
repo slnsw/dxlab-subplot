@@ -38,20 +38,22 @@ export class MapExplorer extends Component {
      */
     showMapDetail({ object }) {
         const [, dispatch] = this.context;
+        console.log(object)
+        if (object) {
+            let { properties: { title, image_url, asset_id } } = object;
+            if (!image_url) {
+                image_url = getImageUrl(asset_id, '_crop_800')
+            }
 
-        let { properties: { title, imageUrl, asset_id } } = object;
-        if (!imageUrl) {
-            imageUrl = getImageUrl(asset_id, '_crop_800')
+            this.setState({
+                modalData: { title, image_url, asset_id },
+                selectedMap: object,
+                showModal: true
+            });
+
+            // Update map context to keep track with the selected map
+            dispatch(showDetailMap({ asset_id }))
         }
-
-        this.setState({
-            modalData: { title, imageUrl, asset_id },
-            selectedMap: object,
-            showModal: true
-        });
-
-        // Update map context to keep track with the selected map
-        dispatch(showDetailMap({ asset_id }))
     };
 
 
@@ -67,8 +69,8 @@ export class MapExplorer extends Component {
             // [SearchResultLayer, { view: 'all' }],
             [LandmarksLayer, { view: 'all' }], 
             // [MapsDistributionLayer, { view: 'master' }],
-            [FootprintMapsLayer, { view: 'slave' }],
-            // [MapsPolygonLayer, { view: 'master', onClick: this.showMapDetail.bind(this) }],
+            // [FootprintMapsLayer, { view: 'slave' }],
+            [MapsPolygonLayer, { view: 'master', onClick: this.showMapDetail.bind(this) }],
             // [MapsLabelLayer, {view: 'master'}],
             [MapsClusterCounts, {view: 'master'}],
             // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: '_crop.png', view: 'slave', onClick: this.showMapDetail.bind(this) }],

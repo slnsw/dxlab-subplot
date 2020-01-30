@@ -34,6 +34,10 @@ export function getMaps({around, fromYear, toYear, assetIds}){
     }
 }
 
+export function applyFilter( fromYear, toYear) {
+
+}
+
 // Temporal method until full transition to API-less implementation
 export function getMapsRaw({around, fromYear, toYear, assetIds}) {
 

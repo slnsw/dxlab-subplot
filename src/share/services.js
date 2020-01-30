@@ -42,7 +42,7 @@ export function fetchData( {around, aroundRadius, fromYear, toYear, assetIds}) {
 
 export function loadData() {
   const query = {
-    // 'properties.year': {'$lt': 1880}
+    'properties.year': {'$lt': 1890, '$ne': null},
   }
   return fetch(`${process.env.REACT_APP_DATA_URL}?query=${JSON.stringify(query)}`)
   // We get the API response and receive data in JSON format...

@@ -16,6 +16,7 @@ export function mapsReducer(state, action) {
         case ActionTypes.MAPS_DATA_COMPLETE: {
             return {
                 ...state,
+                dataSet: action.data, // Unfiltered data
                 data: action.data,
                 filter: action.filter
             };
