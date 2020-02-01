@@ -133,7 +133,7 @@ export class MapViewer extends Component {
             dispatch(
                 socketEmit({
                     subject: 'viewchange',
-                    data: { viewState: newState, filter: state.maps.filter }
+                    data: { viewState: newState, filter: state.maps.filters }
                 })
             );
 
@@ -176,14 +176,14 @@ export class MapViewer extends Component {
 
     prepareLayers() {
         const data = this.context[0].maps.data;
-        const filter = this.context[0].maps.filter;
+        const filters = this.context[0].maps.filters;
         if (data.length > 0) {
             return [
                 ...this.props.layers.map(([L, props]) => {
                     props = {
                         ...props,
                         data,
-                        filter
+                        filters
                     }
                     const [state, dispatch] = this.context;
                     return new L({ contextState: state, dispatch, ...props })

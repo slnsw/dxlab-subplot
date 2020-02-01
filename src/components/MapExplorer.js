@@ -38,7 +38,7 @@ export class MapExplorer extends Component {
      */
     showMapDetail({ object }) {
         const [, dispatch] = this.context;
-        console.log(object)
+        // console.log(object)
         if (object) {
             let { properties: { title, image_url, asset_id } } = object;
             if (!image_url) {
@@ -70,9 +70,9 @@ export class MapExplorer extends Component {
             [LandmarksLayer, { view: 'all' }], 
             // [MapsDistributionLayer, { view: 'master' }],
             // [FootprintMapsLayer, { view: 'slave' }],
-            [MapsPolygonLayer, { view: 'master', onClick: this.showMapDetail.bind(this) }],
+            // [MapsPolygonLayer, { view: 'master', onClick: this.showMapDetail.bind(this) }],
             // [MapsLabelLayer, {view: 'master'}],
-            [MapsClusterCounts, {view: 'master'}],
+            // [MapsClusterCounts, {view: 'master'}],
             // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: '_crop.png', view: 'slave', onClick: this.showMapDetail.bind(this) }],
             // [MapsBitmapLayer, { id: 'edge', name: 'edge', suffix: '_edge.png', view: 'slave', onClick: this.showMapDetail.bind(this) }],
             // [TileImagesLayer, {view: 'all'}]

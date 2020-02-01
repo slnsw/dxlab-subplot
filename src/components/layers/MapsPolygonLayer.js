@@ -1,6 +1,7 @@
 
 import { CompositeLayer } from 'deck.gl';
 import { GeoJsonLayer } from '@deck.gl/layers';
+// import { DataFilterExtension } from '@deck.gl/extensions';
 
 import { pick } from 'lodash';
 
@@ -30,13 +31,12 @@ export class MapsPolygonLayer extends CompositeLayer {
             
             this.setState({feature, elev: 0});
             
-
         }
     }
 
     buildLayer(data) {
-        const { id, filter} = this.props;
-        const {fromYear, toYear} = filter;
+        const { id, filters} = this.props;
+        const {fromYear, toYear} = filters;
         const yearColorScale = scaleLinear([fromYear, toYear], ["gold", "limegreen"]);
         
         const {elev} = this.state;
@@ -70,6 +70,11 @@ export class MapsPolygonLayer extends CompositeLayer {
             //       enter: value => [value[0], value[1], value[2], 255] // fade in
             //     }
             // }
+            
+            // DataFilterExension
+            // getFilterValue: f => f.properties.year,  
+            // filterRange: [fromYear, toYear],  // range of values
+            // extensions: [new DataFilterExtension({filterSize: 1})]
                
         });
     }

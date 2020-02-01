@@ -1,28 +1,23 @@
 import { ActionTypes } from './MapsReducer';
 import { fetchData,loadData } from '../share/services';
-import { pickBy, get, identity } from 'lodash';
+import { pickBy, get, identity, some, omit } from 'lodash';
 
 
 
-export function getMaps({around, fromYear, toYear, assetIds}){
+export function getMaps({...query}){
     return (dispatch, state) => {
+        const {around} = query
         const radius = get(around, 'properties.radius', null);
 
-        const filter = pickBy({
-            ...state.maps.filter,
-            ...(around && {around}),
-            ...(radius && {aroundRadius: radius}),
-            ...(fromYear && {fromYear}),
-            ...(toYear && {toYear}),
-            ...(assetIds && {assetIds})
-        }, identity);
+        const filters = updatefilters(state.maps.filters, { radius, ...query})
 
         loadData()
             .then((data) => {
                 dispatch({
                     type: ActionTypes.MAPS_DATA_COMPLETE,
-                    data,
-                    filter
+                    dataSet: data,
+                    data: filterData(data, filters),
+                    filters
                 })
             })
             .catch((error) => {
@@ -34,8 +29,46 @@ export function getMaps({around, fromYear, toYear, assetIds}){
     }
 }
 
-export function applyFilter( fromYear, toYear) {
+export function applyFilters({...query}) {
+    return (dispatch, state) => {
+        const {around} = query
+        const radius = get(around, 'properties.radius', null);
 
+        const filters = updatefilters(state.maps.filters, { radius, ...query})
+        const data = filterData(state.maps.dataSet, filters)      
+
+        dispatch({
+            type: ActionTypes.MAPS_FILTER_COMPLETE,
+            filters,
+            data
+        })
+    }
+}
+
+function updatefilters(current, {around, radius, fromYear, toYear, assetIds, ...properties}) {
+    return pickBy({
+        ...current,
+        ...(around && {around}),
+        ...(radius && {aroundRadius: radius}),
+        ...(fromYear && {fromYear}),
+        ...(toYear && {toYear}),
+        ...properties
+    }, identity);
+}
+
+function filterData(data, {around, radius, fromYear, toYear, assetIds, ...properties}) {
+
+    return data.filter((d) => {
+            let select = true
+            // Filter by range of years
+            select = d.properties.year >= fromYear && d.properties.year <= toYear
+
+            // Filter by exact match of other properties
+            if (select) {
+                select = some([d.properties], omit(properties, ['aroundRadius']))
+            }
+            return select
+        })
 }
 
 // Temporal method until full transition to API-less implementation
@@ -46,8 +79,8 @@ export function getMapsRaw({around, fromYear, toYear, assetIds}) {
 
         // Get data
         // const data = [];
-        const filter = pickBy({
-            ...state.maps.filter,
+        const filters = pickBy({
+            ...state.maps.filters,
             ...(around && {around}),
             ...(radius && {aroundRadius: radius}),
             ...(fromYear && {fromYear}),
@@ -59,12 +92,12 @@ export function getMapsRaw({around, fromYear, toYear, assetIds}) {
             type: ActionTypes.MAPS_DATA_REQUEST,
         });
 
-        fetchData(filter)
+        fetchData(filters)
             .then((data) => {
                 dispatch({
                     type: ActionTypes.MAPS_DATA_COMPLETE,
                     data,
-                    filter
+                    filters
                 })
             })
             .catch((error) => {

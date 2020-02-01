@@ -16,8 +16,8 @@ export class MapsDistributionLayer extends CompositeLayer {
         if (changeFlags.dataChanged) {
 
             // Group data by year
-            const { data, filter } = props;
-            const { fromYear, toYear } = filter;
+            const { data, filters } = props;
+            const { fromYear, toYear } = filters;
 
             if (!data) {
                 return;
@@ -87,8 +87,8 @@ export class MapsDistributionLayer extends CompositeLayer {
 
 
     buildLayers() {
-        const { id, filter } = this.props;
-        const { fromYear, toYear } = filter;
+        const { id, filters } = this.props;
+        const { fromYear, toYear } = filters;
         const { featureCollection } = this.state;
 
         // const yearScale = scaleLinear().domain([this.state.year_from, this.state.year_to]).range(["brown", "steelblue"]); 

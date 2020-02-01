@@ -24,6 +24,8 @@ export class MapsClusterCounts extends CompositeLayer {
 
 
     updateState({ props, changeFlags }) {
+        let refresh = false;
+
         const { data } = props;
         if (!data) {
             return;
@@ -40,11 +42,12 @@ export class MapsClusterCounts extends CompositeLayer {
             );
 
             this.setState({ index });
+            refresh = true;
         }
 
         const zoom = Math.floor(this.context.viewport.zoom);
 
-        if (this.state.zoom !== zoom) {
+        if (this.state.zoom !== zoom || refresh) {
             const cluster = this.state.index.getClusters([-180, -85, 180, 85], zoom);
             this.setState({ cluster, zoom });
         }
@@ -70,6 +73,7 @@ export class MapsClusterCounts extends CompositeLayer {
             getPosition: d => d.geometry.coordinates,
             getIcon: d => 'marker', // getIconName(d.properties.cluster ? d.properties.point_count : 1),
             getSize: d => this.getIconSize(d.properties.cluster ? d.properties.point_count : 1)
+
         })));
 
         layers.push(new TextLayer(this.getSubLayerProps({

@@ -13,9 +13,10 @@ function App() {
   const initial = {
     maps: {
       data: [],
-      filter: {
+      filters: {
         fromYear: 1880,
-        toYear: 1980,
+        toYear: 1886,
+        // colored: true,
         assetIds: null,
         around: null,
         aroundRadius: null

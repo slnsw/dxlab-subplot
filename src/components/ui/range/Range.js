@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { MapDataContext } from '../../../context/MapsContext';
-import { getMaps } from '../../../context/MapsActions';
-import { get } from 'lodash';
+import { applyFilters } from '../../../context/MapsActions';
+import { get, map, isNumber, max, min } from 'lodash';
 
 
 import Slider from 'rc-slider';
@@ -12,9 +12,30 @@ const RangeTooltips = createSliderWithTooltip(Slider.Range);
 
 export class Range extends Component {
 
+    componentDidMount(...args) {
+
+        const [state,] = this.context;
+        const data = get(state, 'maps.dataSet', [])
+        console.log(data)
+
+        // const years = map(data, 'properties.year').filter(d => isNumber(d) || !isNaN(d))
+        // years.forEach(d => console.log(isNaN(d)))
+
+        // const maxYear = max(years)
+        // const minYear = min(years)
+
+        // this.setState({
+        //     maxYear,
+        //     minYear
+        // })
+
+        // console.log(maxYear, minYear)
+
+    }
+
     countByYear() {
         const [state,] = this.context;
-        const data = get(state, 'maps.data', []);
+        const data = get(state, 'maps.dataSet', []);
 
         if (!data) {
             return;
@@ -38,8 +59,8 @@ export class Range extends Component {
     render() {
         const [state, dispatch] = this.context;
         const grps = this.countByYear();
-        const fromYear = get(state, 'maps.filter.fromYear', 0);
-        const toYear = get(state, 'maps.filter.toYear', 0);
+        const fromYear = get(state, 'maps.filters.fromYear', 0);
+        const toYear = get(state, 'maps.filters.toYear', 0);
 
         return (
             <React.Fragment>
@@ -62,7 +83,8 @@ export class Range extends Component {
                     pushable
                     vertical
                     onChange={([fromYear, toYear]) => {
-                        dispatch(getMaps({ fromYear, toYear }));
+                        //dispatch(getMaps({ fromYear, toYear }));
+                        dispatch(applyFilters({ fromYear, toYear}))
                     }} />
 
             </React.Fragment>

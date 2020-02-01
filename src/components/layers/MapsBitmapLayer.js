@@ -2,6 +2,7 @@
 import { CompositeLayer } from 'deck.gl';
 import { BitmapLayer, GeoJsonLayer } from '@deck.gl/layers';
 import { getImageUrl, interpolateScale } from '../../share/utils';
+import { DataFilterExtension } from '@deck.gl/extensions';
 
 import { pick } from 'lodash';
 
@@ -66,8 +67,9 @@ export class MapsBitmapLayer extends CompositeLayer {
 
 
     buildLayers() {
-        const { id, name } = this.props;
+        const { id, name, filters } = this.props;
         const { feature: { features } } = this.state;
+        const { fromYear, toYear } = filters;
         const layers = [];
 
         layers.push(features.map(({properties: {asset_id, image_bounds, image_url}}) => {   
@@ -90,6 +92,12 @@ export class MapsBitmapLayer extends CompositeLayer {
             stroked: true,
             getFillColor: [0, 0, 0, 0],
             getLineColor: [0, 0, 0, 125],
+
+            // DataFilterExension
+            // getFilterValue: f => f.properties.year,  
+            // filterRange: [fromYear, toYear],  // range of values
+            // extensions: [new DataFilterExtension({filterSize: 1})]
+            
         })));
 
         return layers;
