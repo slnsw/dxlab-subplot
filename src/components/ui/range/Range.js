@@ -12,27 +12,6 @@ const RangeTooltips = createSliderWithTooltip(Slider.Range);
 
 export class Range extends Component {
 
-    componentDidMount(...args) {
-
-        const [state,] = this.context;
-        const data = get(state, 'maps.dataSet', [])
-        console.log(data)
-
-        // const years = map(data, 'properties.year').filter(d => isNumber(d) || !isNaN(d))
-        // years.forEach(d => console.log(isNaN(d)))
-
-        // const maxYear = max(years)
-        // const minYear = min(years)
-
-        // this.setState({
-        //     maxYear,
-        //     minYear
-        // })
-
-        // console.log(maxYear, minYear)
-
-    }
-
     countByYear() {
         const [state,] = this.context;
         const data = get(state, 'maps.dataSet', []);
@@ -61,6 +40,8 @@ export class Range extends Component {
         const grps = this.countByYear();
         const fromYear = get(state, 'maps.filters.fromYear', 0);
         const toYear = get(state, 'maps.filters.toYear', 0);
+        const maxYear = get(state, 'maps.meta.maxYear', 0);
+        const minYear = get(state, 'maps.meta.minYear', 0);
 
         return (
             <React.Fragment>
@@ -71,8 +52,8 @@ export class Range extends Component {
 
                 <RangeTooltips
                     className={styles.slider}
-                    min={1880}
-                    max={1950}
+                    min={minYear}
+                    max={maxYear}
                     marks={grps}
                     steps={20}
                     defaultValue={[fromYear, toYear]}

@@ -8,6 +8,10 @@ export const MapDataContext = React.createContext();
 const initialState = {
     maps: {
         data: [],
+        meta: {
+            maxYear: 0,
+            minYear: 0
+        },
         filter: {}
     },
     comm: {}

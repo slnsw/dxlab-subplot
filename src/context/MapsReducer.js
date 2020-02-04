@@ -20,9 +20,10 @@ export function mapsReducer(state, action) {
         case ActionTypes.MAPS_DATA_COMPLETE: {
             return {
                 ...state,
+                filters: action.filters,
                 dataSet: action.dataSet, // Unfiltered data
                 data: action.data,
-                filters: action.filters
+                meta: action.meta
             };
         }
 

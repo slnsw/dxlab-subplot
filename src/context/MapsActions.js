@@ -1,6 +1,6 @@
 import { ActionTypes } from './MapsReducer';
 import { fetchData,loadData } from '../share/services';
-import { pickBy, get, identity, some, omit } from 'lodash';
+import { pickBy, get, identity, some, omit, map, isNumber, max, min } from 'lodash';
 
 
 
@@ -13,11 +13,18 @@ export function getMaps({...query}){
 
         loadData()
             .then((data) => {
+                // Get maxium and minium year 
+                const years = map(data, 'properties.year').filter(d => isNumber(d) || !isNaN(d))
+  
                 dispatch({
                     type: ActionTypes.MAPS_DATA_COMPLETE,
+                    filters,
                     dataSet: data,
                     data: filterData(data, filters),
-                    filters
+                    meta: {
+                        maxYear: max(years),
+                        minYear: min(years)
+                    }
                 })
             })
             .catch((error) => {
