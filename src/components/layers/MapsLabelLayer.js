@@ -1,7 +1,6 @@
 
 import { CompositeLayer } from 'deck.gl';
 import { TextLayer } from '@deck.gl/layers';
-import { pick } from 'lodash';
 
 export class MapsLabelLayer extends CompositeLayer {
 

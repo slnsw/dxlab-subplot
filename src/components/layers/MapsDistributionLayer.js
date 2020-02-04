@@ -2,7 +2,7 @@
 import { CompositeLayer } from 'deck.gl';
 import { GeoJsonLayer } from '@deck.gl/layers';
 
-import { chain, pick, get, set, zipObject, cloneDeep } from 'lodash';
+import { get } from 'lodash';
 import { MergeGeoJsonPolygon, interpolateScale } from '../../share/utils';
 
 

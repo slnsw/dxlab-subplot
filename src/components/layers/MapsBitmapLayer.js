@@ -1,10 +1,7 @@
 
 import { CompositeLayer } from 'deck.gl';
 import { BitmapLayer, GeoJsonLayer } from '@deck.gl/layers';
-import { getImageUrl, interpolateScale } from '../../share/utils';
-import { DataFilterExtension } from '@deck.gl/extensions';
-
-import { pick } from 'lodash';
+import { getImageUrl } from '../../share/utils';
 
 export class MapsBitmapLayer extends CompositeLayer {
 
@@ -16,6 +13,7 @@ export class MapsBitmapLayer extends CompositeLayer {
             if (!data) {
                 return;
             }
+            
             const featuresData = data.reduce(function (result, el) {
                 const { geometry, properties } = el;
                 if (geometry) {
@@ -25,7 +23,7 @@ export class MapsBitmapLayer extends CompositeLayer {
                     //  const elevation = interpolateScale(parseInt(m.year), toYear, fromYear) * 50; 
                     //  mapValue(m.year, this.state.year_from, this.state.year_to, 0, this.state.year_to - this.state.year_from);
 
-                    const image = getImageUrl(properties.asset_id, suffix, '400,');
+                    const image = getImageUrl(properties.asset_id, suffix, '150,');
 
                     const feature = {
                         ...el,
@@ -67,9 +65,8 @@ export class MapsBitmapLayer extends CompositeLayer {
 
 
     buildLayers() {
-        const { id, name, filters } = this.props;
+        const { id, name } = this.props;
         const { feature: { features } } = this.state;
-        const { fromYear, toYear } = filters;
         const layers = [];
 
         layers.push(features.map(({properties: {asset_id, image_bounds, image_url}}) => {   
@@ -92,11 +89,6 @@ export class MapsBitmapLayer extends CompositeLayer {
             stroked: true,
             getFillColor: [0, 0, 0, 0],
             getLineColor: [0, 0, 0, 125],
-
-            // DataFilterExension
-            // getFilterValue: f => f.properties.year,  
-            // filterRange: [fromYear, toYear],  // range of values
-            // extensions: [new DataFilterExtension({filterSize: 1})]
             
         })));
 

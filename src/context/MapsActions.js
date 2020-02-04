@@ -116,8 +116,7 @@ export function getMapsRaw({around, fromYear, toYear, assetIds}) {
     }
 }
 
-export function showDetailMap({}) {
+export function showDetailMap() {
     return (dispatch, state) => {
-        
     }
 }

@@ -215,10 +215,6 @@ export class MapViewer extends Component {
         viewState.pitch = (mode === 'master') ? 0 : viewState.pitch;
 
 
-
-        const [state, dispatch] = this.context;
-        const { maps: { filter } } = state;
-
         return (
             <React.Fragment>
                 {/* :P ;( horrible Gecoder needs to be a child of InteractiveMap for that 

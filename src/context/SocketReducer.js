@@ -1,5 +1,3 @@
-import socket from '../share/socket';
-
 export const ActionTypes = {
     SOCKET_CONNECT_SERVER_REQUEST: 'SOCKET_CONNECT_SERVER_REQUEST',
     SOCKET_CONNECT_SERVER_COMPLETE: 'SOCKET_CONNECT_SERVER_COMPLETE',

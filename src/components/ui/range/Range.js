@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { MapDataContext } from '../../../context/MapsContext';
 import { applyFilters } from '../../../context/MapsActions';
-import { get, map, isNumber, max, min } from 'lodash';
+import { get } from 'lodash';
 
 
 import Slider from 'rc-slider';

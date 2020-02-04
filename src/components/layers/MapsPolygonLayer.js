@@ -1,13 +1,9 @@
 
 import { CompositeLayer } from 'deck.gl';
 import { GeoJsonLayer } from '@deck.gl/layers';
-// import { DataFilterExtension } from '@deck.gl/extensions';
-
-import { pick } from 'lodash';
-
 import { scaleLinear } from 'd3-scale';
 import { color } from 'd3-color'
-import { easeCubicIn } from 'd3-ease';
+
 
 export class MapsPolygonLayer extends CompositeLayer {
 
@@ -70,11 +66,7 @@ export class MapsPolygonLayer extends CompositeLayer {
             //       enter: value => [value[0], value[1], value[2], 255] // fade in
             //     }
             // }
-            
-            // DataFilterExension
-            // getFilterValue: f => f.properties.year,  
-            // filterRange: [fromYear, toYear],  // range of values
-            // extensions: [new DataFilterExtension({filterSize: 1})]
+        
                
         });
     }
