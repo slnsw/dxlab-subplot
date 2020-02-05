@@ -2,6 +2,7 @@
 import { CompositeLayer } from 'deck.gl';
 import { BitmapLayer, GeoJsonLayer } from '@deck.gl/layers';
 import { getImageUrl } from '../../share/utils';
+import { load } from "@loaders.gl/core";
 
 export class MapsBitmapLayer extends CompositeLayer {
 
@@ -23,8 +24,8 @@ export class MapsBitmapLayer extends CompositeLayer {
                     //  const elevation = interpolateScale(parseInt(m.year), toYear, fromYear) * 50; 
                     //  mapValue(m.year, this.state.year_from, this.state.year_to, 0, this.state.year_to - this.state.year_from);
 
-                    const image = getImageUrl(properties.asset_id, suffix, '150,');
-
+                    const image = getImageUrl(properties.asset_id, suffix, '80,');
+    
                     const feature = {
                         ...el,
                         geometry: {
@@ -37,7 +38,7 @@ export class MapsBitmapLayer extends CompositeLayer {
                         properties: {
                             ...properties,
                             elevation,
-                            image_url: image,
+                            image_url: load(image),
                             // IMPORTANT: Change image bound structure to a single array
                             // Deck.gl API needs image bounds in a single array. 
                             image_bounds: properties.image_bounds.coordinates[0].map((c) => {

@@ -49,14 +49,14 @@ export class Range extends Component {
                     <h1>Select range {fromYear} - {toYear} </h1>
                 </div>
 
-
+                { (maxYear > 0 && minYear > 0) &&
                 <RangeTooltips
                     className={styles.slider}
                     min={minYear}
                     max={maxYear}
                     marks={grps}
                     steps={20}
-                    defaultValue={[fromYear, toYear]}
+                    defaultValue={[minYear, maxYear]}
                     tipFormatter={value => ` Year ${value} `}
                     tipProps={{
                         placement: 'left'
@@ -67,6 +67,7 @@ export class Range extends Component {
                         //dispatch(getMaps({ fromYear, toYear }));
                         dispatch(applyFilters({ fromYear, toYear}))
                     }} />
+                }
 
             </React.Fragment>
         )

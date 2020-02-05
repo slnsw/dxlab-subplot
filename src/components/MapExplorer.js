@@ -73,9 +73,9 @@ export class MapExplorer extends Component {
             // [MapsPolygonLayer, { view: 'master', onClick: this.showMapDetail.bind(this) }],
             // [MapsLabelLayer, {view: 'master'}],
             // [MapsClusterCounts, {view: 'master'}],
-            // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: '_crop.png', view: 'slave', onClick: this.showMapDetail.bind(this) }],
+            // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: '_crop.png', view: 'all', onClick: this.showMapDetail.bind(this) }],
             // [MapsBitmapLayer, { id: 'edge', name: 'edge', suffix: '_edge.png', view: 'slave', onClick: this.showMapDetail.bind(this) }],
-            // [TileImagesLayer, {view: 'all'}]
+            [TileImagesLayer, {view: 'all'}]
         ];
 
         const { showModal, modalData } = this.state;
