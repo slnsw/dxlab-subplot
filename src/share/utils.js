@@ -84,7 +84,12 @@ export function linealScale(value, [domain_from, domain_to], [range_from, range_
 }
 
 // Temporal 
-export function getImageUrl(asset_id, suffix = '.tif', size = '800,', format = 'default') {
-  const url = `${process.env.REACT_APP_STATIC_BASE_URL}${asset_id}${suffix}/full/${size}/0/${format}.png`;
+export function getZoomableImageUrl(asset_id, suffix = '.tif', size = '800,', format = 'default') {
+  const url = `${process.env.REACT_APP_STATIC_BASE_URL}/tiled/${asset_id}${suffix}/full/${size}/0/${format}.png`;
+  return url;
+}
+
+export function getImageUrl(asset_id, suffix, size = '128', ext='png') {
+  const url = `${process.env.REACT_APP_STATIC_BASE_URL}/${asset_id}_${suffix}_${size}.${ext}`;
   return url;
 }

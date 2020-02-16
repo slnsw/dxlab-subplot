@@ -15,7 +15,7 @@ function App() {
       data: [],
       filters: {
         fromYear: 1880,
-        toYear: 1950,
+        toYear: 1890,
         // colored: true,
         assetIds: null,
         around: null,

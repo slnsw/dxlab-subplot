@@ -24,8 +24,8 @@ export class MapsBitmapLayer extends CompositeLayer {
                     //  const elevation = interpolateScale(parseInt(m.year), toYear, fromYear) * 50; 
                     //  mapValue(m.year, this.state.year_from, this.state.year_to, 0, this.state.year_to - this.state.year_from);
 
-                    const image = getImageUrl(properties.asset_id, suffix, '80,');
-    
+                    const image = getImageUrl(properties.asset_id, suffix, '128');
+
                     const feature = {
                         ...el,
                         geometry: {

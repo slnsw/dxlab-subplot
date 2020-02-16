@@ -5,6 +5,7 @@ import { get } from 'lodash';
 
 
 import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 import styles from './Range.module.scss';
 
 const createSliderWithTooltip = Slider.createSliderWithTooltip;

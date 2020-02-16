@@ -69,13 +69,13 @@ export class MapExplorer extends Component {
             // [SearchResultLayer, { view: 'all' }],
             [LandmarksLayer, { view: 'all' }], 
             // [MapsDistributionLayer, { view: 'master' }],
-            // [FootprintMapsLayer, { view: 'slave' }],
-            // [MapsPolygonLayer, { view: 'master', onClick: this.showMapDetail.bind(this) }],
+            [FootprintMapsLayer, { view: 'slave' }],
+            // [MapsPolygonLayer, { view: 'master', onClick: this.showMapDetail.bind(this) }], 
             // [MapsLabelLayer, {view: 'master'}],
             // [MapsClusterCounts, {view: 'master'}],
-            // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: '_crop.png', view: 'all', onClick: this.showMapDetail.bind(this) }],
+            // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: 'uncrop', view: 'all', onClick: this.showMapDetail.bind(this) }],
             // [MapsBitmapLayer, { id: 'edge', name: 'edge', suffix: '_edge.png', view: 'slave', onClick: this.showMapDetail.bind(this) }],
-            [TileImagesLayer, {view: 'all'}]
+            [TileImagesLayer, {id: 'tile_crop', view: 'all',  suffix: 'crop', onClick: this.showMapDetail.bind(this)}]
         ];
 
         const { showModal, modalData } = this.state;

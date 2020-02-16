@@ -33,7 +33,7 @@ export class MapViewer extends Component {
             longitude: 151.2101,
             bearing: -163,
             pitch: 60,
-            zoom: 15,
+            zoom: 14, //15
             reuseMaps: true,
         }
 

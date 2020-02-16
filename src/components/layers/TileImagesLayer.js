@@ -43,7 +43,7 @@ export class TileImagesLayer extends CompositeLayer {
           //  const elevation = interpolateScale(parseInt(m.year), toYear, fromYear) * 50; 
           //  mapValue(m.year, this.state.year_from, this.state.year_to, 0, this.state.year_to - this.state.year_from);
 
-          const image = getImageUrl(properties.asset_id, suffix, '80,');
+          const image = getImageUrl(properties.asset_id, suffix, '128');
           const feature = {
             ...el,
             geometry: {
@@ -83,7 +83,7 @@ export class TileImagesLayer extends CompositeLayer {
   }
 
   shouldUpdateState({ props, oldProps, context, oldContext, changeFlags }) {
-    return (changeFlags.viewportChanged !== false);
+    return (changeFlags.viewportChanged !== false || changeFlags.dataChanged);
   }
 
 
@@ -105,7 +105,7 @@ export class TileImagesLayer extends CompositeLayer {
 
   getViewBounds() {
     const viewport = this.context.viewport
-    return { top: 100, right: viewport.width - 100, bottom: viewport.height - 100, left: 100 }
+    return { top: 0, right: viewport.width, bottom: viewport.height, left: 0 }
   }
 
   loadImages() {
@@ -258,8 +258,8 @@ export class TileImagesLayer extends CompositeLayer {
 
 
   renderLayers() {
-    // return this.buildLayers();
-    return this.loadImages();
+    return this.buildLayers();
+    // return this.loadImages();
   }
 
 }
