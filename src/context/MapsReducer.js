@@ -9,7 +9,10 @@ export const ActionTypes = {
 
     MAPS_DETAIL_REQUEST: 'MAPS_DETAIL_REQUEST',
     MAPS_DETAIL_COMPLETE: 'MAPS_DETAIL_COMPLETE',
-    MAPS_DETAIL_FAIL: 'MAPS_DETAIL_FAIL',    
+    MAPS_DETAIL_FAIL: 'MAPS_DETAIL_FAIL',   
+    
+    MAPS_FOCUS: 'MAPS_FOCUS',
+    MAPS_UNFOCUS: 'MAPS_UNFOCUS',
     
 }
 
@@ -37,6 +40,23 @@ export function mapsReducer(state, action) {
                 }
             }
         }
+
+
+        case ActionTypes.MAPS_FOCUS: {
+            return {
+                ...state,
+                focus: action.focus
+            }
+        }
+
+        case ActionTypes.MAPS_UNFOCUS: {
+            return {
+                ...state,
+                focus: null
+            }
+        }
+
+
 
         default: 
             return state

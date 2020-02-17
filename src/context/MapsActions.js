@@ -121,3 +121,21 @@ export function showDetailMap() {
     return (dispatch, state) => {
     }
 }
+
+
+export function focusMap(object) {
+    return (dispatch, state) => {
+        dispatch({
+            type: ActionTypes.MAPS_FOCUS,
+            focus: object
+        });
+    }
+}
+
+export function removeFocusMap() {
+    return (dispatch, state) => {
+        dispatch({
+            type: ActionTypes.MAPS_UNFOCUS,
+        });
+    }
+}

@@ -3,7 +3,7 @@ import OSD from 'openseadragon';
 
 import styles from './Zoomable.module.scss'
 
-export default class Zoomable extends Component {
+export default class Zoomable extends Component { 
 
     render() {
         let { id } = this.props
@@ -21,12 +21,12 @@ export default class Zoomable extends Component {
 
     initSeaDragon() {
         const { assetId } = this.props
-        fetch(`${process.env.REACT_APP_STATIC_BASE_URL}${assetId}.tif/info.json`)
+        fetch(`${process.env.REACT_APP_TILED_IMAGE_BASE_URL}/${assetId}.tif/info.json`)
             .then((response) => response.json())
             .then((info) => {
                 // Temporal solution until I implement an updated version of 
                 // Loris or I use another IIIF server 
-                info['@id'] = `${process.env.REACT_APP_STATIC_BASE_URL}${assetId}.tif`;
+                info['@id'] = `${process.env.REACT_APP_TILED_IMAGE_BASE_URL}/${assetId}.tif`;
                 
                 // Create an instance of OSD
                 const { id } = this.props;

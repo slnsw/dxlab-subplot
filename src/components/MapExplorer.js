@@ -8,6 +8,7 @@ import { MapViewer } from './MapViewer';
 // UI Components
 import { ModalWindow } from './ui/modal/ModalWindow';
 import { Range } from './ui/range/Range';
+import { Header } from './ui/header/Header';
 import { getImageUrl } from '../share/utils';
 
 // Data vizualization and info layers
@@ -21,7 +22,7 @@ import { MapsLabelLayer } from './layers/MapsLabelLayer';
 import { MapsClusterCounts } from './layers/MapsClusterCounts';
 import { TileImagesLayer } from './layers/TileImagesLayer';
 
-import { showDetailMap } from '../context/MapsActions';
+import { showDetailMap, focusMap,  removeFocusMap} from '../context/MapsActions';
 
 
 
@@ -41,9 +42,6 @@ export class MapExplorer extends Component {
         // console.log(object)
         if (object) {
             let { properties: { title, image_url, asset_id } } = object;
-            if (!image_url) {
-                image_url = getImageUrl(asset_id, '_crop_800')
-            }
 
             this.setState({
                 modalData: { title, image_url, asset_id },
@@ -56,6 +54,16 @@ export class MapExplorer extends Component {
         }
     };
 
+    onHover({object}) {
+        const [, dispatch] = this.context;
+        if(object) {
+            // Update map context to keep track of map in focus
+            dispatch(focusMap(object))
+        }else {
+            dispatch(removeFocusMap())
+        }
+    }
+
 
     render() {
         // Note: DeckGL creates a custom React context for managing layers data
@@ -65,17 +73,24 @@ export class MapExplorer extends Component {
         // MapExplorer layers structure. [ Layer class, {props} ]
         // view == main or minimap or all
         // TODO: define a prop structure for this.
+
+        const handlers = {
+            onClick: this.showMapDetail.bind(this),
+            onHover: this.onHover.bind(this)
+
+        }
+
         const layers = [
             // [SearchResultLayer, { view: 'all' }],
             [LandmarksLayer, { view: 'all' }], 
             // [MapsDistributionLayer, { view: 'master' }],
             // [FootprintMapsLayer, { view: 'slave' }],
-            // [MapsPolygonLayer, { view: 'master', onClick: this.showMapDetail.bind(this) }], 
+            // [MapsPolygonLayer, { view: 'master',  ...handlers }], 
             // [MapsLabelLayer, {view: 'master'}],
             // [MapsClusterCounts, {view: 'master'}],
-            [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: 'uncrop', view: 'all', onClick: this.showMapDetail.bind(this) }],
-            // [MapsBitmapLayer, { id: 'edge', name: 'edge', suffix: '_edge.png', view: 'slave', onClick: this.showMapDetail.bind(this) }],
-            // [TileImagesLayer, {id: 'tile_crop', view: 'all',  suffix: 'crop', onClick: this.showMapDetail.bind(this)}]
+            // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: 'crop', view: 'all', ...handlers  }],
+            // [MapsBitmapLayer, { id: 'edge', name: 'edge', suffix: '_edge.png', view: 'slave', ...handlers }],
+            [TileImagesLayer, {id: 'tile_crop', view: 'all',  suffix: 'crop', ...handlers }]
         ];
 
         const { showModal, modalData } = this.state;
@@ -90,8 +105,10 @@ export class MapExplorer extends Component {
                     onRequestClose={() => this.setState({ showModal: false })}
                     {...modalData}
                 />
-                
-                <Range></Range>
+
+                <Header/>
+            
+                <Range/>
 
                 <MapViewer
                     mode={mode}

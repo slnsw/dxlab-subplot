@@ -4,6 +4,8 @@ import { BitmapLayer, GeoJsonLayer } from '@deck.gl/layers';
 import { getImageUrl } from '../../share/utils';
 import { load } from "@loaders.gl/core";
 
+import { get } from 'lodash';
+
 export class MapsBitmapLayer extends CompositeLayer {
 
 
@@ -66,21 +68,14 @@ export class MapsBitmapLayer extends CompositeLayer {
 
 
     buildLayers() {
-        const { id, name } = this.props;
+        const { id, name, contextState } = this.props;
         const { feature: { features } } = this.state;
         const layers = [];
 
-        layers.push(features.map(({properties: {asset_id, image_bounds, image_url}}) => {   
-            return new BitmapLayer(this.getSubLayerProps({
-                    id: `${id}-bitmap-layer-${name}-${asset_id}`,
-                    bounds: image_bounds,
-                    opacity: 0.8,
-                    pickable: false,
-                    autoHighlight: false,
-                    image: image_url
-                }));
+        // TODO: Decouple this context from this layer. Option inject focus via props
+        const inFocus = get(contextState, 'maps.focus.properties.asset_id', null)
 
-        }));        
+    
 
         layers.push(new GeoJsonLayer(this.getSubLayerProps({
             id: `${id}-bitmap-layer-${name}-cutlines`,
@@ -93,6 +88,23 @@ export class MapsBitmapLayer extends CompositeLayer {
             
         })));
 
+
+        layers.push(features.map(({properties: {asset_id, image_bounds, image_url}}) => {   
+            let opacity = 1;
+            if(inFocus) {
+                opacity = ( asset_id && (inFocus === asset_id) ) ? 1 : .1;
+            }
+
+            return new BitmapLayer(this.getSubLayerProps({
+                    id: `${id}-bitmap-layer-${name}-${asset_id}`,
+                    bounds: image_bounds,
+                    opacity: opacity,
+                    pickable: false,
+                    autoHighlight: false,
+                    image: image_url
+                }));
+
+        }));    
         return layers;
 
     }

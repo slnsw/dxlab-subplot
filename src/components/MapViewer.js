@@ -10,6 +10,7 @@ import Geocoder from "react-map-gl-geocoder";
 // Custom mapbox style
 import MAP_STYLE from '../styles/dxmaps_v2.json';
 
+
 import { MapDataContext } from '../context/MapsContext';
 import { getMaps } from '../context/MapsActions';
 import { socketConnect, socketEmit } from '../context/SocketActions';
@@ -225,7 +226,7 @@ export class MapViewer extends Component {
                         height: 50,
                         position: "absolute",
                         alignItems: "center",
-                        margin: '10px',
+                        margin: '20px',
                         zIndex: 200
                     }}
                 />
@@ -241,7 +242,8 @@ export class MapViewer extends Component {
                     <InteractiveMap
                         reuseMaps
                         mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
-                        mapStyle={mapStyle}
+                        // mapStyle={mapStyle}
+                        mapStyle='mapbox://sprites/mapbox/dark-v10'
                         preventStyleDiffing={true}
                         ref={mapRef}
                     >

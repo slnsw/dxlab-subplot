@@ -12,7 +12,8 @@ const initialState = {
             maxYear: 0,
             minYear: 0
         },
-        filter: {}
+        filter: {},
+        focus: {} // Hover map
     },
     comm: {}
 }

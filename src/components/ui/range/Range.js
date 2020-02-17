@@ -145,23 +145,9 @@ export class Range extends Component {
         if (!data) {
             return [];
         }
-
         return data.map((it) => {
             return it.properties.year;
         }).sort()
-
-        // return data.reduce((result, it) => {
-        //     const year = it.properties.year;
-        //     if (year) {
-        //         const count = get(result, year, 0);
-        //         // Update result
-        //         result[year] = count + 1;
-        //     }
-        //     return result;
-
-
-        // }, {});
-
 
     }
 
@@ -195,7 +181,7 @@ export class Range extends Component {
                     <Slider
                         vertical
                         mode={this.mode.bind(this)}
-                        step={5}
+                        step={2}
                         domain={domain}
                         values={defaultValues}
                         rootStyle={sliderStyle}

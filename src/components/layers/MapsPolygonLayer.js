@@ -4,6 +4,8 @@ import { GeoJsonLayer } from '@deck.gl/layers';
 import { scaleLinear } from 'd3-scale';
 import { color } from 'd3-color'
 
+import { get } from 'lodash'
+
 
 export class MapsPolygonLayer extends CompositeLayer {
 
@@ -30,13 +32,15 @@ export class MapsPolygonLayer extends CompositeLayer {
         }
     }
 
-    buildLayer(data) {
-        const { id, filters} = this.props;
+    buildLayer() {
+        const { id, filters, contextState} = this.props;
         const {fromYear, toYear} = filters;
         const yearColorScale = scaleLinear([fromYear, toYear], ["gold", "limegreen"]);
         
         const {elev} = this.state;
-        // console.log(elev);
+
+        // TODO: Decouple this context from this layer. Option inject focus via props
+        const inFocus = get(contextState, 'maps.focus.properties.asset_id', null)
 
         return new GeoJsonLayer({
             id: `${id}-maps-polygon-layer`,
@@ -48,24 +52,33 @@ export class MapsPolygonLayer extends CompositeLayer {
             getLineWidth: 1,
             getFillColor: (d) => {
                 // const alpha = mapValue(d.year, this.state.year_from, this.state.year_to, 0, 255);
+
+                // reduce opacity to polygons are not in focus
+                let asset_id = get(d, 'properties.asset_id', null)
+                let opacity = 255;
+                if(inFocus) {
+                    opacity = ( asset_id && (inFocus === asset_id) ) ? 255 : 50;
+                }
+
                 let c = color(yearColorScale(d.properties.year));
                 if (c) {
-                    c = [c.r, c.g, c.b];
+                    c = [c.r, c.g, c.b, opacity];
                 }
                 return c;
             },
             getElevation: (d) => d.properties.year * elev, 
-            // updateTriggers: {
-            //     getElevation: [elev]
-            // },
-            // transitions: {
-            //     getElevation: 600,
-            //     getFillColor: {
-            //       duration: 300,
-            //       easing: easeCubicIn,
-            //       enter: value => [value[0], value[1], value[2], 255] // fade in
-            //     }
-            // }
+            updateTriggers: {
+                getFillColor: [inFocus]
+            },
+            transitions: {
+                getFillColor: 300
+                // getElevation: 600,
+                // getFillColor: {
+                //   duration: 300,
+                //   easing: easeCubicIn,
+                //   enter: value => [value[0], value[1], value[2], 255] // fade in
+                // }
+            }
         
                
         });
@@ -78,8 +91,7 @@ export class MapsPolygonLayer extends CompositeLayer {
     }
 
     renderLayers() {
-        const { data } = this.props;
-        return this.buildLayer(data);
+        return this.buildLayer();
     }
 
 

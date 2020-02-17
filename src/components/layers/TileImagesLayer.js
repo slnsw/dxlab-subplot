@@ -5,8 +5,8 @@ import { BitmapLayer, GeoJsonLayer } from '@deck.gl/layers';
 import { getImageUrl } from '../../share/utils';
 
 import { load } from "@loaders.gl/core";
-import { max, min } from 'lodash'
-
+import { max, min, get } from 'lodash'
+import { scaleLinear } from 'd3-scale';
 
 
 const areRectanglesOverlap = (a, b) => {
@@ -43,7 +43,7 @@ export class TileImagesLayer extends CompositeLayer {
           //  const elevation = interpolateScale(parseInt(m.year), toYear, fromYear) * 50; 
           //  mapValue(m.year, this.state.year_from, this.state.year_to, 0, this.state.year_to - this.state.year_from);
 
-          const image = getImageUrl(properties.asset_id, suffix, '128');
+          const image = getImageUrl(properties.asset_id, suffix, '16');
           const feature = {
             ...el,
             geometry: {
@@ -82,8 +82,8 @@ export class TileImagesLayer extends CompositeLayer {
     }
   }
 
-  shouldUpdateState({ props, oldProps, context, oldContext, changeFlags }) {
-    return (changeFlags.viewportChanged !== false || changeFlags.dataChanged);
+  shouldUpdateState({ changeFlags }) {
+    return (changeFlags.viewportChanged !== false || changeFlags.dataChanged || changeFlags.propsChanged);
   }
 
 
@@ -205,38 +205,21 @@ export class TileImagesLayer extends CompositeLayer {
   }
 
   buildLayers() {
-    const { id, name } = this.props;
+    const { id, name, contextState, suffix } = this.props;
     const { feature: { features } } = this.state;
     const layers = [];
 
-    // layers.push(features.map(({ properties: { asset_id, image_bounds, image_url } }) => {
+    
+    const zoom = this.context.viewport.zoom;
+    const lod =  [8, 16, 32, 64, 128, 512, 1024]
+    const scale = scaleLinear([4, 18],[0, lod.length -1])
+    const size = Math.floor(scale(zoom))
 
-    //   return new BitmapLayer(this.getSubLayerProps({
-    //     id: `${id}-bitmap-layer-${name}-${asset_id}`,
-    //     bounds: image_bounds,
-    //     opacity: 0.8,
-    //     pickable: false,
-    //     autoHighlight: false,
-    //     image: image_url
-    //   }));
 
-    // }));
+    // TODO: Decouple this context from this layer. Option inject focus via props
+    const inFocus = get(contextState, 'maps.focus.properties.asset_id', null)
 
-    const viewportRect = this.getViewBounds()
-    const visible = features.filter(({ properties: { image_bounds } }) => areRectanglesOverlap(viewportRect, this.getImageBounds(image_bounds)))
 
-    layers.push(visible.map(({ properties: { asset_id, image_bounds, image_url } }) => {
-
-      return new BitmapLayer(this.getSubLayerProps({
-        id: `${id}-bitmap-layer-${name}-${asset_id}`,
-        bounds: image_bounds,
-        opacity: 0.8,
-        pickable: false,
-        autoHighlight: false,
-        image: image_url
-      }));
-
-    }));
 
 
     layers.push(new GeoJsonLayer(this.getSubLayerProps({
@@ -249,6 +232,32 @@ export class TileImagesLayer extends CompositeLayer {
       getLineColor: [0, 0, 0, 125],
 
     })));
+
+
+    const viewportRect = this.getViewBounds()
+    const visible = features.filter(({ properties: { image_bounds } }) => areRectanglesOverlap(viewportRect, this.getImageBounds(image_bounds)))
+
+    layers.push(visible.map(({ properties: { asset_id, image_bounds } }) => {
+
+      const image_url = getImageUrl(asset_id, suffix, lod[size]);
+
+      let opacity = 1;
+      if(inFocus) {
+          opacity = ( asset_id && (inFocus === asset_id) ) ? 1 : .05;
+      }
+
+      return new BitmapLayer(this.getSubLayerProps({
+        id: `${id}-bitmap-layer-${name}-${asset_id}`,
+        bounds: image_bounds,
+        opacity: opacity,
+        pickable: false,
+        autoHighlight: false,
+        image: image_url
+      }));
+
+    }));
+
+
 
     return layers;
 
