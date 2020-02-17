@@ -1,6 +1,7 @@
 import { ActionTypes } from './MapsReducer';
 import { fetchData,loadData } from '../share/services';
 import { pickBy, get, identity, some, omit, map, isNumber, max, min } from 'lodash';
+import { roundYearDown, roundYearUp } from './utils'
 
 
 
@@ -22,8 +23,8 @@ export function getMaps({...query}){
                     dataSet: data,
                     data: filterData(data, filters),
                     meta: {
-                        maxYear: max(years),
-                        minYear: min(years)
+                        maxYear: roundYearUp(max(years)),
+                        minYear: roundYearDown(min(years))
                     }
                 })
             })

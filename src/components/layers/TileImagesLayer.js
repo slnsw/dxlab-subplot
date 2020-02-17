@@ -184,10 +184,10 @@ export class TileImagesLayer extends CompositeLayer {
     return new Promise((resolve, reject) => {
       cancel = reject;
       if (inViewport) {
-        console.log('visible')
+        // console.log('visible')
         setTimeout(() => {
           load(url).then((r) => {
-            console.log('loaded', r.src);
+            // console.log('loaded', r.src);
             resolve(r)
           }).catch((err) => {
             // console.log(err);
@@ -197,7 +197,7 @@ export class TileImagesLayer extends CompositeLayer {
           , 5000);
         // resolve()
       } else {
-        console.log('hidden')
+        // console.log('hidden')
         resolve(null)
       }
     })
@@ -226,8 +226,6 @@ export class TileImagesLayer extends CompositeLayer {
     const visible = features.filter(({ properties: { image_bounds } }) => areRectanglesOverlap(viewportRect, this.getImageBounds(image_bounds)))
 
     layers.push(visible.map(({ properties: { asset_id, image_bounds, image_url } }) => {
-      console.log(image_url)
-
 
       return new BitmapLayer(this.getSubLayerProps({
         id: `${id}-bitmap-layer-${name}-${asset_id}`,
