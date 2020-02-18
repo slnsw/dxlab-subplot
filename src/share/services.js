@@ -35,17 +35,17 @@ export function fetchData( {around, aroundRadius, fromYear, toYear, assetIds}) {
   }
 
   // Call REST API
-  return fetch(`${process.env.REACT_APP_API_BASE_URL}?query=${JSON.stringify(query)}`)
+  return fetch(`${process.env.REACT_APP_API_RAW_URL}?query=${JSON.stringify(query)}`)
     // We get the API response and receive data in JSON format...
     .then(response => response.json())
 }
 
-export function loadData() {
+export function loadAPIData() {
   // Temporal query
   const query = {
     'properties.year': {'$ne': null},
   }
-  return fetch(`${process.env.REACT_APP_DATA_URL}?query=${JSON.stringify(query)}`)
+  return fetch(`${process.env.REACT_APP_API_DATA_URL}?query=${JSON.stringify(query)}`)
   // We get the API response and receive data in JSON format...
   .then(response => response.json())
   // TODO: Wrap response around FeatureCollection structure
@@ -56,4 +56,14 @@ export function loadData() {
   //   }
   // }) 
 }
+
+
+
+export function loadData() {
+  return fetch(`${process.env.REACT_APP_DATA_URL}`)
+  // We get the API response and receive data in JSON format...
+  .then(response => response.json())
+}
+
+
 
