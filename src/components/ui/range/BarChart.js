@@ -15,6 +15,7 @@ export class BarChart extends Component {
     for (let i = 0; i < domain[1]; i++) {
       barDataValues.push(counts[i] || 0);
     }
+
     const barData = {
       labels: barDataValues.map((val, i) => i),
       datasets: [
@@ -51,7 +52,8 @@ export class BarChart extends Component {
             display: false,
             ticks: {
               min: domain[0],
-              beginAtZero: false
+              beginAtZero: false,
+              // reverse: true
             }
           }
         ]

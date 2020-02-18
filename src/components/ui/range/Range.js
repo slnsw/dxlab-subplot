@@ -145,9 +145,11 @@ export class Range extends Component {
         if (!data) {
             return [];
         }
+        
         return data.map((it) => {
             return it.properties.year;
-        }).sort()
+        })
+
 
     }
 
@@ -162,8 +164,7 @@ export class Range extends Component {
 
         const domain = [minYear, maxYear]
         const defaultValues = [fromYear, toYear]
-
-
+        
         return (
             <React.Fragment>
 
@@ -186,6 +187,7 @@ export class Range extends Component {
                         values={defaultValues}
                         rootStyle={sliderStyle}
                         onChange={this.onChange.bind(this)}
+                        // reversed
                     >
 
                         <Rail>
