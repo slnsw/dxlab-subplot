@@ -54,7 +54,7 @@ export function loadAPIData() {
   //       'type': 'FeatureCollection',
   //       'features': data
   //   }
-  // }) 
+  // })  
 }
 
 

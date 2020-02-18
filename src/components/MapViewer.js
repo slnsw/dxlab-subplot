@@ -20,6 +20,7 @@ import { debounce, keys, pick, filter, includes } from 'lodash';
 // import { Range } from 'rc-slider';
 import styles from './MapViewer.module.scss';
 
+import lightingEffect from './lights';
 
 // Geocoder, execute geo-search around sydney
 const proximity = { longitude: 151.21065829636484, latitude: -33.86631790142455 }
@@ -233,6 +234,7 @@ export class MapViewer extends Component {
 
                 <DeckGL
                     layerFilter={this.layerViewVisibility.bind(this)}
+                    effects={[lightingEffect]}
                     layers={layers}
                     viewState={viewState}
                     controller={mapcontroller}

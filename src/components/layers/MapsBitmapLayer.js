@@ -101,7 +101,11 @@ export class MapsBitmapLayer extends CompositeLayer {
                     opacity: opacity,
                     pickable: false,
                     autoHighlight: false,
-                    image: image_url
+                    image: image_url,
+                    parameters: {
+                        // Prevent png alpha channel create artifacts when overlaping other pngs
+                        depthMask: false, 
+                    },
                 }));
 
         }));    
