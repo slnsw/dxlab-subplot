@@ -38,7 +38,7 @@ export default class Zoomable extends Component {
                         defaultZoomLevel: 1,
                         minZoomLevel: 1,
                         maxZoomLevel: 10,
-                        showNavigator: true,
+                        showNavigator: false,
                         tileSources: [
                             info
                         ]
