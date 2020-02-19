@@ -34,9 +34,10 @@ export class MapsLabelLayer extends CompositeLayer {
             id: `${id}-layer-${name}-label`,
             data: features,
             pickable: false,
-            billboard: true,
-            fontFamily: 'Roboto Slab',
+            billboard: false,
+            fontFamily: 'Lekton',
             getPixelOffset: [0, 0],
+            getColor: [255,255,255,125],
 
             // autoHighlight: true,
             getText: d => String(d.properties.year),

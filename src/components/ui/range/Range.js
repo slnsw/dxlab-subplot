@@ -182,7 +182,7 @@ export class Range extends Component {
                     <Slider
                         vertical
                         mode={this.mode.bind(this)}
-                        step={2}
+                        step={1}
                         domain={domain}
                         values={defaultValues}
                         rootStyle={sliderStyle}

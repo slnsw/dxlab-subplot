@@ -93,8 +93,8 @@ export class MapExplorer extends Component {
             [TileImagesLayer, {id: 'tile_crop', view: 'all',  suffix: 'crop', ...handlers }]
         ];
 
-        const { showModal, modalData } = this.state;
-        // const {  }
+        const { showModal, modalData, selectedMap = {} } = this.state;
+        const { properties = {} } = selectedMap
 
         const { mode } = this.props;
 
@@ -104,6 +104,7 @@ export class MapExplorer extends Component {
                     isOpen={showModal}
                     onRequestClose={() => this.setState({ showModal: false })}
                     {...modalData}
+                    info={properties}
                 />
 
                 <Header/>

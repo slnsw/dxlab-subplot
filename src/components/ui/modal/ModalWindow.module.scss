@@ -1,11 +1,14 @@
 .modalWindow {
 
     position: absolute;
-    background-color: #000a;
-    top: 40px;
-    left: 40px;
-    right: 40px;
-    bottom: 40px;
+    background-color: rgba(0, 0, 0, 0.85);
+    // border: 1px solid rgba(125, 125, 125, 0.911);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 50px;
+    color: white;
 
     &:focus{
         outline:0;
@@ -14,11 +17,56 @@
     .modalTitle {
         color: #fff;
         text-align: center;
+        font-size: 32px;
+        margin-bottom: 60px;
     }
 
+
     .zoomable {
-        width: 50vw;
-        height: 90%;
+        width: 49%;
+        height: 100%;
+        background-color: #000000;
+        border: 1px solid rgba(255, 255, 255, .5);
+        float: left;
+    } 
+
+    .info {
+        font-size: 20px;
+        float: right;
+        width: 49%;
+
+        ul {
+            padding: 0;
+            margin: 0;
+
+            li{
+                margin-top: 15px;
+                list-style: none
+            }
+        }
+
+        img {
+            float: left;
+            margin-top: 10px;
+            margin-right: 10px;
+            display: block;
+        }
+
+    } 
+
+    .close {
+        font-weight: bolder;
+        font-size: 40px;
+        color: white;
+        background: none;
+        border: none;
+        float: right;
+
+        &:focus{
+            outline: 0;
+        }
+
+        
     }
 
 }
