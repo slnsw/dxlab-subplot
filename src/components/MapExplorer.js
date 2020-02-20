@@ -9,7 +9,7 @@ import { MapViewer } from './MapViewer';
 import { ModalWindow } from './ui/modal/ModalWindow';
 import { Range } from './ui/range/Range';
 import { Header } from './ui/header/Header';
-import { getImageUrl } from '../share/utils';
+
 
 // Data vizualization and info layers
 import { LandmarksLayer } from './layers/LandmarksLayer';
@@ -22,7 +22,8 @@ import { MapsLabelLayer } from './layers/MapsLabelLayer';
 import { MapsClusterCounts } from './layers/MapsClusterCounts';
 import { TileImagesLayer } from './layers/TileImagesLayer';
 
-import { showDetailMap, focusMap,  removeFocusMap} from '../context/MapsActions';
+import { showDetailMap, focusMap, removeFocusMap } from '../context/MapsActions';
+import { get } from 'lodash';
 
 
 
@@ -54,12 +55,16 @@ export class MapExplorer extends Component {
         }
     };
 
-    onHover({object}) {
+    onHover({ object, x, y }) {
         const [, dispatch] = this.context;
-        if(object) {
+        if (object) {
             // Update map context to keep track of map in focus
-            dispatch(focusMap(object))
-        }else {
+            dispatch(focusMap({
+                ...object,
+                mouseX: x,
+                mouseY: y
+            }))
+        } else {
             dispatch(removeFocusMap())
         }
     }
@@ -82,7 +87,7 @@ export class MapExplorer extends Component {
 
         const layers = [
             // [SearchResultLayer, { view: 'all' }],
-            [LandmarksLayer, { view: 'all' }], 
+            [LandmarksLayer, { view: 'all' }],
             // [MapsDistributionLayer, { view: 'master' }],
             [FootprintMapsLayer, { view: 'slave' }],
             // [MapsPolygonLayer, { view: 'master',  ...handlers }], 
@@ -90,13 +95,15 @@ export class MapExplorer extends Component {
             // [MapsClusterCounts, {view: 'master'}],
             // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: 'crop', view: 'all', ...handlers  }],
             // [MapsBitmapLayer, { id: 'edge', name: 'edge', suffix: '_edge.png', view: 'slave', ...handlers }],
-            [TileImagesLayer, {id: 'tile_crop', view: 'all',  suffix: 'crop', ...handlers }]
+            [TileImagesLayer, { id: 'tile_crop', view: 'all', suffix: 'crop', ...handlers }]
         ];
 
         const { showModal, modalData, selectedMap = {} } = this.state;
         const { properties = {} } = selectedMap
 
         const { mode } = this.props;
+        const [state,] = this.context;
+        const data = get(state, 'maps.data', [])
 
         return (
             <React.Fragment>
@@ -107,10 +114,12 @@ export class MapExplorer extends Component {
                     info={properties}
                 />
 
-                <Header/>
-            
-                <Range/>
-
+                {data.length > 0 &&
+                    <React.Fragment>
+                        <Header />
+                        <Range />
+                    </React.Fragment>
+                }
                 <MapViewer
                     mode={mode}
                     layers={layers}

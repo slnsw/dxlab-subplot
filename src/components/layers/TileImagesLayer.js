@@ -39,7 +39,7 @@ export class TileImagesLayer extends CompositeLayer {
       const { filters } = this.props;
       const { fromYear, toYear } = filters;
 
-      const scaleElevation = scaleLinear([fromYear, toYear], [0, 200])
+      const scaleElevation = scaleLinear([fromYear, toYear], [0,  toYear - fromYear])
 
       const featuresData = data.reduce(function (result, el) {
         const { geometry, properties } = el;
@@ -47,7 +47,7 @@ export class TileImagesLayer extends CompositeLayer {
           // const elevation = 0;
 
           //interpolateScale(parseInt(properties.year), toYear, fromYear) * 50;
-          const elevation = Math.floor(scaleElevation(parseInt(properties.year))) * 5;
+          const elevation = Math.floor(scaleElevation(parseInt(properties.year))) * 100;
           //  mapValue(m.year, this.state.year_from, this.state.year_to, 0, this.state.year_to - this.state.year_from);
 
           const image = getImageUrl(properties.asset_id, suffix, '16');
@@ -85,7 +85,7 @@ export class TileImagesLayer extends CompositeLayer {
   }
 
   shouldUpdateState({ changeFlags }) {
-    return (changeFlags.viewportChanged !== false || changeFlags.dataChanged || changeFlags.propsChanged);
+    return ( changeFlags.viewportChanged !== false || changeFlags.dataChanged || changeFlags.propsChanged);
   }
 
 
@@ -118,13 +118,12 @@ export class TileImagesLayer extends CompositeLayer {
 
 
     const zoom = this.context.viewport.zoom;
-    const lod = [8, 16, 32, 64, 128, 512, 1024]
+    const lod = [8, 16, 32, 64, 128, 512] //, 1024]
     const scale = scaleLinear([4, 18], [0, lod.length - 1])
-    const size = Math.floor(scale(zoom))
-
 
     // TODO: Decouple this context from this layer. Option inject focus via props
     const inFocus = get(contextState, 'maps.focus.properties.asset_id', null)
+    // const inFocusYear = get(contextState, 'maps.focus.properties.year', null)
 
     layers.push(new GeoJsonLayer(this.getSubLayerProps({
       id: `${id}-bitmap-layer-${name}-cutlines`,
@@ -133,15 +132,31 @@ export class TileImagesLayer extends CompositeLayer {
       pickable: true,
       autoHighlight: true,
       stroked: true,
-      getFillColor: [255, 255, 255, 125],
-      getLineWidth: 3,
-      getLineColor: [255, 255, 255, 255],
       material: {
         ambient: 0.35,
         diffuse: .6,
         shininess: 32,
         specularColor: [30, 30, 30]
       },
+      getLineWidth: 3,
+      getFillColor: [255, 255, 255, 125],
+      getLineColor: [255, 255, 255, 255],
+      // getLineColor: (d) => {
+      //   const currYear = get(d, 'properties.year', null);
+      //   const opacity =  (currYear > inFocusYear)? 0 : 255;
+      //   return [255, 255, 255, opacity]
+      // },
+      // getFillColor: (d) => {
+      //   const currYear = get(d, 'properties.year', null);
+      //   const opacity =  (currYear > inFocusYear)? 0 : 125;
+      //   return [255, 255, 255, opacity]
+      // },
+      // updateTriggers: {
+      //   getFillColor: [inFocus]
+      // },
+      // transitions: {
+      //   getFillColor: 300
+      // }
 
     })));
 
@@ -176,15 +191,17 @@ export class TileImagesLayer extends CompositeLayer {
 
 
     const viewportRect = this.getViewBounds()
-    const visible = features.filter(({ properties: { image_bounds } }) => areRectanglesOverlap(viewportRect, this.getImageBounds(image_bounds)))
+    const visible = features.filter(({ properties: { image_bounds, year } }) => areRectanglesOverlap(viewportRect, this.getImageBounds(image_bounds))) 
 
-    layers.push(visible.map(({ properties: { asset_id, image_bounds } }) => {
+    layers.push(visible.map(({ properties: { asset_id, image_bounds, elevation } }) => {
 
-      const image_url = getImageUrl(asset_id, suffix, lod[size]);
+      const size = Math.floor(scale(zoom + (elevation / 100) ))
+      let image_url = getImageUrl(asset_id, suffix, lod[size]);
 
       let opacity = 1;
       if (inFocus) {
         opacity = (asset_id && (inFocus === asset_id)) ? 1 : .05;
+        image_url = getImageUrl(asset_id, suffix, 1024);
       }
 
       return new BitmapLayer(this.getSubLayerProps({
