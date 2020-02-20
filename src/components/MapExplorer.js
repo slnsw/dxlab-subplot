@@ -22,7 +22,7 @@ import { MapsLabelLayer } from './layers/MapsLabelLayer';
 import { MapsClusterCounts } from './layers/MapsClusterCounts';
 import { TileImagesLayer } from './layers/TileImagesLayer';
 
-import { showDetailMap, focusMap, removeFocusMap } from '../context/MapsActions';
+import { selectMap, focusMap, removeFocusMap } from '../context/MapsActions';
 import { get } from 'lodash';
 
 
@@ -31,7 +31,6 @@ export class MapExplorer extends Component {
 
     state = {
         showModal: false,
-        modalData: {}
     }
 
     /**
@@ -42,16 +41,11 @@ export class MapExplorer extends Component {
         const [, dispatch] = this.context;
         // console.log(object)
         if (object) {
-            let { properties: { title, image_url, asset_id } } = object;
-
             this.setState({
-                modalData: { title, image_url, asset_id },
-                selectedMap: object,
                 showModal: true
             });
-
             // Update map context to keep track with the selected map
-            dispatch(showDetailMap({ asset_id }))
+            dispatch(selectMap({ ...object }))
         }
     };
 
@@ -98,8 +92,7 @@ export class MapExplorer extends Component {
             [TileImagesLayer, { id: 'tile_crop', view: 'master', suffix: 'crop', ...handlers }]
         ];
 
-        const { showModal, modalData, selectedMap = {} } = this.state;
-        const { properties = {} } = selectedMap
+        const { showModal } = this.state;
 
         const { mode } = this.props;
         const [state,] = this.context;
@@ -107,12 +100,11 @@ export class MapExplorer extends Component {
 
         return (
             <React.Fragment>
-                <ModalWindow
+                { showModal && <ModalWindow
                     isOpen={showModal}
                     onRequestClose={() => this.setState({ showModal: false })}
-                    {...modalData}
-                    info={properties}
                 />
+                }
 
                 {data.length > 0 &&
                     <React.Fragment>

@@ -49,6 +49,7 @@ export class Header extends Component {
         const vh = window.innerHeight
         const imgH = 512 * (height / width);
 
+        const showPreview = asset_id && mouseX && mouseY
 
         const vPosition = (mouseY <= (vh * .5)) ? {'bottom': 20} : {'top': 90}
         const hPosition = (mouseX <= (vw * .5)) ? {'right': '10%'} : {'left': 0} 
@@ -68,10 +69,10 @@ export class Header extends Component {
                 <h1 style={rangeHeaderStyle}> {fromYear} - {toYear} </h1>
                 {title && <p style={infoStyle}>[{year}] {title}</p>}
                 
-                {asset_id && 
+                {showPreview &&
                     <img src={url} 
-                         alt={asset_id} 
-                         style={imgStyle}
+                        alt={asset_id} 
+                        style={imgStyle}
                     />
                 }
 

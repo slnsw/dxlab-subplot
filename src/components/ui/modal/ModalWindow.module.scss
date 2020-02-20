@@ -44,13 +44,20 @@
                 list-style: none
             }
         }
-
-        img {
-            float: left;
-            margin-top: 10px;
-            margin-right: 10px;
-            display: block;
+        .related {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            align-content: center;
+    
+            img {
+                margin-top: 10px;
+                margin-right: 10px;
+                cursor: pointer;
+            }
+    
         }
+    
 
     } 
 
@@ -68,6 +75,7 @@
 
         
     }
+
 
 }
 

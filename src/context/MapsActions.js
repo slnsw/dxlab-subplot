@@ -117,8 +117,20 @@ export function getMapsRaw({around, fromYear, toYear, assetIds}) {
     }
 }
 
-export function showDetailMap() {
+export function selectMap(object) {
     return (dispatch, state) => {
+        dispatch({
+            type: ActionTypes.MAPS_SELECT,
+            selected: object
+        });
+    }
+}
+
+export function unSelectMap() {
+    return (dispatch, state) => {
+        dispatch({
+            type: ActionTypes.MAPS_UNSELECT,
+        });
     }
 }
 
