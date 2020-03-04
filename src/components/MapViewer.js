@@ -239,6 +239,7 @@ export class MapViewer extends Component {
                     viewState={viewState}
                     controller={mapcontroller}
                     onViewStateChange={this.onViewStateChange.bind(this)}
+                    far={20}
                 >
 
                     <InteractiveMap

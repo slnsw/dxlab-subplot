@@ -37,6 +37,7 @@ export class Header extends Component {
         const [state,] = this.context;
         const fromYear = get(state, 'maps.filters.fromYear', 0);
         const toYear = get(state, 'maps.filters.toYear', 0);
+        const data = get(state, 'maps.data', []);
 
         let focus = get(state, 'maps.focus')
         focus =  (!focus) ? {} : focus;
@@ -66,8 +67,8 @@ export class Header extends Component {
 
         return (
             <div style={rootStyle}>
-                <h1 style={rangeHeaderStyle}> {fromYear} - {toYear} </h1>
-                {title && <p style={infoStyle}>[{year}] {title}</p>}
+                <h1 style={rangeHeaderStyle}> {fromYear} - {toYear} | {data.length}</h1>
+        {title && <p style={infoStyle}>[{year}] {title}</p>}
                 
                 {showPreview &&
                     <img src={url} 

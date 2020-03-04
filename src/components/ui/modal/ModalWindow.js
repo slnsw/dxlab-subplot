@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { MapDataContext } from '../../../context/MapsContext';
+import { UIContext } from '../../../context/UIContext';
 
 import IdleTimer from 'react-idle-timer'
 import ReactModal from 'react-modal';
@@ -40,13 +40,13 @@ export class ModalWindow extends Component {
     }
 
     onRelateClick(asset_id) {
-        const [state, distpatch] = this.context
-        const data = get(state, 'maps.data', [])
-        const select = find(data, ['properties.asset_id', asset_id])
-        if (select) {
-            distpatch(selectMap(select))
-        }
-        // console.log(select)
+        // const [state, distpatch] = this.context
+        // const data = get(state, 'maps.data', [])
+        // const select = find(data, ['properties.asset_id', asset_id])
+        // if (select) {
+        //     distpatch(selectMap(select))
+        // }
+        // // console.log(select)
     }
 
 
@@ -58,7 +58,7 @@ export class ModalWindow extends Component {
             return null
 
         const [state,] = this.context
-        let selected = get(state, 'maps.selected')
+        let selected = get(state, 'selected')
         selected = (!selected) ? {} : selected
 
         const { properties = {} } = selected
@@ -121,4 +121,4 @@ export class ModalWindow extends Component {
     }
 }
 
-ModalWindow.contextType = MapDataContext;
+ModalWindow.contextType = UIContext;

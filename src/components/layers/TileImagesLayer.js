@@ -2,7 +2,7 @@
 import { CompositeLayer } from 'deck.gl';
 import { BitmapLayer, GeoJsonLayer, TextLayer } from '@deck.gl/layers';
 
-import { getImageUrl, interpolateScale } from '../../share/utils';
+import { getImageUrl, interpolateScale, makeCancelable } from '../../share/utils';
 
 import { load } from "@loaders.gl/core";
 import { max, min, get } from 'lodash'
@@ -84,9 +84,12 @@ export class TileImagesLayer extends CompositeLayer {
     }
   }
 
-  shouldUpdateState({ changeFlags }) {
-    return ( changeFlags.viewportChanged !== false || changeFlags.dataChanged || changeFlags.propsChanged);
-  }
+  // shouldUpdateState({ changeFlags }) {
+  //   // console.log(changeFlags)
+  //   return ( changeFlags.viewportChanged !== false || changeFlags.dataChanged || changeFlags.propsChanged);
+  //   // return (  changeFlags.dataChanged || changeFlags.propsChanged);
+  //   // return false;
+  // }
 
 
 
@@ -125,22 +128,18 @@ export class TileImagesLayer extends CompositeLayer {
     const inFocus = get(contextState, 'maps.focus.properties.asset_id', null)
     // const inFocusYear = get(contextState, 'maps.focus.properties.year', null)
 
-    layers.push(new GeoJsonLayer(this.getSubLayerProps({
-      id: `${id}-bitmap-layer-${name}-cutlines`,
+    const geoJsonFillLayer = new GeoJsonLayer(this.getSubLayerProps({
+      id: `${id}-geojson-cutlines`,
       data: this.state.feature,
       extruded: false,
       pickable: true,
       autoHighlight: true,
       stroked: true,
-      material: {
-        ambient: 0.35,
-        diffuse: .6,
-        shininess: 32,
-        specularColor: [30, 30, 30]
-      },
+      // material: false,
       getLineWidth: 3,
       getFillColor: [255, 255, 255, 125],
       getLineColor: [255, 255, 255, 255],
+
       // getLineColor: (d) => {
       //   const currYear = get(d, 'properties.year', null);
       //   const opacity =  (currYear > inFocusYear)? 0 : 255;
@@ -158,45 +157,54 @@ export class TileImagesLayer extends CompositeLayer {
       //   getFillColor: 300
       // }
 
-    })));
+    }))
+    
+    layers.push(geoJsonFillLayer);
 
-    layers.push(new TextLayer(this.getSubLayerProps({
-      id: `${id}-bitmap-label-${suffix}`,
-      data: features,
-      pickable: false,
-      billboard: true,
-      getSize: 16,
-      sizeScale: 20 / 16,
+    // layers.push(new TextLayer(this.getSubLayerProps({
+    //   id: `${id}-bitmap-label-${suffix}`,
+    //   data: features,
+    //   pickable: false,
+    //   billboard: true,
+    //   getSize: 16,
+    //   sizeScale: 20 / 16,
 
-      fontWeight: 800,
-      fontFamily: 'Lekton',
-      getPixelOffset: [0, -10, 0],
-      getColor: (d) => {
-        const opacity = (zoom < 13.5 || !inFocus || inFocus === d.properties.asset_id) ? 0 : 255;
-        return [255, 255, 255, opacity]
-      },
+    //   fontWeight: 800,
+    //   fontFamily: 'Lekton',
+    //   getPixelOffset: [0, -10, 0],
+    //   getColor: (d) => {
+    //     const opacity = (zoom < 13.5 || !inFocus || inFocus === d.properties.asset_id) ? 0 : 255;
+    //     return [255, 255, 255, opacity]
+    //   },
 
-      // autoHighlight: true,
-      // getAngle: (d) => d.properties.bearing,
-      getText: (d) => (d.properties.year.toString()),
-      getPosition: (d) => d.properties.centroid,
-      updateTriggers: {
-        getColor: [zoom, inFocus]
-      },
-      transitions: {
-        getColor: 300
-      }
+    //   // autoHighlight: true,
+    //   // getAngle: (d) => d.properties.bearing,   
+    //   getText: (d) => (d.properties.year.toString()),
+    //   getPosition: (d) => d.properties.centroid,
+    //   updateTriggers: {
+    //     getColor: [zoom, inFocus]
+    //   },
+    //   transitions: {
+    //     getColor: 300
+    //   }
 
-    })));
+    // })));
 
 
     const viewportRect = this.getViewBounds()
-    const visible = features.filter(({ properties: { image_bounds, year } }) => areRectanglesOverlap(viewportRect, this.getImageBounds(image_bounds))) 
+    // let countVisible = 0;
+    // const visible = features.filter(({ properties: { image_bounds } }) => areRectanglesOverlap(viewportRect, this.getImageBounds(image_bounds))) 
 
-    layers.push(visible.map(({ properties: { asset_id, image_bounds, elevation } }) => {
+    layers.push(features.map(({ properties: { asset_id, image_bounds, elevation } }) => {
+
+      // is visible?
+      const visible = areRectanglesOverlap(viewportRect, this.getImageBounds(image_bounds))
+      // if (visible){
+      //   countVisible++;
+      // }
 
       const size = Math.floor(scale(zoom + (elevation / 100) ))
-      let image_url = getImageUrl(asset_id, suffix, lod[size]);
+      let image_url = getImageUrl(asset_id, suffix, 128);// lod[size]);
 
       let opacity = 1;
       if (inFocus) {
@@ -206,17 +214,19 @@ export class TileImagesLayer extends CompositeLayer {
 
       return new BitmapLayer(this.getSubLayerProps({
         id: `${id}-bitmap-layer-${name}-${asset_id}`,
+        visible: visible,
         bounds: image_bounds,
         opacity: opacity,
         pickable: false,
         autoHighlight: false,
         image: image_url,
-        material: {
-          ambient: 0.35,
-          diffuse: .6,
-          shininess: 32,
-          specularColor: [30, 30, 30]
-        },
+        material: false,
+        // material: {
+        //   ambient: 0.35,
+        //   diffuse: .6,
+        //   shininess: 32,
+        //   specularColor: [30, 30, 30]
+        // },
         parameters: {
           // Prevent png alpha channel create artifacts when overlaping other pngs
           depthMask: false,
@@ -226,6 +236,7 @@ export class TileImagesLayer extends CompositeLayer {
     }));
 
 
+    // console.log('visible', countVisible);
 
     return layers;
 
@@ -233,6 +244,7 @@ export class TileImagesLayer extends CompositeLayer {
 
 
   renderLayers() {
+    console.log('render images')
     return this.buildLayers();
     // return this.loadImages();
   }
@@ -339,3 +351,22 @@ export class TileImagesLayer extends CompositeLayer {
 }
 
 TileImagesLayer.layerName = 'TileImageLayer';
+
+TileImagesLayer.defaultProps = {
+  // // Shared accessors
+  // getPosition: {type: 'accessor', value: x => x.position},
+  // // Icon properties
+  // iconAtlas: null,
+  // iconMapping: {type: 'object', value: {}, async: true},
+  // // Icon accessors
+  // getIcon: {type: 'accessor', value: x => x.icon},
+  // getIconSize: {type: 'accessor', value: 20},
+  // getIconColor: {type: 'accessor', value: [0, 0, 0, 255]},
+  // // Text properties
+  // // fontFamily: DEFAULT_FONT_FAMILY,
+  // // fontWeight: DEFAULT_FONT_WEIGHT,
+  // // Text accessors
+  // getText: {type: 'accessor', value: x => x.text},
+  // getTextSize: {type: 'accessor', value: 12}
+  // // getTextColor: {type: 'accessor', value: [0, 0, 0, 255]}
+}

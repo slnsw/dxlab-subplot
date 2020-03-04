@@ -22,8 +22,9 @@ import { MapsLabelLayer } from './layers/MapsLabelLayer';
 import { MapsClusterCounts } from './layers/MapsClusterCounts';
 import { TileImagesLayer } from './layers/TileImagesLayer';
 
-import { selectMap, focusMap, removeFocusMap } from '../context/MapsActions';
+import { selectMap, focusMap, removeFocusMap } from '../context/UIActions';
 import { get } from 'lodash';
+import { UIContext } from '../context/UIContext';
 
 
 
@@ -33,19 +34,20 @@ export class MapExplorer extends Component {
         showModal: false,
     }
 
+    UIDispatch = null;
+
     /**
      * Open a modal window to display map detail data
      * @param {*} info 
      */
     showMapDetail({ object }) {
-        const [, dispatch] = this.context;
         // console.log(object)
         if (object) {
             this.setState({
                 showModal: true
             });
             // Update map context to keep track with the selected map
-            dispatch(selectMap({ ...object }))
+            this.UIDispatch(selectMap({ ...object }))
         }
     };
 
@@ -53,13 +55,13 @@ export class MapExplorer extends Component {
         const [, dispatch] = this.context;
         if (object) {
             // Update map context to keep track of map in focus
-            dispatch(focusMap({
+            this.UIDispatch(focusMap({
                 ...object,
                 mouseX: x,
                 mouseY: y
             }))
         } else {
-            dispatch(removeFocusMap())
+            this.UIDispatch(removeFocusMap())
         }
     }
 
@@ -81,7 +83,7 @@ export class MapExplorer extends Component {
 
         const layers = [
             // [SearchResultLayer, { view: 'all' }],
-            [LandmarksLayer, { view: 'master' }],
+            // [LandmarksLayer, { view: 'master' }],
             // [MapsDistributionLayer, { view: 'master' }],
             [FootprintMapsLayer, { view: 'all' }],
             // [MapsPolygonLayer, { view: 'master',  ...handlers }], 
@@ -89,7 +91,7 @@ export class MapExplorer extends Component {
             // [MapsClusterCounts, {view: 'master'}],
             // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: 'crop', view: 'all', ...handlers  }],
             // [MapsBitmapLayer, { id: 'edge', name: 'edge', suffix: '_edge.png', view: 'slave', ...handlers }],
-            [TileImagesLayer, { id: 'tile_crop', view: 'master', suffix: 'crop', ...handlers }]
+            [TileImagesLayer, { id: 'tile_crop', view: 'master', suffix: 'crop', ...handlers , material: false}]
         ];
 
         const { showModal } = this.state;
@@ -99,28 +101,37 @@ export class MapExplorer extends Component {
         const data = get(state, 'maps.data', [])
 
         return (
-            <React.Fragment>
-                { showModal && <ModalWindow
-                    isOpen={showModal}
-                    onRequestClose={() => this.setState({ showModal: false })}
-                />
-                }
 
-                {data.length > 0 &&
-                    <React.Fragment>
-                        <Header />
-                        <Range />
-                    </React.Fragment>
-                }
-                <MapViewer
-                    mode={mode}
-                    layers={layers}
-                ></MapViewer>
+            <UIContext.Consumer>
+                {([, UIDispatch]) => {
+                    this.UIDispatch = UIDispatch
 
+                    return (
+                        <React.Fragment>
+                            {showModal && <ModalWindow
+                                isOpen={showModal}
+                                onRequestClose={() => this.setState({ showModal: false })}
+                            />
+                            }
 
+                            {data.length > 0 &&
+                                <React.Fragment>
+                                    <Header />
+                                    <Range />
+                                </React.Fragment>
+                            }
 
+                            <MapViewer
+                                mode={mode}
+                                layers={layers}
+                            ></MapViewer>
+                        </React.Fragment>
 
-            </React.Fragment>
+                    )
+                }}
+
+            </UIContext.Consumer>
+
         )
     }
 }

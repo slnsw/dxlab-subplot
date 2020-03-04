@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { MapDataContext } from '../../../context/MapsContext';
 import { applyFilters } from '../../../context/MapsActions';
-import { get } from 'lodash';
+import { get, debounce } from 'lodash';
 
 import Slider, { Rail, Handles, Tracks, Ticks } from 'react-compound-slider'
 import { getUpdatedHandles } from 'react-compound-slider/Slider/utils'
@@ -52,13 +52,13 @@ const containerStyle = {
 export class Range extends Component {
 
 
-    onChange(values) {
+    onChange = debounce((values) => {
         const [fromYear, toYear] = values
         if (fromYear > 0 && toYear > 0) {
             const [, dispatch] = this.context;
             dispatch(applyFilters({ fromYear, toYear }))
         }
-    }
+    }, 20)
 
     mode(curr, next, step, reversed, getValue) {
 

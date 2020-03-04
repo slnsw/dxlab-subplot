@@ -83,6 +83,25 @@ export function linealScale(value, [domain_from, domain_to], [range_from, range_
   return res;
 }
 
+
+export function  makeCancelable(promise) {
+  let hasCanceled_ = false;
+
+  const wrappedPromise = new Promise((resolve, reject) => {
+    promise.then(
+      val => hasCanceled_ ? reject({isCanceled: true}) : resolve(val),
+      error => hasCanceled_ ? reject({isCanceled: true}) : reject(error)
+    );
+  });
+
+  return {
+    promise: wrappedPromise,
+    cancel() {
+      hasCanceled_ = true;
+    },
+  };
+};
+
 // Temporal 
 export function getZoomableImageUrl(asset_id, suffix = '.tif', size = '800,', format = 'default') {
   const url = `${process.env.REACT_APP_STATIC_BASE_URL}/tiled/${asset_id}${suffix}/full/${size}/0/${format}.png`;

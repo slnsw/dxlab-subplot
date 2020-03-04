@@ -41,11 +41,9 @@ export class FootprintMapsLayer extends CompositeLayer {
             extruded: false,
             stroked: false,
             getLineWidth: 0,
+            material: false,
             getPolygon: (d) => d,
-            getFillColor: (d) => {
-                // const alpha = mapValue(d.year, this.state.year_from, this.state.year_to, 0, 255);
-                return [0, 0, 0, 150];
-            },
+            getFillColor: (d) => [0, 0, 0, 150]
         });
 
     }
