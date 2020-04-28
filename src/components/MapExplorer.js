@@ -20,6 +20,7 @@ import { MapsPolygonLayer } from './layers/MapsPolygonLayer';
 import { MapsBitmapLayer } from './layers/MapsBitmapLayer';
 import { MapsLabelLayer } from './layers/MapsLabelLayer';
 import { MapsClusterCounts } from './layers/MapsClusterCounts';
+import { MapsCloudLayer } from './layers/MapsCloudLayer';
 import { TileImagesLayer } from './layers/TileImagesLayer';
 
 import { selectMap, focusMap, removeFocusMap } from '../context/UIActions';
@@ -85,13 +86,14 @@ export class MapExplorer extends Component {
             // [SearchResultLayer, { view: 'all' }],
             // [LandmarksLayer, { view: 'master' }],
             // [MapsDistributionLayer, { view: 'master' }],
-            [FootprintMapsLayer, { view: 'all' }],
+            // [FootprintMapsLayer, { view: 'all' }],
             // [MapsPolygonLayer, { view: 'master',  ...handlers }], 
             // [MapsLabelLayer, {view: 'master'}],
             // [MapsClusterCounts, {view: 'master'}],
+            [MapsCloudLayer, {view: 'master'}],
             // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: 'crop', view: 'all', ...handlers  }],
             // [MapsBitmapLayer, { id: 'edge', name: 'edge', suffix: '_edge.png', view: 'slave', ...handlers }],
-            [TileImagesLayer, { id: 'tile_crop', view: 'master', suffix: 'crop', ...handlers , material: false}]
+            // [TileImagesLayer, { id: 'tile_crop', view: 'master', suffix: 'crop', ...handlers , material: false}]
         ];
 
         const { showModal } = this.state;

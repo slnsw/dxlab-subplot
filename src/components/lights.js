@@ -28,7 +28,7 @@ class MyLightingEffect extends LightingEffect {
 
   // preRender
   prepare(gl, {layers, ...params}) {
-    layers = layers.filter((l) => (l.props.material))
+    // layers = layers.filter((l) => (l.props.material))
     return super.prepare(gl, {layers, ...params})
   }
 }

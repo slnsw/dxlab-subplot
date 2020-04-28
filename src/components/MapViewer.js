@@ -154,9 +154,12 @@ export class MapViewer extends Component {
     }
 
     getParent(layer) {
-        let parent = layer.parent;
-        if (parent.parent) {
-            parent = this.getParent(parent);
+        let parent = null;
+        if (layer) {
+            parent = layer.parent;
+            if (parent && parent.parent) {
+                parent = this.getParent(parent);
+            }
         }
         return parent
     }

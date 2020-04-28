@@ -84,12 +84,12 @@ export class TileImagesLayer extends CompositeLayer {
     }
   }
 
-  // shouldUpdateState({ changeFlags }) {
-  //   // console.log(changeFlags)
-  //   return ( changeFlags.viewportChanged !== false || changeFlags.dataChanged || changeFlags.propsChanged);
-  //   // return (  changeFlags.dataChanged || changeFlags.propsChanged);
-  //   // return false;
-  // }
+  shouldUpdateState({ changeFlags }) {
+    // console.log(changeFlags)
+    return ( changeFlags.viewportChanged !== false || changeFlags.dataChanged || changeFlags.propsChanged);
+    // return (  changeFlags.dataChanged || changeFlags.propsChanged);
+    // return false;
+  }
 
 
 
@@ -194,6 +194,8 @@ export class TileImagesLayer extends CompositeLayer {
     const viewportRect = this.getViewBounds()
     // let countVisible = 0;
     // const visible = features.filter(({ properties: { image_bounds } }) => areRectanglesOverlap(viewportRect, this.getImageBounds(image_bounds))) 
+    // const bounds = [[151.214204, -33.864048], [151.210451, -33.864039], [151.210455, -33.859921], [151.214208, -33.859929]]
+
 
     layers.push(features.map(({ properties: { asset_id, image_bounds, elevation } }) => {
 
