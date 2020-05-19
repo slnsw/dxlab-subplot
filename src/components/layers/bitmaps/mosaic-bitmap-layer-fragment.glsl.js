@@ -1,40 +1,40 @@
 export default `
 #define SHADER_NAME mosaic-bitmap-layer-fragment-shader
 
-#ifdef GL_ES
-precision highp float;
-#endif
+// uniform sampler2D uTexture;
 
-uniform sampler2D bitmapTexture;
+// varying vec2 vUV;
+varying vec3 vColor;
 
-varying vec2 vTexCoord;
 
-uniform float desaturate;
-uniform vec4 transparentColor;
-uniform vec3 tintColor;
-uniform float opacity;
+void main() {
+    // Color render
+    // gl_FragColor = vec4(vec3(1.0, 1.0, 0.0), 1.0);
+    gl_FragColor = vec4(vColor, 1.0);
+    
+    // Just render texture
+    // vec4 texColor = texture2D(uTexture, vec2(vUV.x, vUV.y));
+    // gl_FragColor = texColor;
 
-// apply desaturation
-vec3 color_desaturate(vec3 color) {
-  float luminance = (color.r + color.g + color.b) * 0.333333333;
-  return mix(color, vec3(luminance), desaturate);
-}
+    // // Load texture option 1
+    // vec4 texColor = texture2D(uTexture, vec2(vUV.x, vUV.y));
+    // vec4 aColor = vec4(0.0, 0.0, 0.0, 1.0);
+    // vec3 color = mix(texColor.rgb, aColor.rgb, 0.0);
+    // float a = texColor.a * 1.0 * aColor.a;
 
-// apply tint
-vec3 color_tint(vec3 color) {
-  return color * tintColor;
-}
+    // if (a < 0.05) {
+    //     discard;
+    // }
 
-// blend with background color
-vec4 apply_opacity(vec3 color, float alpha) {
-  return mix(transparentColor, vec4(color, 1.0), alpha);
-}
+    // gl_FragColor = vec4(color, a); 
 
-void main(void) {
 
-  vec4 bitmapColor = texture2D(bitmapTexture, vTexCoord);
-  gl_FragColor = apply_opacity(color_tint(color_desaturate(bitmapColor.rgb)), bitmapColor.a * opacity);
-  geometry.uv = vTexCoord;
-  DECKGL_FILTER_COLOR(gl_FragColor, geometry);
+    // // Load texture option 2
+    // vec4 texColor = texture2D(uTexture, vec2(vUV.x, vUV.y));
+    // vec4 aColor = vec4(0.0, 0.0, 0.0, 1.0);
+    // vec4 color = mix(aColor, vec4(texColor.rgb, 1.0), texColor.a * 0.8);
+
+
+    // gl_FragColor = color;
 }
 `;

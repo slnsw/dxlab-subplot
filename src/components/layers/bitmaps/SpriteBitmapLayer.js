@@ -12,15 +12,16 @@ const DEFAULT_TEXTURE_PARAMETERS = {
   [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
 };
 
-const DEFAULT_COLOR = [0, 0, 0, 255];
-
 const defaultProps = {
   image: {type: 'object', value: null, async: true},
-  mapping: {type: 'object', value: {}, async: true},
+  bounds: {type: 'array', value: [1, 0, 0, 1], compare: true},
 
-  getPosition: {type: 'accessor', value: x => x.position},
-  getImage: {type: 'accessor', value: x => x.image},
-  getColor: {type: 'accessor', value: DEFAULT_COLOR},
+  desaturate: {type: 'number', min: 0, max: 1, value: 0},
+  // More context: because of the blending mode we're using for ground imagery,
+  // alpha is not effective when blending the bitmap layers with the base map.
+  // Instead we need to manually dim/blend rgb values with a background color.
+  transparentColor: {type: 'color', value: [0, 0, 0, 0]},
+  tintColor: {type: 'color', value: [255, 255, 255]}
 };
 
 /*
@@ -38,87 +39,91 @@ export class SpriteBitmapLayer extends Layer {
     const attributeManager = this.getAttributeManager();
 
     attributeManager.add({
-      instancePositions: {
+      positions: {
         size: 3,
         type: GL.DOUBLE,
         fp64: this.use64bitPositions(),
-        transition: true,
-        accessor: 'getPosition',
-        update: this.preparePositions,
-        // noAlloc,
-        shaderAttributes: {
-          positions: {
-            offset: 0,
-            divisor: 0
-          },
-          instancePositions: {
-            offset: 0,
-            divisor: 1
-          },
-          nextPositions: {
-            offset: 12,
-            divisor: 1
-          }
-        }
-      },
-      instanceImageFrames: {size: 4, accessor: 'getImage', transform: this.getInstanceIconFrame},
-      instanceColors: {
-        size: this.props.colorFormat.length,
-        type: GL.UNSIGNED_BYTE,
-        normalized: true,
-        transition: true,
-        accessor: 'getColor',
-        defaultValue: DEFAULT_COLOR
-      },
+        update: this.calculatePositions,
+        noAlloc: true
+      }
     });
 
+    this.setState({
+      numInstances: 1,
+      positions: new Float64Array(12)
+    });
   }
 
   updateState({props, oldProps, changeFlags}) {
-    super.updateState({props, oldProps, changeFlags});
-    const attributeManager = this.getAttributeManager();
-
+    // setup model first
     if (changeFlags.extensionsChanged) {
       const {gl} = this.context;
       if (this.state.model) {
         this.state.model.delete();
       }
       this.setState({model: this._getModel(gl)});
-      attributeManager.invalidateAll();
+      this.getAttributeManager().invalidateAll();
     }
 
-    // // setup model first
-    // if (changeFlags.extensionsChanged) {
-    //   const {gl} = this.context;
-    //   if (this.state.model) {
-    //     this.state.model.delete();
-    //   }
-    //   this.setState({model: this._getModel(gl)});
-    //   this.getAttributeManager().invalidateAll();
-    // }
+    if (props.image !== oldProps.image) {
+      this.loadTexture(props.image);
+    }
 
-    // if (props.image !== oldProps.image) {
-    //   this.loadTexture(props.image);
-    // }
+    const attributeManager = this.getAttributeManager();
 
-    // const attributeManager = this.getAttributeManager();
-
-    // if (props.bounds !== oldProps.bounds) {
-    //   attributeManager.invalidate('positions');
-    // }
+    if (props.bounds !== oldProps.bounds) {
+      attributeManager.invalidate('positions');
+    }
   }
 
   finalizeState() {
     super.finalizeState();
 
-    // if (this.state.bitmapTexture) {
-    //   this.state.bitmapTexture.delete();
-    // }
+    if (this.state.bitmapTexture) {
+      this.state.bitmapTexture.delete();
+    }
   }
 
+  calculatePositions(attributes) {
+    const {positions} = this.state;
+    const {bounds} = this.props;
+    // bounds as [minX, minY, maxX, maxY]
+    if (Number.isFinite(bounds[0])) {
+      /*
+        (minX0, maxY3) ---- (maxX2, maxY3)
+               |                  |
+               |                  |
+               |                  |
+        (minX0, minY1) ---- (maxX2, minY1)
+     */
+      positions[0] = bounds[0];
+      positions[1] = bounds[1];
+      positions[2] = 0;
+
+      positions[3] = bounds[0];
+      positions[4] = bounds[3];
+      positions[5] = 0;
+
+      positions[6] = bounds[2];
+      positions[7] = bounds[3];
+      positions[8] = 0;
+
+      positions[9] = bounds[2];
+      positions[10] = bounds[1];
+      positions[11] = 0;
+    } else {
+      // [[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY]]
+      for (let i = 0; i < bounds.length; i++) {
+        positions[i * 3 + 0] = bounds[i][0];
+        positions[i * 3 + 1] = bounds[i][1];
+        positions[i * 3 + 2] = bounds[i][2] || 0;
+      }
+    }
+
+    attributes.value = positions;
+  }
 
   _getModel(gl) {
-    console.log('model..')
     if (!gl) {
       return null;
     }
@@ -134,42 +139,90 @@ export class SpriteBitmapLayer extends Layer {
         id: this.props.id,
         geometry: new Geometry({
           drawMode: GL.TRIANGLE_FAN,
-          vertexCount: 12,
+          vertexCount: 4,
           attributes: {
-            texCoords: new Float32Array([0, 0, 0, 1, 1, 1, 1, 0]),
-            // positions:  new Float32Array([-1, -1, 0, -1, 1, 0, 1, 1, 0, 1, -1, 0])
+            texCoords: new Float32Array([0, 0, 0, 1, 1, 1, 1, 0])
           }
         }),
-        // instanceCount: 2,
-        // isInstanced: true
+        isInstanced: false
       })
     );
   }
 
+  draw(opts) {
+    const {uniforms} = opts;
+    const {bitmapTexture, model} = this.state;
+    const {image, desaturate, transparentColor, tintColor} = this.props;
 
-  preparePositions(attributes) {
-    const {data} = this.props;
-    const positions = [];
-    for (let j = 0; j < data.length; j++) {
-      let bounds = data[j];
-      let offset = positions.length;
-
-      for (let i = 0; i < bounds.length; i++) {
-        positions[offset + i * 3 + 0] = bounds[i][0];
-        positions[offset + i * 3 + 1] = bounds[i][1];
-        positions[offset + i * 3 + 2] = bounds[i][2] || 0;
+    // Update video frame
+    if (
+      bitmapTexture &&
+      image instanceof HTMLVideoElement &&
+      image.readyState > HTMLVideoElement.HAVE_METADATA
+    ) {
+      const sizeChanged =
+        bitmapTexture.width !== image.videoWidth || bitmapTexture.height !== image.videoHeight;
+      if (sizeChanged) {
+        // note clears image and mipmaps when resizing
+        bitmapTexture.resize({width: image.videoWidth, height: image.videoHeight, mipmaps: true});
+        bitmapTexture.setSubImageData({
+          data: image,
+          paramters: DEFAULT_TEXTURE_PARAMETERS
+        });
+      } else {
+        bitmapTexture.setSubImageData({
+          data: image
+        });
       }
+
+      bitmapTexture.generateMipmap();
     }
-    attributes.values = positions;
-  }
-  
 
-  getInstanceImageFrame(image) {
-    console.log(image)
-    const rect = {x: 0, y: 0, width: 10, height: 10};
-    return [rect.x || 0, rect.y || 0, rect.width || 0, rect.height || 0];
+    // // TODO fix zFighting
+    // Render the image
+    if (bitmapTexture && model) {
+      model
+        .setUniforms(
+          Object.assign({}, uniforms, {
+            bitmapTexture,
+            desaturate,
+            transparentColor: transparentColor.map(x => x / 255),
+            tintColor: tintColor.slice(0, 3).map(x => x / 255)
+          })
+        )
+        .draw();
+    }
   }
 
+  loadTexture(image) {
+    const {gl} = this.context;
+
+    if (this.state.bitmapTexture) {
+      this.state.bitmapTexture.delete();
+    }
+
+    if (image instanceof Texture2D) {
+      this.setState({bitmapTexture: image});
+    } else if (image instanceof HTMLVideoElement) {
+      // Initialize an empty texture while we wait for the video to load
+      this.setState({
+        bitmapTexture: new Texture2D(gl, {
+          width: 1,
+          height: 1,
+          parameters: DEFAULT_TEXTURE_PARAMETERS,
+          mipmaps: false
+        })
+      });
+    } else if (image) {
+      // Browser object: Image, ImageData, HTMLCanvasElement, ImageBitmap
+      this.setState({
+        bitmapTexture: new Texture2D(gl, {
+          data: image,
+          parameters: DEFAULT_TEXTURE_PARAMETERS
+        })
+      });
+    }
+  }
 }
 
 SpriteBitmapLayer.layerName = 'SpriteBitmapLayer';
