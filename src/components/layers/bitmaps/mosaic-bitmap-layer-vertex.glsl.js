@@ -1,7 +1,7 @@
 export default `
 #define SHADER_NAME mosaic-bitmap-layer-vertex-shader
 
-attribute vec3 vertices;
+attribute vec2 vertices;
 attribute vec2 texCoords;
 // attribute vec3 color;
 // attribute vec3 offset;
@@ -21,6 +21,7 @@ attribute vec4 boundZ;
 // attribute vec4 textureMapping;
 // uniform vec2 uTextureDim;
 
+attribute vec3 color;
 varying vec3 vColor;
 // varying vec2 vUV;
 
@@ -45,8 +46,7 @@ void main() {
         // bound64xyLow = vec3(boundX64xyLow.w, boundY64xyLow.w, boundZ64xyLow.w);
     }
 
-    // vec4 position =  vec4(( ((vec3(vertices, 1.0) + bound  ) / 5.0 ) + offset), 1.0);
-    // vec4 position = vec4(((vec3(vertices, 1.0) / 10.0) + offset), 1.0);
+
     gl_Position = project_position_to_clipspace(position, vec2(0.0), vec3(0.0), geometry.position);
     DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
 
@@ -56,7 +56,7 @@ void main() {
     // geometry.worldPosition = bounds;
     // geometry.uv = texCoords;
     // gl_Position = project_position_to_clipspace(bounds, bounds64xyLow, vec3(0.0), geometry.position);
-    // gl_Position = project_position_to_clipspace(vertices, vec2(0.0), vec3(0.0), geometry.position);
+    // gl_Position = project_position_to_clipspace(positions, vec2(0.0), vec3(0.0), geometry.position);
     // DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
 
 
@@ -64,7 +64,7 @@ void main() {
     // Calculate uv
     // vUV = texCoords;
     // vColor = bounds;
-    vColor = vec3(1.0, 0.0, 0.0);
+    vColor = color;
     
     // vUV = mix(textureMapping.xy, textureMapping.xy + textureMapping.zw, texCoords.xy) / uTextureDim;
     

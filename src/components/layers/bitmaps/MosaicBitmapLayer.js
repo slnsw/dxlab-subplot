@@ -20,6 +20,7 @@ const defaultProps = {
 
   getBounds: { type: 'accessor', value: x => x.bounds },
   getImage: { type: 'accessor', value: x => x.image },
+  getColor: { type: 'accessor', value: x => x.color },
 
   desaturate: { type: 'number', min: 0, max: 1, value: 0 },
   // More context: because of the blending mode we're using for ground imagery,
@@ -48,102 +49,145 @@ export class MosaicBitmapLayer extends Layer {
         size: 4,
         type: GL.FLOAT,
         // fp64: this.use64bitPositions(),
-        update: () => { },
+        update: this.calculatePositions,
         transition: true,
-        divisor: 0
+        divisor: 1,
       },
       boundY: {
         size: 4,
         type: GL.FLOAT,
         // fp64: this.use64bitPositions(),
-        update: () => { },
+        update: this.calculatePositions,
         transition: true,
-        divisor: 0
+        divisor: 1
       },
       boundZ: {
         size: 4,
         type: GL.FLOAT,
         // fp64: this.use64bitPositions(),
-        update: () => { },
+        update: this.calculatePositions,
         transition: true,
-        divisor: 0
+        divisor: 1
       },
       bounds: {
         size: 3,
         type: GL.FLOAT,
         // fp64: this.use64bitPositions(),
-        accessor: 'getBounds', //this.getBounds,
+        accessor: 'getBounds',
         update: this.calculatePositions,
         transition: true,
-        divisor: 0,
+        divisor: 1,
         defaultValue: [0, 0, 0],
-        transform: this.trnBounds
+        // transform: this.trnBounds
+      },
+      color : {
+        size: 3,
+        accessor: 'getColor',
+        divisor: 1
       }
       // instanceTextureMapping: {size: 4, accessor: 'getImage', transform: this.getTextureMapping}
     });
     /* eslint-enable max-len */
+
+    this.state = {
+      boundX: [],
+      boundY: [],
+      boundZ: [],
+      bounds: [],
+      positionCalculated: false
+    };
   }
 
 
 
-  trnBounds(bounds) {
+  trnBounds(coords) {
     const positions = [];
     // [[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY]]
-    for (let i = 0; i < bounds.length; i++) {
-      positions[i * 3 + 0] = bounds[i][0];
-      positions[i * 3 + 1] = bounds[i][1];
-      positions[i * 3 + 2] = bounds[i][2] || 0;
+    for (let i = 0; i < coords.length; i++) {
+      positions[i * 3 + 0] = coords[i][0];
+      positions[i * 3 + 1] = coords[i][1];
+      positions[i * 3 + 2] = coords[i][2] || 0;
     }
 
     return positions;
   }
 
+  // calculatePositions(attribute, { data, numInstances }) {
+  //   const attributeManager = this.getAttributeManager();
+  //   const { boundX, boundY, boundZ } = attributeManager.getAttributes();
 
-  transformBound(coordinate) {
-    return (bounds) => {
-      const bound = [];
+  //   const values = [];
+  //   const valuesX = [];
+  //   const valuesY = [];
+  //   const valuesZ = [];
 
-      for (let i = 0; i < bounds.length; i++) {
-        bound.push(bounds[i][coordinate] || 0);
-      }
+  //   const { getBounds } = this.props;
+  //   data.forEach((item, j) => {
+  //     let bounds = getBounds(item);
 
-      console.log(coordinate, bound);
+  //     bounds.forEach((point, i) => {
+  //       valuesX.push(point[0]);
+  //       valuesY.push(point[1]);
+  //       valuesZ.push(point[2] || 0);
+  //     });
 
-      return new Float64Array(bound);
-    };
-  }
+  //     bounds = this.trnBounds(bounds);
+  //     values.push(...bounds);
+  //   });
+
+  //   attribute.value = new Float32Array(values);
+  //   boundX.value = new Float32Array(valuesX); 
+  //   boundY.value = new Float32Array(valuesY);
+  //   boundZ.value = new Float32Array(valuesZ);
+
+  //   // console.log(values, valuesX, valuesY, valuesZ)
+  //   console.log(attribute, boundX, valuesX)
+
+  // }
 
   calculatePositions(attribute, { data, numInstances }) {
-    const attributeManager = this.getAttributeManager();
-    const { boundX, boundY, boundZ } = attributeManager.getAttributes();
+    const { calculatePositions } = this.state;
 
-    const values = [];
-    const valuesX = [];
-    const valuesY = [];
-    const valuesZ = [];
+    // Split bounds only ones
+    // Wierd solution but when I assing the values directly 
+    // to the attribute they are not pass to the vertex shader
+    if (!calculatePositions) {
+      const bounds = [];
+      const boundX = [];
+      const boundY = [];
+      const boundZ = [];
 
-    const { getBounds } = this.props;
-    data.forEach((item, j) => {
-      let bounds = getBounds(item);
-  
-      bounds.forEach((point, i) => {
-        valuesX.push(point[0]);
-        valuesY.push(point[1]);
-        valuesZ.push(point[2] || 0);
+      const { getBounds } = this.props;
+      data.forEach((item, j) => {
+        let coords = getBounds(item);
+
+        coords.forEach((point, i) => {
+          boundX.push(point[0]);
+          boundY.push(point[1]);
+          boundZ.push(point[2] || 0);
+        });
+
+        coords = this.trnBounds(coords);
+        bounds.push(...coords);
       });
 
-      bounds = this.trnBounds(bounds);
-      values.push(...bounds);
-    });
+      this.state = {
+        ...this.state,
+        boundX,
+        boundY,
+        boundZ,
+        bounds,
+        calculatePositions: true
+      }
+    }
 
+    const values = this.state[attribute.id];
     attribute.value = new Float32Array(values);
-    boundX.value = new Float32Array(valuesX);
-    boundY.value = new Float32Array(valuesY);
-    boundZ.value = new Float32Array(valuesZ);
-
-    console.log(valuesX)
-
+    
   }
+
+
+
 
 
 
@@ -167,6 +211,10 @@ export class MosaicBitmapLayer extends Layer {
 
     if (props.data !== oldProps.data) {
       attributeManager.invalidate('bounds');
+      attributeManager.invalidate('boundX');
+      attributeManager.invalidate('boundY');
+      attributeManager.invalidate('boundZ');
+      this.state = { ...this.state, calculatePositions : false}
     }
   }
 
@@ -219,14 +267,11 @@ export class MosaicBitmapLayer extends Layer {
         id: this.props.id,
         geometry: new Geometry({
           drawMode: GL.TRIANGLE_FAN,
-          isInstanced: true,
-          instanceCount: 2,
-          vertexCount: 4,
           attributes: {
             texCoords: { size: 2, type: GL.FLOAT, value: texCoords },
             vertices: { size: 2, type: GL.FLOAT, value: vertices },
             vertexId: { size: 1, type: GL.FLOAT, value: vertexIds },
-            // vertices: {
+            // positions: {
             //   size: 3, type: GL.FLOAT, value: new Float32Array(this.trnBounds([
             //     [151.214204, -33.864048],
             //     [151.210451, -33.864039],
@@ -236,7 +281,9 @@ export class MosaicBitmapLayer extends Layer {
             // }
           }
         }),
-        isInstanced: true
+        // isInstanced: true,
+        vertexCount: 4,
+        instanced: true
       })
     );
   }
