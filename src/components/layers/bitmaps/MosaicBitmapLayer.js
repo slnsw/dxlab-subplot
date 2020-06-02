@@ -14,8 +14,9 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 
 const defaultProps = {
   imageAtlas: { type: 'object', value: null, async: true },
+  imageMapping: { type: 'object', value: null, async: true },
   data: { type: 'array', value: [], async: true },
-  // bounds: {type: 'array', value: [1, 0, 0, 1], compare: true},
+
   alphaCutoff: { type: 'number', value: 0.05, min: 0, max: 1 },
 
   getBounds: { type: 'accessor', value: x => x.bounds },
@@ -23,6 +24,7 @@ const defaultProps = {
   getColor: { type: 'accessor', value: x => x.color },
 
   desaturate: { type: 'number', min: 0, max: 1, value: 0 },
+  // Inspired by  Deck.gl BitmapLayer implementation
   // More context: because of the blending mode we're using for ground imagery,
   // alpha is not effective when blending the bitmap layers with the base map.
   // Instead we need to manually dim/blend rgb values with a background color.
@@ -80,12 +82,17 @@ export class MosaicBitmapLayer extends Layer {
         defaultValue: [0, 0, 0],
         // transform: this.trnBounds
       },
-      color : {
+      color: {
         size: 3,
         accessor: 'getColor',
         divisor: 1
+      },
+      textureMapping: { 
+        size: 4, 
+        accessor: 'getImage',
+        divisor: 1, 
+        transform: this.getTextureMapping 
       }
-      // instanceTextureMapping: {size: 4, accessor: 'getImage', transform: this.getTextureMapping}
     });
     /* eslint-enable max-len */
 
@@ -112,38 +119,6 @@ export class MosaicBitmapLayer extends Layer {
     return positions;
   }
 
-  // calculatePositions(attribute, { data, numInstances }) {
-  //   const attributeManager = this.getAttributeManager();
-  //   const { boundX, boundY, boundZ } = attributeManager.getAttributes();
-
-  //   const values = [];
-  //   const valuesX = [];
-  //   const valuesY = [];
-  //   const valuesZ = [];
-
-  //   const { getBounds } = this.props;
-  //   data.forEach((item, j) => {
-  //     let bounds = getBounds(item);
-
-  //     bounds.forEach((point, i) => {
-  //       valuesX.push(point[0]);
-  //       valuesY.push(point[1]);
-  //       valuesZ.push(point[2] || 0);
-  //     });
-
-  //     bounds = this.trnBounds(bounds);
-  //     values.push(...bounds);
-  //   });
-
-  //   attribute.value = new Float32Array(values);
-  //   boundX.value = new Float32Array(valuesX); 
-  //   boundY.value = new Float32Array(valuesY);
-  //   boundZ.value = new Float32Array(valuesZ);
-
-  //   // console.log(values, valuesX, valuesY, valuesZ)
-  //   console.log(attribute, boundX, valuesX)
-
-  // }
 
   calculatePositions(attribute, { data, numInstances }) {
     const { calculatePositions } = this.state;
@@ -183,13 +158,8 @@ export class MosaicBitmapLayer extends Layer {
 
     const values = this.state[attribute.id];
     attribute.value = new Float32Array(values);
-    
+
   }
-
-
-
-
-
 
 
   updateState({ props, oldProps, changeFlags }) {
@@ -203,9 +173,9 @@ export class MosaicBitmapLayer extends Layer {
       this.getAttributeManager().invalidateAll();
     }
 
-    // if (props.image !== oldProps.image) {
-    //   this.loadTexture(props.image);
-    // }
+    if (props.imageAtlas !== oldProps.imageAtlas) {
+      this.loadTexture(props.imageAtlas);
+    }
 
     const attributeManager = this.getAttributeManager();
 
@@ -214,7 +184,7 @@ export class MosaicBitmapLayer extends Layer {
       attributeManager.invalidate('boundX');
       attributeManager.invalidate('boundY');
       attributeManager.invalidate('boundZ');
-      this.state = { ...this.state, calculatePositions : false}
+      this.state = { ...this.state, calculatePositions: false }
     }
   }
 
@@ -289,8 +259,37 @@ export class MosaicBitmapLayer extends Layer {
   }
 
   draw(opts) {
-    this.state.model.draw();
+    const { uniforms } = opts;
+    const { model, texture } = this.state;
+
+    model
+      .setUniforms({
+        ...uniforms,
+        uTexture: texture,
+        uTextureDim: new Float32Array([1024, 1657])
+
+      })
+      .draw();
   }
+
+
+  loadTexture(imageAtlas) {
+    const { gl } = this.context;
+    const texture = new Texture2D(gl, {
+      data: imageAtlas,
+      parameters: DEFAULT_TEXTURE_PARAMETERS
+    })
+    this.setState({ texture });
+  }
+
+  count = 0;
+
+  getTextureMapping(imageId) {
+    const rect = this.props.imageMapping[this.count % 5]
+    this.count++;
+    return [rect.x || 0, rect.y || 0, rect.w || 0, rect.h || 0];
+  }
+
 
 
 }

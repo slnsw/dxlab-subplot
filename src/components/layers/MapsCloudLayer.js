@@ -89,6 +89,14 @@ export class MapsCloudLayer extends CompositeLayer {
 
         const {mosaicData} = this.state;
 
+        const atlas = {
+            0: { x: 0, y: 0, w: 512, h: 371 },
+            1: { x: 512, y: 0, w: 512, h: 371 },
+            2: { x: 0, y: 371, w: 512, h: 428 },
+            3: { x: 512, y: 371, w: 512, h: 430 },
+            4: { x: 0, y: 801, w: 512, h: 430 },
+        }
+
         // const mosaicData = [
         //     { 
         //         image: '001', 
@@ -111,12 +119,16 @@ export class MapsCloudLayer extends CompositeLayer {
             // opacity: opacity,
             // pickable: false,
             // autoHighlight: false,
-            // imageAtlas: 'map_sheet.png',
-            // imageMapping: {},
+            imageAtlas: 'map_sheet.png',
+            imageMapping: atlas,
 
             material: false,
 
-            getBounds: (d) => d.bounds
+            getBounds: (d) => d.bounds,
+            parameters: {
+                // Prevent png alpha channel create artifacts when overlaping other pngs
+                depthMask: false, 
+            },
 
         }));
 

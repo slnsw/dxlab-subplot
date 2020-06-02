@@ -3,8 +3,7 @@ export default `
 
 attribute vec2 vertices;
 attribute vec2 texCoords;
-// attribute vec3 color;
-// attribute vec3 offset;
+attribute vec3 color;
 attribute float instanceIds;
 attribute float vertexId;
 
@@ -18,12 +17,12 @@ attribute vec4 boundY;
 attribute vec4 boundZ; 
 // attribute vec4 boundZ64xyLow;
 
-// attribute vec4 textureMapping;
-// uniform vec2 uTextureDim;
+attribute vec4 textureMapping;
+uniform vec2 uTextureDim;
 
-attribute vec3 color;
+
 varying vec3 vColor;
-// varying vec2 vUV;
+varying vec2 vUV;
 
 void main() {
     // color_setColor(color);
@@ -47,6 +46,9 @@ void main() {
     }
 
 
+    // geometry.worldPosition = position;
+    // geometry.uv = texCoords;
+
     gl_Position = project_position_to_clipspace(position, vec2(0.0), vec3(0.0), geometry.position);
     DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
 
@@ -63,10 +65,10 @@ void main() {
 
     // Calculate uv
     // vUV = texCoords;
-    // vColor = bounds;
+    vUV = mix(textureMapping.xy, textureMapping.xy + textureMapping.zw, texCoords.xy) / uTextureDim;
     vColor = color;
     
-    // vUV = mix(textureMapping.xy, textureMapping.xy + textureMapping.zw, texCoords.xy) / uTextureDim;
+    
     
 }
 `;
