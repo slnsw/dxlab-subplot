@@ -87,7 +87,7 @@ export class MapExplorer extends Component {
             // [LandmarksLayer, { view: 'master' }],
             // [MapsDistributionLayer, { view: 'master' }],
             // [FootprintMapsLayer, { view: 'all' }],
-            [MapsPolygonLayer, { view: 'master',  ...handlers }], 
+            // [MapsPolygonLayer, { view: 'master',  ...handlers }], 
             // [MapsLabelLayer, {view: 'master'}],
             // [MapsClusterCounts, {view: 'master'}],
             [MapsCloudLayer, {view: 'master'}],

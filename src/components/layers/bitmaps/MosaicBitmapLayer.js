@@ -87,11 +87,17 @@ export class MosaicBitmapLayer extends Layer {
         accessor: 'getColor',
         divisor: 1
       },
-      textureMapping: { 
+      imageFrame: { 
         size: 4, 
         accessor: 'getImage',
         divisor: 1, 
-        transform: this.getTextureMapping 
+        transform: this.getImageFrame 
+      },
+      imageRotated: { 
+        size: 1, 
+        accessor: 'getImage',
+        divisor: 1, 
+        transform: this.getImageRotated 
       }
     });
     /* eslint-enable max-len */
@@ -202,28 +208,27 @@ export class MosaicBitmapLayer extends Layer {
     }
 
     /*
-    -1,1 ---- 1,1
-     |        |
-    -1,-1 --- 1,-1
-    */
-    const vertices = new Float32Array([
-      -1, -1, // Left - Bottom
-      -1, 1, // Left - Top
-      1, 1,  // Right - Top 
-      1, -1  // Right - Bottom
-
-    ])
-
-    /*
     0,0 --- 1,0
     |       |
     0,1 --- 1,1
     */
-    const texCoords = new Float32Array([
-      0, 1, // 0, 1 
-      0, 0, // 0, 0 
-      1, 0, // 1, 0
-      1, 1 // 1, 1
+    const texCoords = new Float32Array([    
+      0, 0, 
+      0, 1, 
+      1, 1, 
+      1, 0, 
+
+      // Rotate 45 to  right
+      // 0, 0,
+      // 1, 0, 
+      // 1, 1, 
+      // 0, 1, 
+ 
+     
+
+
+
+
     ])
     // END: Geometry attributes
 
@@ -239,16 +244,7 @@ export class MosaicBitmapLayer extends Layer {
           drawMode: GL.TRIANGLE_FAN,
           attributes: {
             texCoords: { size: 2, type: GL.FLOAT, value: texCoords },
-            vertices: { size: 2, type: GL.FLOAT, value: vertices },
             vertexId: { size: 1, type: GL.FLOAT, value: vertexIds },
-            // positions: {
-            //   size: 3, type: GL.FLOAT, value: new Float32Array(this.trnBounds([
-            //     [151.214204, -33.864048],
-            //     [151.210451, -33.864039],
-            //     [151.210455, -33.859921],
-            //     [151.214208, -33.859929]
-            //   ]))
-            // }
           }
         }),
         // isInstanced: true,
@@ -261,12 +257,13 @@ export class MosaicBitmapLayer extends Layer {
   draw(opts) {
     const { uniforms } = opts;
     const { model, texture } = this.state;
+    const { transparentColor, tintColor } = this.props;
 
     model
       .setUniforms({
         ...uniforms,
         uTexture: texture,
-        uTextureDim: new Float32Array([1024, 1657])
+        uTextureDim: new Float32Array([2048, 2048])
 
       })
       .draw();
@@ -284,12 +281,18 @@ export class MosaicBitmapLayer extends Layer {
 
   count = 0;
 
-  getTextureMapping(imageId) {
-    const rect = this.props.imageMapping[this.count % 5]
-    this.count++;
+  getImageFrame(imageId) {
+    // this.count % 4
+    const rect = this.props.imageMapping.frames[0].frame
+    // this.count++;
     return [rect.x || 0, rect.y || 0, rect.w || 0, rect.h || 0];
   }
 
+  getImageRotated(imageId) {
+    const rotated = this.props.imageMapping.frames[0].rotated
+    // this.count++;
+    return (rotated) ? 1 : 0;
+  }
 
 
 }

@@ -17,7 +17,8 @@ attribute vec4 boundY;
 attribute vec4 boundZ; 
 // attribute vec4 boundZ64xyLow;
 
-attribute vec4 textureMapping;
+attribute vec4 imageFrame;
+attribute float imageRotated;
 uniform vec2 uTextureDim;
 
 
@@ -65,7 +66,15 @@ void main() {
 
     // Calculate uv
     // vUV = texCoords;
-    vUV = mix(textureMapping.xy, textureMapping.xy + textureMapping.zw, texCoords.xy) / uTextureDim;
+    vec2 uv = vec2(0.0);
+    if (imageRotated == 1.0) {
+        uv = texCoords.yx;
+    } else {
+        uv = texCoords.xy;
+    } 
+    vUV = mix(imageFrame.xy, imageFrame.xy + imageFrame.zw, uv) / uTextureDim;
+    // vUV = mix(vec2(0.0, 0.0),  vec2(0.0, 0.0) + vec2(512.0, 371.0), texCoords.xy) / vec2(1024.0, 1657.0);
+    vUV.y = 1.0 - vUV.y;
     vColor = color;
     
     

@@ -35,15 +35,15 @@ export class MapsCloudLayer extends CompositeLayer {
             }
 
 
-            const mosaicData = data.reduce(function (result, el) {
+            const mosaicData = data.slice(0,10).reduce(function (result, el) {
                 const { geometry, properties } = el;
                 // if (geometry) {
 
-                    result.push({
-                        bounds: properties.image_bounds.coordinates[0].map((c) => [...c, 200]),
-                        image: properties.asset_id,
-                        color: [1.0,0,0]
-                    });
+                result.push({
+                    bounds: properties.image_bounds.coordinates[0].map((c) => [...c, 200]),
+                    image: properties.asset_id,
+                    color: [1.0, 0, 0]
+                });
 
                 // }
                 return result;
@@ -87,14 +87,89 @@ export class MapsCloudLayer extends CompositeLayer {
         // ]
 
 
-        const {mosaicData} = this.state;
+        const { mosaicData } = this.state;
 
-        const atlas = {
+        const atlas2 = {
             0: { x: 0, y: 0, w: 512, h: 371 },
             1: { x: 512, y: 0, w: 512, h: 371 },
             2: { x: 0, y: 371, w: 512, h: 428 },
             3: { x: 512, y: 371, w: 512, h: 430 },
             4: { x: 0, y: 801, w: 512, h: 430 },
+        }
+
+        const atlas = {
+            "frames": {
+                // 0: {"frame": {"x": 92, "y": 1562, "w": 95, "h": 128}, "size": {"w": 128, "h": 95}, "rotated": true, "offset": {"x": 0, "y": 0}},
+                0:  {"frame": {"x": 1541, "y": 1027, "w": 383, "h": 512}, "size": {"w": 512, "h": 383}, "rotated": true, "offset": {"x": 0, "y": 0}},
+                // 0: {
+                //     "frame": {
+                //         "x": 1842,
+                //         "y": 1172,
+                //         "w": 106,
+                //         "h": 128
+                //     },
+                //     "size": {
+                //         "w": 128,
+                //         "h": 106
+                //     },
+                //     "rotated": true,
+                //     "offset": {
+                //         "x": 0,
+                //         "y": 0
+                //     }
+                // },
+                1: {
+                    "frame": {
+                        "x": 209,
+                        "y": 132,
+                        "w": 104,
+                        "h": 128
+                    },
+                    "size": {
+                        "w": 128,
+                        "h": 104
+                    },
+                    "rotated": true,
+                    "offset": {
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                2: {
+                    "frame": {
+                        "x": 108,
+                        "y": 522,
+                        "w": 106,
+                        "h": 128
+                    },
+                    "size": {
+                        "w": 128,
+                        "h": 106
+                    },
+                    "rotated": true,
+                    "offset": {
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+                3: {
+                    "frame": {
+                        "x": 678,
+                        "y": 1302,
+                        "w": 107,
+                        "h": 128
+                    },
+                    "size": {
+                        "w": 128,
+                        "h": 107
+                    },
+                    "rotated": true,
+                    "offset": {
+                        "x": 0,
+                        "y": 0
+                    }
+                },
+            }
         }
 
         // const mosaicData = [
@@ -119,7 +194,7 @@ export class MapsCloudLayer extends CompositeLayer {
             // opacity: opacity,
             // pickable: false,
             // autoHighlight: false,
-            imageAtlas: 'map_sheet.png',
+            imageAtlas: 'sprites/subdivisions87.png',
             imageMapping: atlas,
 
             material: false,
@@ -127,7 +202,7 @@ export class MapsCloudLayer extends CompositeLayer {
             getBounds: (d) => d.bounds,
             parameters: {
                 // Prevent png alpha channel create artifacts when overlaping other pngs
-                depthMask: false, 
+                depthMask: false,
             },
 
         }));
