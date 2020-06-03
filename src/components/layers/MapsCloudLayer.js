@@ -33,9 +33,9 @@ export class MapsCloudLayer extends CompositeLayer {
             if (!data) {
                 return;
             }
-
-
-            const mosaicData = data.slice(0,10).reduce(function (result, el) {
+            
+            // Load maps data
+            const mosaicData = data.reduce(function (result, el) {
                 const { geometry, properties } = el;
                 // if (geometry) {
 
@@ -50,6 +50,16 @@ export class MapsCloudLayer extends CompositeLayer {
             }, []);
 
             this.setState({ mosaicData });
+
+
+            //`${process.env.REACT_APP_SPRITE_MAPING_PATH}`
+            // ()['/sprites/subdivisions_']
+
+            // fetch(`${process.env.REACT_APP_SPRITE_MAPING_PATH}`)
+            // // We get the API response and receive data in JSON format...
+            // .then(response => response.json())
+
+
         }
 
     }
@@ -87,8 +97,7 @@ export class MapsCloudLayer extends CompositeLayer {
         // ]
 
 
-        const { mosaicData } = this.state;
-
+        /*
         const atlas2 = {
             0: { x: 0, y: 0, w: 512, h: 371 },
             1: { x: 512, y: 0, w: 512, h: 371 },
@@ -96,28 +105,28 @@ export class MapsCloudLayer extends CompositeLayer {
             3: { x: 512, y: 371, w: 512, h: 430 },
             4: { x: 0, y: 801, w: 512, h: 430 },
         }
-
-        const atlas = {
+        */
+        /*const atlas = {
             "frames": {
                 // 0: {"frame": {"x": 92, "y": 1562, "w": 95, "h": 128}, "size": {"w": 128, "h": 95}, "rotated": true, "offset": {"x": 0, "y": 0}},
-                0:  {"frame": {"x": 1541, "y": 1027, "w": 383, "h": 512}, "size": {"w": 512, "h": 383}, "rotated": true, "offset": {"x": 0, "y": 0}},
-                // 0: {
-                //     "frame": {
-                //         "x": 1842,
-                //         "y": 1172,
-                //         "w": 106,
-                //         "h": 128
-                //     },
-                //     "size": {
-                //         "w": 128,
-                //         "h": 106
-                //     },
-                //     "rotated": true,
-                //     "offset": {
-                //         "x": 0,
-                //         "y": 0
-                //     }
-                // },
+                // 0:  {"frame": {"x": 1541, "y": 1027, "w": 383, "h": 512}, "size": {"w": 512, "h": 383}, "rotated": true, "offset": {"x": 0, "y": 0}},
+                0: {
+                    "frame": {
+                        "x": 1842,
+                        "y": 1172,
+                        "w": 106,
+                        "h": 128
+                    },
+                    "size": {
+                        "w": 128,
+                        "h": 106
+                    },
+                    "rotated": true,
+                    "offset": {
+                        "x": 0,
+                        "y": 0
+                    }
+                },
                 1: {
                     "frame": {
                         "x": 209,
@@ -170,7 +179,7 @@ export class MapsCloudLayer extends CompositeLayer {
                     }
                 },
             }
-        }
+        }*/
 
         // const mosaicData = [
         //     { 
@@ -187,6 +196,8 @@ export class MapsCloudLayer extends CompositeLayer {
         //     },
         // ];
 
+        const { mosaicData } = this.state;
+
         const mb = new MosaicBitmapLayer(this.getSubLayerProps({
             id: `${id}-bitmap-layer-mosaic`,
 
@@ -194,8 +205,18 @@ export class MapsCloudLayer extends CompositeLayer {
             // opacity: opacity,
             // pickable: false,
             // autoHighlight: false,
-            imageAtlas: 'sprites/subdivisions87.png',
-            imageMapping: atlas,
+            // imageAtlas: [
+            //     'sprites/subdivisions_0.png', 
+            //     'sprites/subdivisions_1.png'
+            // ],
+            // imageMapping: [
+            //     'sprites/subdivisions_0.json', 
+            //     'sprites/subdivisions_1.json'
+            // ],
+
+            imageAtlas: 'sprites/subdivisions_0.png',
+            imageMapping: 'sprites/subdivisions_0.json',
+            
 
             material: false,
 

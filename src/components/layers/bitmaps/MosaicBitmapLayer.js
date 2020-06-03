@@ -4,6 +4,7 @@ import { Model, Geometry, Texture2D } from '@luma.gl/core';
 
 import vs from './mosaic-bitmap-layer-vertex.glsl';
 import fs from './mosaic-bitmap-layer-fragment.glsl';
+import MosaicManager from './MosaicManager';
 
 const DEFAULT_TEXTURE_PARAMETERS = {
   [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
@@ -14,7 +15,7 @@ const DEFAULT_TEXTURE_PARAMETERS = {
 
 const defaultProps = {
   imageAtlas: { type: 'object', value: null, async: true },
-  imageMapping: { type: 'object', value: null, async: true },
+  imageMapping: { type: 'object', value: {}, async: true },
   data: { type: 'array', value: [], async: true },
 
   alphaCutoff: { type: 'number', value: 0.05, min: 0, max: 1 },
@@ -107,7 +108,8 @@ export class MosaicBitmapLayer extends Layer {
       boundY: [],
       boundZ: [],
       bounds: [],
-      positionCalculated: false
+      positionCalculated: false,
+      mosaicManager: new MosaicManager(this.context.gl, {onUpdate: () => this.onManagerUpdate()})
     };
   }
 
@@ -169,21 +171,46 @@ export class MosaicBitmapLayer extends Layer {
 
 
   updateState({ props, oldProps, changeFlags }) {
+    // console.log('update', changeFlags);
     // setup model first
+    const {mosaicManager} = this.state;
+    const attributeManager = this.getAttributeManager();
+    let mosaicChanged = false;
+
     if (changeFlags.extensionsChanged) {
       const { gl } = this.context;
       if (this.state.model) {
         this.state.model.delete();
       }
       this.setState({ model: this._getModel(gl) });
-      this.getAttributeManager().invalidateAll();
+      this.getAttributeManager().invalidateAll(); 
     }
 
     if (props.imageAtlas !== oldProps.imageAtlas) {
       this.loadTexture(props.imageAtlas);
     }
 
-    const attributeManager = this.getAttributeManager();
+    if (props.imageMapping !== oldProps.imageMapping) {
+      // console.log('loaded init');
+      mosaicManager.loadAtlases();
+      mosaicChanged = true;
+    }
+
+
+    if (
+      changeFlags.dataChanged ||
+      (changeFlags.updateTriggersChanged &&
+        (changeFlags.updateTriggersChanged.all || changeFlags.updateTriggersChanged.getImage))
+    ) {
+      // console.log('change');
+      // iconManager.setProps({data, getIcon});
+      mosaicChanged = true;
+    }
+
+    if(mosaicChanged) {
+      attributeManager.invalidate('imageFrame');
+      attributeManager.invalidate('imageRotated');
+    }
 
     if (props.data !== oldProps.data) {
       attributeManager.invalidate('bounds');
@@ -217,20 +244,7 @@ export class MosaicBitmapLayer extends Layer {
       0, 1, 
       1, 1, 
       1, 0, 
-
-      // Rotate 45 to  right
-      // 0, 0,
-      // 1, 0, 
-      // 1, 1, 
-      // 0, 1, 
- 
-     
-
-
-
-
-    ])
-    // END: Geometry attributes
+    ]);
 
 
     // Create and ID for each vertex so we can access the right vertex position
@@ -263,12 +277,15 @@ export class MosaicBitmapLayer extends Layer {
       .setUniforms({
         ...uniforms,
         uTexture: texture,
-        uTextureDim: new Float32Array([2048, 2048])
+        uTextureDim: new Float32Array([texture.width, texture.height])
 
       })
       .draw();
   }
 
+  onManagerUpdate(){ 
+    this.setNeedsRedraw();
+  }
 
   loadTexture(imageAtlas) {
     const { gl } = this.context;
@@ -279,18 +296,15 @@ export class MosaicBitmapLayer extends Layer {
     this.setState({ texture });
   }
 
-  count = 0;
+
 
   getImageFrame(imageId) {
-    // this.count % 4
-    const rect = this.props.imageMapping.frames[0].frame
-    // this.count++;
+    const rect = this.state.mosaicManager.getImageMapping(imageId);
     return [rect.x || 0, rect.y || 0, rect.w || 0, rect.h || 0];
   }
 
   getImageRotated(imageId) {
-    const rotated = this.props.imageMapping.frames[0].rotated
-    // this.count++;
+    const {rotated} = this.state.mosaicManager.getImageMapping(imageId);
     return (rotated) ? 1 : 0;
   }
 
