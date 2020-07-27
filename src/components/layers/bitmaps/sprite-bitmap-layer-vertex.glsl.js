@@ -16,4 +16,4 @@ void main(void) {
   vColor = positions;
   picking_setPickingColor(instancePickingColors);
 }
-`;
+`

@@ -1,17 +1,17 @@
-import GL from '@luma.gl/constants';
-import { Layer } from '@deck.gl/core';
-import { Model, Geometry, Texture2D } from '@luma.gl/core';
+import GL from '@luma.gl/constants'
+import { Layer } from '@deck.gl/core'
+import { Model, Geometry, Texture2D } from '@luma.gl/core'
 
-import vs from './mosaic-bitmap-layer-vertex.glsl';
-import fs from './mosaic-bitmap-layer-fragment.glsl';
-import MosaicManager from './MosaicManager';
+import vs from './mosaic-bitmap-layer-vertex.glsl'
+import fs from './mosaic-bitmap-layer-fragment.glsl'
+import MosaicManager from './MosaicManager'
 
 const DEFAULT_TEXTURE_PARAMETERS = {
   [GL.TEXTURE_MIN_FILTER]: GL.LINEAR_MIPMAP_LINEAR,
   [GL.TEXTURE_MAG_FILTER]: GL.LINEAR,
   [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
   [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
-};
+}
 
 const defaultProps = {
   imageAtlas: { type: 'object', value: null, async: true },
@@ -31,7 +31,7 @@ const defaultProps = {
   // Instead we need to manually dim/blend rgb values with a background color.
   transparentColor: { type: 'color', value: [0, 0, 0, 0] },
   tintColor: { type: 'color', value: [255, 255, 255] }
-};
+}
 
 /*
  * @class
@@ -40,12 +40,12 @@ const defaultProps = {
  * @param {number} props.tintColor - color bias
  */
 export class MosaicBitmapLayer extends Layer {
-  getShaders() {
-    return super.getShaders({ vs, fs, modules: ['project32'] }); // 'picking'
+  getShaders () {
+    return super.getShaders({ vs, fs, modules: ['project32'] }) // 'picking'
   }
 
-  initializeState() {
-    const attributeManager = this.getAttributeManager();
+  initializeState () {
+    const attributeManager = this.getAttributeManager()
     /* eslint-disable max-len */
     attributeManager.add({
       boundX: {
@@ -54,7 +54,7 @@ export class MosaicBitmapLayer extends Layer {
         // fp64: this.use64bitPositions(),
         update: this.calculatePositions,
         transition: true,
-        divisor: 1,
+        divisor: 1
       },
       boundY: {
         size: 4,
@@ -80,7 +80,7 @@ export class MosaicBitmapLayer extends Layer {
         update: this.calculatePositions,
         transition: true,
         divisor: 1,
-        defaultValue: [0, 0, 0],
+        defaultValue: [0, 0, 0]
         // transform: this.trnBounds
       },
       color: {
@@ -88,19 +88,19 @@ export class MosaicBitmapLayer extends Layer {
         accessor: 'getColor',
         divisor: 1
       },
-      imageFrame: { 
-        size: 4, 
+      imageFrame: {
+        size: 4,
         accessor: 'getImage',
-        divisor: 1, 
-        transform: this.getImageFrame 
+        divisor: 1,
+        transform: this.getImageFrame
       },
-      imageRotated: { 
-        size: 1, 
+      imageRotated: {
+        size: 1,
         accessor: 'getImage',
-        divisor: 1, 
-        transform: this.getImageRotated 
+        divisor: 1,
+        transform: this.getImageRotated
       }
-    });
+    })
     /* eslint-enable max-len */
 
     this.state = {
@@ -109,50 +109,47 @@ export class MosaicBitmapLayer extends Layer {
       boundZ: [],
       bounds: [],
       positionCalculated: false,
-      mosaicManager: new MosaicManager(this.context.gl, {onUpdate: () => this.onManagerUpdate()})
-    };
+      mosaicManager: new MosaicManager(this.context.gl, { onUpdate: () => this.onManagerUpdate() })
+    }
   }
 
-
-
-  trnBounds(coords) {
-    const positions = [];
+  trnBounds (coords) {
+    const positions = []
     // [[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY]]
     for (let i = 0; i < coords.length; i++) {
-      positions[i * 3 + 0] = coords[i][0];
-      positions[i * 3 + 1] = coords[i][1];
-      positions[i * 3 + 2] = coords[i][2] || 0;
+      positions[i * 3 + 0] = coords[i][0]
+      positions[i * 3 + 1] = coords[i][1]
+      positions[i * 3 + 2] = coords[i][2] || 0
     }
 
-    return positions;
+    return positions
   }
 
-
-  calculatePositions(attribute, { data, numInstances }) {
-    const { calculatePositions } = this.state;
+  calculatePositions (attribute, { data, numInstances }) {
+    const { calculatePositions } = this.state
 
     // Split bounds only ones
-    // Wierd solution but when I assing the values directly 
+    // Wierd solution but when I assing the values directly
     // to the attribute they are not pass to the vertex shader
     if (!calculatePositions) {
-      const bounds = [];
-      const boundX = [];
-      const boundY = [];
-      const boundZ = [];
+      const bounds = []
+      const boundX = []
+      const boundY = []
+      const boundZ = []
 
-      const { getBounds } = this.props;
+      const { getBounds } = this.props
       data.forEach((item, j) => {
-        let coords = getBounds(item);
+        let coords = getBounds(item)
 
         coords.forEach((point, i) => {
-          boundX.push(point[0]);
-          boundY.push(point[1]);
-          boundZ.push(point[2] || 0);
-        });
+          boundX.push(point[0])
+          boundY.push(point[1])
+          boundZ.push(point[2] || 0)
+        })
 
-        coords = this.trnBounds(coords);
-        bounds.push(...coords);
-      });
+        coords = this.trnBounds(coords)
+        bounds.push(...coords)
+      })
 
       this.state = {
         ...this.state,
@@ -164,38 +161,35 @@ export class MosaicBitmapLayer extends Layer {
       }
     }
 
-    const values = this.state[attribute.id];
-    attribute.value = new Float32Array(values);
-
+    const values = this.state[attribute.id]
+    attribute.value = new Float32Array(values)
   }
 
-
-  updateState({ props, oldProps, changeFlags }) {
+  updateState ({ props, oldProps, changeFlags }) {
     // console.log('update', changeFlags);
     // setup model first
-    const {mosaicManager} = this.state;
-    const attributeManager = this.getAttributeManager();
-    let mosaicChanged = false;
+    const { mosaicManager } = this.state
+    const attributeManager = this.getAttributeManager()
+    let mosaicChanged = false
 
     if (changeFlags.extensionsChanged) {
-      const { gl } = this.context;
+      const { gl } = this.context
       if (this.state.model) {
-        this.state.model.delete();
+        this.state.model.delete()
       }
-      this.setState({ model: this._getModel(gl) });
-      this.getAttributeManager().invalidateAll(); 
+      this.setState({ model: this._getModel(gl) })
+      this.getAttributeManager().invalidateAll()
     }
 
     if (props.imageAtlas !== oldProps.imageAtlas) {
-      this.loadTexture(props.imageAtlas);
+      this.loadTexture(props.imageAtlas)
     }
 
     if (props.imageMapping !== oldProps.imageMapping) {
       // console.log('loaded init');
-      mosaicManager.loadAtlases();
-      mosaicChanged = true;
+      mosaicManager.loadAtlases()
+      mosaicChanged = true
     }
-
 
     if (
       changeFlags.dataChanged ||
@@ -204,34 +198,34 @@ export class MosaicBitmapLayer extends Layer {
     ) {
       // console.log('change');
       // iconManager.setProps({data, getIcon});
-      mosaicChanged = true;
+      mosaicChanged = true
     }
 
-    if(mosaicChanged) {
-      attributeManager.invalidate('imageFrame');
-      attributeManager.invalidate('imageRotated');
+    if (mosaicChanged) {
+      attributeManager.invalidate('imageFrame')
+      attributeManager.invalidate('imageRotated')
     }
 
     if (props.data !== oldProps.data) {
-      attributeManager.invalidate('bounds');
-      attributeManager.invalidate('boundX');
-      attributeManager.invalidate('boundY');
-      attributeManager.invalidate('boundZ');
+      attributeManager.invalidate('bounds')
+      attributeManager.invalidate('boundX')
+      attributeManager.invalidate('boundY')
+      attributeManager.invalidate('boundZ')
       this.state = { ...this.state, calculatePositions: false }
     }
   }
 
-  finalizeState() {
-    super.finalizeState();
+  finalizeState () {
+    super.finalizeState()
 
     // if (this.state.bitmapTexture) {
     //   this.state.bitmapTexture.delete();
     // }
   }
 
-  _getModel(gl) {
+  _getModel (gl) {
     if (!gl) {
-      return null;
+      return null
     }
 
     /*
@@ -239,16 +233,15 @@ export class MosaicBitmapLayer extends Layer {
     |       |
     0,1 --- 1,1
     */
-    const texCoords = new Float32Array([    
-      0, 0, 
-      0, 1, 
-      1, 1, 
-      1, 0, 
-    ]);
-
+    const texCoords = new Float32Array([
+      0, 0,
+      0, 1,
+      1, 1,
+      1, 0
+    ])
 
     // Create and ID for each vertex so we can access the right vertex position
-    const vertexIds = new Float32Array([0, 1, 2, 3]);
+    const vertexIds = new Float32Array([0, 1, 2, 3])
 
     return new Model(
       gl,
@@ -258,20 +251,20 @@ export class MosaicBitmapLayer extends Layer {
           drawMode: GL.TRIANGLE_FAN,
           attributes: {
             texCoords: { size: 2, type: GL.FLOAT, value: texCoords },
-            vertexId: { size: 1, type: GL.FLOAT, value: vertexIds },
+            vertexId: { size: 1, type: GL.FLOAT, value: vertexIds }
           }
         }),
         // isInstanced: true,
         vertexCount: 4,
         instanced: true
       })
-    );
+    )
   }
 
-  draw(opts) {
-    const { uniforms } = opts;
-    const { model, texture } = this.state;
-    const { transparentColor, tintColor } = this.props;
+  draw (opts) {
+    const { uniforms } = opts
+    const { model, texture } = this.state
+    // const { transparentColor, tintColor } = this.props
 
     model
       .setUniforms({
@@ -280,37 +273,32 @@ export class MosaicBitmapLayer extends Layer {
         uTextureDim: new Float32Array([texture.width, texture.height])
 
       })
-      .draw();
+      .draw()
   }
 
-  onManagerUpdate(){ 
-    this.setNeedsRedraw();
+  onManagerUpdate () {
+    this.setNeedsRedraw()
   }
 
-  loadTexture(imageAtlas) {
-    const { gl } = this.context;
+  loadTexture (imageAtlas) {
+    const { gl } = this.context
     const texture = new Texture2D(gl, {
       data: imageAtlas,
       parameters: DEFAULT_TEXTURE_PARAMETERS
     })
-    this.setState({ texture });
+    this.setState({ texture })
   }
 
-
-
-  getImageFrame(imageId) {
-    const rect = this.state.mosaicManager.getImageMapping(imageId);
-    return [rect.x || 0, rect.y || 0, rect.w || 0, rect.h || 0];
+  getImageFrame (imageId) {
+    const rect = this.state.mosaicManager.getImageMapping(imageId)
+    return [rect.x || 0, rect.y || 0, rect.w || 0, rect.h || 0]
   }
 
-  getImageRotated(imageId) {
-    const {rotated} = this.state.mosaicManager.getImageMapping(imageId);
-    return (rotated) ? 1 : 0;
+  getImageRotated (imageId) {
+    const { rotated } = this.state.mosaicManager.getImageMapping(imageId)
+    return (rotated) ? 1 : 0
   }
-
-
 }
 
-MosaicBitmapLayer.layerName = 'MosaicBitmapLayer';
-MosaicBitmapLayer.defaultProps = defaultProps;
-
+MosaicBitmapLayer.layerName = 'MosaicBitmapLayer'
+MosaicBitmapLayer.defaultProps = defaultProps

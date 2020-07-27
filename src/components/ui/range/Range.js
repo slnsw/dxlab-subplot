@@ -1,13 +1,12 @@
-import React, { Component } from 'react';
-import { MapDataContext } from '../../../context/MapsContext';
-import { applyFilters } from '../../../context/MapsActions';
-import { get, debounce } from 'lodash';
+import React, { Component } from 'react'
+import { MapDataContext } from '../../../context/MapsContext'
+import { applyFilters } from '../../../context/MapsActions'
+import { get, debounce } from 'lodash'
 
 import Slider, { Rail, Handles, Tracks, Ticks } from 'react-compound-slider'
 import { getUpdatedHandles } from 'react-compound-slider/Slider/utils'
 import { SliderRail, Handle, Track, Tick } from './components'
 import { BarChart } from './BarChart'
-
 
 // const sliderStyle = {
 //     position: 'absolute',
@@ -20,227 +19,221 @@ import { BarChart } from './BarChart'
 // }
 
 const sliderStyle = {
-    position: 'relative',
-    height: '100%',
-    // border: '1px solid red',
-    width: 'auto',
-    // overflow: 'hidden'
+  position: 'relative',
+  height: '100%',
+  // border: '1px solid red',
+  width: 'auto'
+  // overflow: 'hidden'
 }
 
 const barStyle = {
-    // border:'1px solid red',  
-    position: 'absolute',
-    marginLeft: '5px',
-    height: '100%',
-    width: '100%',
-    zIndex: '3003'
+  // border:'1px solid red',
+  position: 'absolute',
+  marginLeft: '5px',
+  height: '100%',
+  width: '100%',
+  zIndex: '3003'
 }
 
 const containerStyle = {
-    // border: '1px solid blue',
-    position: 'absolute',
-    top: '10%',
-    height: '80vh',
-    width: '5%',
-    right: '2%',
-    // touchAction: 'none',
-    zIndex: '3001',
-    // overflow: 'hidden'
+  // border: '1px solid blue',
+  position: 'absolute',
+  top: '10%',
+  height: '80vh',
+  width: '5%',
+  right: '2%',
+  // touchAction: 'none',
+  zIndex: '3001'
+  // overflow: 'hidden'
 }
-
 
 export class Range extends Component {
+  constructor (props) {
+    super(props)
 
+    this.handleChange = debounce(this.handleChange.bind(this), 20)
+    this.mode = this.mode.bind(this)
+  }
 
-    onChange = debounce((values) => {
-        const [fromYear, toYear] = values
-        if (fromYear > 0 && toYear > 0) {
-            const [, dispatch] = this.context;
-            dispatch(applyFilters({ fromYear, toYear }))
-        }
-    }, 20)
+  handleChange (values) {
+    const [fromYear, toYear] = values
+    if (fromYear > 0 && toYear > 0) {
+      const [, dispatch] = this.context
+      dispatch(applyFilters({ fromYear, toYear }))
+    }
+  }
 
-    mode(curr, next, step, reversed, getValue) {
+  mode (curr, next, step, reversed, getValue) {
+    const distance = 20
+    let indexForMovingHandle = -1
+    let directionMove = 0 // 0=neutral
 
-        let distance = 20
-        let indexForMovingHandle = -1;
-        let directionMove = 0; // 0=neutral 
+    // Prevent crossing
+    for (let i = 0; i < curr.length; i++) {
+      const c = curr[i]
+      const n = next[i]
 
-        // Prevent crossing
-        for (let i = 0; i < curr.length; i++) {
-            const c = curr[i];
-            const n = next[i];
-
-            // make sure keys are in same order if not return curr
-            if (!n || n.key !== c.key) {
-                return curr;
-            } else if (n.val !== c.val) {
-                indexForMovingHandle = i;
-                directionMove = (n.val - c.val > 0) ? 1 : -1;
-            }
-        }
-        // nothing has changed (shouldn't happen but just in case).
-        if (indexForMovingHandle === -1) {
-            return curr;
-        }
-
-        for (let i = 0; i < next.length; i++) {
-            const n0 = next[i];
-            const n1 = next[i + 1];
-            const increment = (step * directionMove);
-
-            if (n1 && (Math.abs(n0.val - n1.val) > distance || n0.val === n1.val)) {
-                if (i === indexForMovingHandle) {
-                    const newStep = n1.val + increment;
-
-                    if (getValue(newStep) === newStep) {
-
-                        const clone = getUpdatedHandles(
-                            next,
-                            n1.key,
-                            n1.val + increment,
-                            reversed
-                        );
-                        const check = this.mode(next, clone, step, reversed, getValue);
-
-                        if (check === next) {
-                            return curr;
-                        } else {
-                            return check;
-                        }
-                    } else {
-                        return curr;
-                    }
-
-                } else {
-                    const newStep = n0.val + increment;
-                    if (getValue(newStep) === newStep) {
-                        const clone = getUpdatedHandles(
-                            next,
-                            n0.key,
-                            n0.val + increment,
-                            reversed
-                        );
-                        const check = this.mode(next, clone, step, reversed, getValue);
-
-                        if (check === next) {
-                            return curr;
-                        } else {
-                            return check;
-                        }
-                    } else {
-                        return curr;
-                    }
-                }
-            }
-
-        }
-        return next
+      // make sure keys are in same order if not return curr
+      if (!n || n.key !== c.key) {
+        return curr
+      } else if (n.val !== c.val) {
+        indexForMovingHandle = i
+        directionMove = (n.val - c.val > 0) ? 1 : -1
+      }
+    }
+    // nothing has changed (shouldn't happen but just in case).
+    if (indexForMovingHandle === -1) {
+      return curr
     }
 
-    years() {
-        const [state,] = this.context;
-        const data = get(state, 'maps.dataSet', []);
+    for (let i = 0; i < next.length; i++) {
+      const n0 = next[i]
+      const n1 = next[i + 1]
+      const increment = (step * directionMove)
 
-        if (!data) {
-            return [];
+      if (n1 && (Math.abs(n0.val - n1.val) > distance || n0.val === n1.val)) {
+        if (i === indexForMovingHandle) {
+          const newStep = n1.val + increment
+
+          if (getValue(newStep) === newStep) {
+            const clone = getUpdatedHandles(
+              next,
+              n1.key,
+              n1.val + increment,
+              reversed
+            )
+            const check = this.mode(next, clone, step, reversed, getValue)
+
+            if (check === next) {
+              return curr
+            } else {
+              return check
+            }
+          } else {
+            return curr
+          }
+        } else {
+          const newStep = n0.val + increment
+          if (getValue(newStep) === newStep) {
+            const clone = getUpdatedHandles(
+              next,
+              n0.key,
+              n0.val + increment,
+              reversed
+            )
+            const check = this.mode(next, clone, step, reversed, getValue)
+
+            if (check === next) {
+              return curr
+            } else {
+              return check
+            }
+          } else {
+            return curr
+          }
         }
-        
-        return data.map((it) => {
-            return it.properties.year;
-        })
+      }
+    }
+    return next
+  }
 
+  years () {
+    const [state] = this.context
+    const data = get(state, 'maps.dataSet', [])
 
+    if (!data) {
+      return []
     }
 
-    render() {
+    return data.map((it) => {
+      return it.properties.year
+    })
+  }
 
-        const [state,] = this.context;
-        const fromYear = get(state, 'maps.filters.fromYear', 0);
-        const toYear = get(state, 'maps.filters.toYear', 0);
-        const maxYear = get(state, 'maps.meta.maxYear', 0);
-        const minYear = get(state, 'maps.meta.minYear', 0);
+  render () {
+    const [state] = this.context
+    const fromYear = get(state, 'maps.filters.fromYear', 0)
+    const toYear = get(state, 'maps.filters.toYear', 0)
+    const maxYear = get(state, 'maps.meta.maxYear', 0)
+    const minYear = get(state, 'maps.meta.minYear', 0)
 
+    const domain = [minYear, maxYear]
+    const defaultValues = [fromYear, toYear]
 
-        const domain = [minYear, maxYear]
-        const defaultValues = [fromYear, toYear]
-        
-        return (
-            <React.Fragment>
+    return (
+      <>
 
+        <div style={containerStyle}>
 
-                <div style={containerStyle}>
+          <div style={barStyle}>
+            <BarChart
+              data={this.years()}
+              highlight={defaultValues}
+              domain={domain}
+            />
+          </div>
 
-                    <div style={barStyle}>
-                        <BarChart
-                            data={this.years()}
-                            highlight={defaultValues}
-                            domain={domain}
-                        />
-                    </div>
+          <Slider
+            vertical
+            mode={this.mode}
+            step={1}
+            domain={domain}
+            values={defaultValues}
+            rootStyle={sliderStyle}
+            onChange={this.handleChange}
+            // reversed
+          >
 
-                    <Slider
-                        vertical
-                        mode={this.mode.bind(this)}
-                        step={1}
-                        domain={domain}
-                        values={defaultValues}
-                        rootStyle={sliderStyle}
-                        onChange={this.onChange.bind(this)}
-                        // reversed
-                    >
+            <Rail>
+              {({ getRailProps }) => <SliderRail getRailProps={getRailProps} />}
+            </Rail>
 
-                        <Rail>
-                            {({ getRailProps }) => <SliderRail getRailProps={getRailProps} />}
-                        </Rail>
-
-                        <Handles>
-                            {({ handles, getHandleProps }) => (
-                                <div className="slider-handles">
-                                    {handles.map(handle => (
-                                        <Handle
-                                            key={handle.id}
-                                            handle={handle}
-                                            domain={domain}
-                                            getHandleProps={getHandleProps}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </Handles>
-
-                        <Tracks left={false} right={false}>
-                            {({ tracks, getTrackProps }) => (
-                                <div className="slider-tracks">
-                                    {tracks.map(({ id, source, target }) => (
-                                        <Track
-                                            key={id}
-                                            source={source}
-                                            target={target}
-                                            getTrackProps={getTrackProps}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </Tracks>
-
-                        <Ticks count={10}>
-                            {({ ticks }) => (
-                                <div className="slider-ticks">
-                                    {ticks.map(tick => (
-                                        <Tick key={tick.id} tick={tick} />
-                                    ))}
-                                </div>
-                            )}
-                        </Ticks>
-
-                    </Slider>
+            <Handles>
+              {({ handles, getHandleProps }) => (
+                <div className='slider-handles'>
+                  {handles.map(handle => (
+                    <Handle
+                      key={handle.id}
+                      handle={handle}
+                      domain={domain}
+                      getHandleProps={getHandleProps}
+                    />
+                  ))}
                 </div>
+              )}
+            </Handles>
 
-            </React.Fragment>
-        )
-    }
+            <Tracks left={false} right={false}>
+              {({ tracks, getTrackProps }) => (
+                <div className='slider-tracks'>
+                  {tracks.map(({ id, source, target }) => (
+                    <Track
+                      key={id}
+                      source={source}
+                      target={target}
+                      getTrackProps={getTrackProps}
+                    />
+                  ))}
+                </div>
+              )}
+            </Tracks>
 
+            <Ticks count={10}>
+              {({ ticks }) => (
+                <div className='slider-ticks'>
+                  {ticks.map(tick => (
+                    <Tick key={tick.id} tick={tick} />
+                  ))}
+                </div>
+              )}
+            </Ticks>
+
+          </Slider>
+        </div>
+
+      </>
+    )
+  }
 }
 
-Range.contextType = MapDataContext;
+Range.contextType = MapDataContext

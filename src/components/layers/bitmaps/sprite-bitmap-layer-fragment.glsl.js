@@ -33,4 +33,4 @@ void main(void) {
   // geometry.uv = vTexCoord;
   // DECKGL_FILTER_COLOR(gl_FragColor, geometry);
 }
-`;
+`

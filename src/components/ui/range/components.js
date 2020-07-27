@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
 
 // *******************************************************
@@ -10,8 +10,8 @@ const railOuterStyle = {
   width: 42,
   transform: 'translate(-50%, 0%)',
   borderRadius: 7,
-  cursor: 'pointer',
-//   zIndex: 3001  
+  cursor: 'pointer'
+  //   zIndex: 3001
   // border: '1px solid white',
 
 }
@@ -23,33 +23,33 @@ const railInnerStyle = {
   transform: 'translate(-50%, 0%)',
   borderRadius: 7,
   pointerEvents: 'none',
-  backgroundColor: 'rgb(255,255,255, 0.5)',
+  backgroundColor: 'rgb(255,255,255, 0.5)'
 //   zIndex: 3001
 }
 
-export function SliderRail({ getRailProps }) {
+export function SliderRail ({ getRailProps }) {
   return (
-    <Fragment>
+    <>
       <div style={railOuterStyle} {...getRailProps()} />
       <div style={railInnerStyle} />
-    </Fragment>
+    </>
   )
 }
 
 SliderRail.propTypes = {
-  getRailProps: PropTypes.func.isRequired,
+  getRailProps: PropTypes.func.isRequired
 }
 
 // *******************************************************
 // HANDLE COMPONENT
 // *******************************************************
-export function Handle({
+export function Handle ({
   domain: [min, max],
   handle: { id, value, percent },
-  getHandleProps,
+  getHandleProps
 }) {
   return (
-    <Fragment>
+    <>
       <div
         style={{
           top: `${percent}%`,
@@ -61,12 +61,12 @@ export function Handle({
           height: 28,
           cursor: 'pointer',
           // border: '1px solid white',
-          backgroundColor: 'none',
+          backgroundColor: 'none'
         }}
         {...getHandleProps(id)}
       />
       <div
-        role="slider"
+        role='slider'
         aria-valuemin={min}
         aria-valuemax={max}
         aria-valuenow={value}
@@ -79,10 +79,10 @@ export function Handle({
           height: 20,
           borderRadius: '50%',
           boxShadow: '1px 1px 1px 1px rgba(0, 0, 0, 0.3)',
-          backgroundColor: '#ffc400',  //'#ffc400',
+          backgroundColor: '#ffc400' // '#ffc400',
         }}
       />
-    </Fragment>
+    </>
   )
 }
 
@@ -91,23 +91,23 @@ Handle.propTypes = {
   handle: PropTypes.shape({
     id: PropTypes.string.isRequired,
     value: PropTypes.number.isRequired,
-    percent: PropTypes.number.isRequired,
+    percent: PropTypes.number.isRequired
   }).isRequired,
-  getHandleProps: PropTypes.func.isRequired,
+  getHandleProps: PropTypes.func.isRequired
 }
 
 // *******************************************************
 // KEYBOARD HANDLE COMPONENT
 // Uses button to allow keyboard events
 // *******************************************************
-export function KeyboardHandle({
+export function KeyboardHandle ({
   domain: [min, max],
   handle: { id, value, percent },
-  getHandleProps,
+  getHandleProps
 }) {
   return (
     <button
-      role="slider"
+      role='slider'
       aria-valuemin={min}
       aria-valuemax={max}
       aria-valuenow={value}
@@ -122,7 +122,7 @@ export function KeyboardHandle({
         border: 0,
         borderRadius: '50%',
         boxShadow: '1px 1px 1px 1px rgba(0, 0, 0, 0.3)',
-        backgroundColor: '#ffc400',
+        backgroundColor: '#ffc400'
       }}
       {...getHandleProps(id)}
     />
@@ -134,27 +134,27 @@ KeyboardHandle.propTypes = {
   handle: PropTypes.shape({
     id: PropTypes.string.isRequired,
     value: PropTypes.number.isRequired,
-    percent: PropTypes.number.isRequired,
+    percent: PropTypes.number.isRequired
   }).isRequired,
-  getHandleProps: PropTypes.func.isRequired,
+  getHandleProps: PropTypes.func.isRequired
 }
 
 // *******************************************************
 // TRACK COMPONENT
 // *******************************************************
-export function Track({ source, target, getTrackProps }) {
+export function Track ({ source, target, getTrackProps }) {
   return (
     <div
       style={{
         position: 'absolute',
         zIndex: 1,
-        backgroundColor: '#ffc400', //'rgba(230, 0, 126, 1)',
+        backgroundColor: '#ffc400', // 'rgba(230, 0, 126, 1)',
         borderRadius: 7,
         cursor: 'pointer',
         width: 5,
         transform: 'translate(-50%, 0%)',
         top: `${source.percent}%`,
-        height: `${target.percent - source.percent}%`,
+        height: `${target.percent - source.percent}%`
       }}
       {...getTrackProps()}
     />
@@ -165,20 +165,20 @@ Track.propTypes = {
   source: PropTypes.shape({
     id: PropTypes.string.isRequired,
     value: PropTypes.number.isRequired,
-    percent: PropTypes.number.isRequired,
+    percent: PropTypes.number.isRequired
   }).isRequired,
   target: PropTypes.shape({
     id: PropTypes.string.isRequired,
     value: PropTypes.number.isRequired,
-    percent: PropTypes.number.isRequired,
+    percent: PropTypes.number.isRequired
   }).isRequired,
-  getTrackProps: PropTypes.func.isRequired,
+  getTrackProps: PropTypes.func.isRequired
 }
 
 // *******************************************************
 // TICK COMPONENT
 // *******************************************************
-export function Tick({ tick, format }) {
+export function Tick ({ tick, format }) {
   return (
     <div>
       <div
@@ -189,7 +189,7 @@ export function Tick({ tick, format }) {
           height: 2,
           width: 8,
           backgroundColor: 'rgb(255,255,255, 0.7)',
-          top: `${tick.percent}%`,
+          top: `${tick.percent}%`
         }}
       />
       <div
@@ -213,11 +213,11 @@ Tick.propTypes = {
   tick: PropTypes.shape({
     id: PropTypes.string.isRequired,
     value: PropTypes.number.isRequired,
-    percent: PropTypes.number.isRequired,
+    percent: PropTypes.number.isRequired
   }).isRequired,
-  format: PropTypes.func.isRequired,
+  format: PropTypes.func.isRequired
 }
 
 Tick.defaultProps = {
-  format: d => d,
+  format: d => d
 }

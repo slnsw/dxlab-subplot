@@ -1,110 +1,99 @@
 
-import { CompositeLayer } from 'deck.gl';
-import { TextLayer, IconLayer } from '@deck.gl/layers';
-import Supercluster from 'supercluster';
+import { CompositeLayer } from 'deck.gl'
+import { TextLayer, IconLayer } from '@deck.gl/layers'
+import Supercluster from 'supercluster'
 
 const ICON_MAPPING = {
-    "marker": {
-        "x": 384,
-        "y": 512,
-        "width": 128,
-        "height": 128,
-        "anchorY": 128
-    }
+  marker: {
+    x: 384,
+    y: 512,
+    width: 128,
+    height: 128,
+    anchorY: 128
+  }
 }
-
 
 export class MapsClusterCounts extends CompositeLayer {
+  shouldUpdateState ({ changeFlags }) {
+    return changeFlags.somethingChanged
+  }
 
+  updateState ({ props, changeFlags }) {
+    let refresh = false
 
-    shouldUpdateState({ changeFlags }) {
-        return changeFlags.somethingChanged;
-
+    const { data } = props
+    if (!data) {
+      return
     }
 
+    if (changeFlags.dataChanged) {
+      const index = new Supercluster({ maxZoom: 16, radius: 60 })
 
-    updateState({ props, changeFlags }) {
-        let refresh = false;
+      index.load(
+        data.map(({ properties }) => ({
+          geometry: properties.centroid,
+          properties
+        }))
+      )
 
-        const { data } = props;
-        if (!data) {
-            return;
-        }
-
-        if (changeFlags.dataChanged) {
-            const index = new Supercluster({ maxZoom: 16, radius: 60 });
-
-            index.load(
-                data.map(({ properties }) => ({
-                    geometry: properties.centroid,
-                    properties
-                }))
-            );
-
-            this.setState({ index });
-            refresh = true;
-        }
-
-        const zoom = Math.floor(this.context.viewport.zoom);
-
-        if (this.state.zoom !== zoom || refresh) {
-            const cluster = this.state.index.getClusters([-180, -85, 180, 85], zoom);
-            this.setState({ cluster, zoom });
-        }
+      this.setState({ index })
+      refresh = true
     }
 
-    getIconSize(size) {
-        return Math.min(100, size) / 100 + 1;
+    const zoom = Math.floor(this.context.viewport.zoom)
+
+    if (this.state.zoom !== zoom || refresh) {
+      const cluster = this.state.index.getClusters([-180, -85, 180, 85], zoom)
+      this.setState({ cluster, zoom })
     }
-    
+  }
 
-    buildLayers() {
-        const { id, name } = this.props;
-        const { cluster } = this.state;
+  getIconSize (size) {
+    return Math.min(100, size) / 100 + 1
+  }
 
-        const layers = [];
+  buildLayers () {
+    const { id, name } = this.props
+    const { cluster } = this.state
 
-        layers.push(new IconLayer(this.getSubLayerProps({
-            id: `${id}-layer-${name}-icon-cluster-count`,
-            data: cluster,
-            iconAtlas: 'location-icon-atlas.png',
-            iconMapping: ICON_MAPPING,
-            sizeScale: 60,
-            getPosition: d => d.geometry.coordinates,
-            getIcon: d => 'marker', // getIconName(d.properties.cluster ? d.properties.point_count : 1),
-            getSize: d => this.getIconSize(d.properties.cluster ? d.properties.point_count : 1)
+    const layers = []
 
-        })));
+    layers.push(new IconLayer(this.getSubLayerProps({
+      id: `${id}-layer-${name}-icon-cluster-count`,
+      data: cluster,
+      iconAtlas: 'location-icon-atlas.png',
+      iconMapping: ICON_MAPPING,
+      sizeScale: 60,
+      getPosition: d => d.geometry.coordinates,
+      getIcon: d => 'marker', // getIconName(d.properties.cluster ? d.properties.point_count : 1),
+      getSize: d => this.getIconSize(d.properties.cluster ? d.properties.point_count : 1)
 
-        layers.push(new TextLayer(this.getSubLayerProps({
-            id: `${id}-layer-${name}-label-cluster-count`,
-            data: cluster,
-            pickable: false,
-            billboard: true,
-            fontFamily: 'Roboto Slab',
-            getPixelOffset: d => {
-                const size = this.getIconSize(d.properties.cluster ? d.properties.point_count : 1);
+    })))
 
-                return [0, -(64 / (2 / size))];
-            },
-            getTextAnchor: 'middle',
+    layers.push(new TextLayer(this.getSubLayerProps({
+      id: `${id}-layer-${name}-label-cluster-count`,
+      data: cluster,
+      pickable: false,
+      billboard: true,
+      fontFamily: 'Roboto Slab',
+      getPixelOffset: d => {
+        const size = this.getIconSize(d.properties.cluster ? d.properties.point_count : 1)
 
-            // autoHighlight: true,
-            getText: d => String(d.properties.cluster ? d.properties.point_count : 1),
-            getPosition: d => d.geometry.coordinates,
-        })));
+        return [0, -(64 / (2 / size))]
+      },
+      getTextAnchor: 'middle',
 
-        return layers;
+      // autoHighlight: true,
+      getText: d => String(d.properties.cluster ? d.properties.point_count : 1),
+      getPosition: d => d.geometry.coordinates
+    })))
 
-    }
+    return layers
+  }
 
-
-    renderLayers() {
-        return this.buildLayers();
-    }
-
-
+  renderLayers () {
+    return this.buildLayers()
+  }
 }
 
-MapsClusterCounts.layerName = 'MapsClusterCounts';
-
+MapsClusterCounts.layerName = 'MapsClusterCounts'

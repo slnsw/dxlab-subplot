@@ -1,15 +1,13 @@
+/* eslint-disable no-unused-vars */
 
-import { CompositeLayer } from 'deck.gl';
-import { BitmapLayer, GeoJsonLayer, TextLayer } from '@deck.gl/layers';
+import { CompositeLayer } from 'deck.gl'
+import { BitmapLayer, GeoJsonLayer } from '@deck.gl/layers'
 
-import { getImageUrl, interpolateScale, makeCancelable } from '../../share/utils';
+import { getImageUrl, interpolateScale, makeCancelable } from '../../share/utils'
 
-import { load } from "@loaders.gl/core";
+import { load } from '@loaders.gl/core'
 import { max, min, get } from 'lodash'
-import { scaleLinear } from 'd3-scale';
-
-// Experimental
-import bearing from '@turf/bearing';
+import { scaleLinear } from 'd3-scale'
 
 const areRectanglesOverlap = (a, b) => {
   const visible = !(
@@ -22,35 +20,32 @@ const areRectanglesOverlap = (a, b) => {
   return visible
 }
 
-let promise = null
+const promise = null
 
 export class TileImagesLayer extends CompositeLayer {
-
-
-
-  updateState({ props, changeFlags }) {
+  updateState ({ props, changeFlags }) {
     if (changeFlags.dataChanged) {
-      const { data, suffix } = props;
+      const { data, suffix } = props
 
       if (!data) {
-        return;
+        return
       }
 
-      const { filters } = this.props;
-      const { fromYear, toYear } = filters;
+      const { filters } = this.props
+      const { fromYear, toYear } = filters
 
-      const scaleElevation = scaleLinear([fromYear, toYear], [0,  toYear - fromYear])
+      const scaleElevation = scaleLinear([fromYear, toYear], [0, toYear - fromYear])
 
       const featuresData = data.reduce(function (result, el) {
-        const { geometry, properties } = el;
+        const { geometry, properties } = el
         if (geometry) {
           // const elevation = 0;
 
-          //interpolateScale(parseInt(properties.year), toYear, fromYear) * 50;
-          const elevation = Math.floor(scaleElevation(parseInt(properties.year))) * 100;
+          // interpolateScale(parseInt(properties.year), toYear, fromYear) * 50;
+          const elevation = Math.floor(scaleElevation(parseInt(properties.year))) * 100
           //  mapValue(m.year, this.state.year_from, this.state.year_to, 0, this.state.year_to - this.state.year_from);
 
-          const image = getImageUrl(properties.asset_id, suffix, '16');
+          const image = getImageUrl(properties.asset_id, suffix, '16')
           const feature = {
             ...el,
             geometry: {
@@ -62,38 +57,35 @@ export class TileImagesLayer extends CompositeLayer {
               elevation,
               image_url: image,
               // IMPORTANT: Change image bound structure to a single array
-              // Deck.gl API needs image bounds in a single array. 
+              // Deck.gl API needs image bounds in a single array.
               image_bounds: properties.image_bounds.coordinates[0].map((c) => ([...c, elevation])),
-              centroid: [...properties.centroid.coordinates, elevation],
+              centroid: [...properties.centroid.coordinates, elevation]
               // bearing: bearing(properties.image_bounds.coordinates[0][0], properties.image_bounds.coordinates[0][1]),
             }
 
           }
-          result.push(feature);
+          result.push(feature)
         }
-        return result;
-      }, []);
+        return result
+      }, [])
 
       const feature = {
-        'type': 'FeatureCollection',
-        'features': featuresData
+        type: 'FeatureCollection',
+        features: featuresData
 
       }
-      this.setState({ feature });
-
+      this.setState({ feature })
     }
   }
 
-  shouldUpdateState({ changeFlags }) {
+  shouldUpdateState ({ changeFlags }) {
     // console.log(changeFlags)
-    return ( changeFlags.viewportChanged !== false || changeFlags.dataChanged || changeFlags.propsChanged);
+    return (changeFlags.viewportChanged !== false || changeFlags.dataChanged || changeFlags.propsChanged)
     // return (  changeFlags.dataChanged || changeFlags.propsChanged);
     // return false;
   }
 
-
-
-  getImageBounds(bounds) {
+  getImageBounds (bounds) {
     const points = bounds.map(p => this.context.viewport.project(p))
     const longs = points.map((c) => c[0])
     const lats = points.map((c) => c[1])
@@ -105,22 +97,19 @@ export class TileImagesLayer extends CompositeLayer {
     const top = max(lats)
     const bottom = min(lats)
     return { top, right, bottom, left }
-
   }
 
-  getViewBounds() {
+  getViewBounds () {
     const viewport = this.context.viewport
     return { top: 0, right: viewport.width, bottom: viewport.height, left: 0 }
   }
 
+  buildLayers () {
+    const { id, name, contextState, suffix } = this.props
+    const { feature: { features } } = this.state
+    const layers = []
 
-  buildLayers() {
-    const { id, name, contextState, suffix } = this.props;
-    const { feature: { features } } = this.state;
-    const layers = [];
-
-
-    const zoom = this.context.viewport.zoom;
+    const zoom = this.context.viewport.zoom
     const lod = [8, 16, 32, 64, 128, 512] //, 1024]
     const scale = scaleLinear([4, 18], [0, lod.length - 1])
 
@@ -138,7 +127,7 @@ export class TileImagesLayer extends CompositeLayer {
       // material: false,
       getLineWidth: 3,
       getFillColor: [255, 255, 255, 125],
-      getLineColor: [255, 255, 255, 255],
+      getLineColor: [255, 255, 255, 255]
 
       // getLineColor: (d) => {
       //   const currYear = get(d, 'properties.year', null);
@@ -158,8 +147,8 @@ export class TileImagesLayer extends CompositeLayer {
       // }
 
     }))
-    
-    layers.push(geoJsonFillLayer);
+
+    layers.push(geoJsonFillLayer)
 
     // layers.push(new TextLayer(this.getSubLayerProps({
     //   id: `${id}-bitmap-label-${suffix}`,
@@ -178,7 +167,7 @@ export class TileImagesLayer extends CompositeLayer {
     //   },
 
     //   // autoHighlight: true,
-    //   // getAngle: (d) => d.properties.bearing,   
+    //   // getAngle: (d) => d.properties.bearing,
     //   getText: (d) => (d.properties.year.toString()),
     //   getPosition: (d) => d.properties.centroid,
     //   updateTriggers: {
@@ -190,28 +179,25 @@ export class TileImagesLayer extends CompositeLayer {
 
     // })));
 
-
     const viewportRect = this.getViewBounds()
     // let countVisible = 0;
-    // const visible = features.filter(({ properties: { image_bounds } }) => areRectanglesOverlap(viewportRect, this.getImageBounds(image_bounds))) 
+    // const visible = features.filter(({ properties: { image_bounds } }) => areRectanglesOverlap(viewportRect, this.getImageBounds(image_bounds)))
     // const bounds = [[151.214204, -33.864048], [151.210451, -33.864039], [151.210455, -33.859921], [151.214208, -33.859929]]
 
-
     layers.push(features.map(({ properties: { asset_id, image_bounds, elevation } }) => {
-
       // is visible?
       const visible = areRectanglesOverlap(viewportRect, this.getImageBounds(image_bounds))
       // if (visible){
       //   countVisible++;
       // }
 
-      const size = Math.floor(scale(zoom + (elevation / 100) ))
-      let image_url = getImageUrl(asset_id, suffix, 128);// lod[size]);
+      const size = Math.floor(scale(zoom + (elevation / 100)))
+      let image_url = getImageUrl(asset_id, suffix, 128)// lod[size]);
 
-      let opacity = 1;
+      let opacity = 1
       if (inFocus) {
-        opacity = (asset_id && (inFocus === asset_id)) ? 1 : .05;
-        image_url = getImageUrl(asset_id, suffix, 1024);
+        opacity = (asset_id && (inFocus === asset_id)) ? 1 : 0.05
+        image_url = getImageUrl(asset_id, suffix, 1024)
       }
 
       return new BitmapLayer(this.getSubLayerProps({
@@ -231,35 +217,29 @@ export class TileImagesLayer extends CompositeLayer {
         // },
         parameters: {
           // Prevent png alpha channel create artifacts when overlaping other pngs
-          depthMask: false,
-        },
-      }));
-
-    }));
-
+          depthMask: false
+        }
+      }))
+    }))
 
     // console.log('visible', countVisible);
 
-    return layers;
-
+    return layers
   }
 
-
-  renderLayers() {
+  renderLayers () {
     console.log('render images')
-    return this.buildLayers();
+    return this.buildLayers()
     // return this.loadImages();
   }
 
-
   // Testing alternative loading
-  loadImages() {
+  loadImages () {
     const tileServer = 'http://dxmap.dimaginarium.com/tiled/'
 
     // [[west, south], [west, north], [east, north], [east, south], [west, south]]
     // const bounds = [[151.214204, -33.864048, 50], [151.210451, -33.864039, 50], [151.210455, -33.859921, 50], [151.214208, -33.859929, 50]]
     const bounds = [[151.214204, -33.864048], [151.210451, -33.864039], [151.210455, -33.859921], [151.214208, -33.859929]]
-
 
     const z = this.context.viewport.zoom
     const height = 4493
@@ -271,14 +251,13 @@ export class TileImagesLayer extends CompositeLayer {
 
     const scale = Math.ceil(Math.pow(0.5, maxZoom - z))
 
-    const iiifTileSizeWidth = Math.ceil(tileWidth / scale);
-    const iiifTileSizeHeight = Math.ceil(tileHeight / scale);
-
+    const iiifTileSizeWidth = Math.ceil(tileWidth / scale)
+    const iiifTileSizeHeight = Math.ceil(tileHeight / scale)
 
     // 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096
-    // 
+    //
     const image = `${tileServer}a1367540.tif/full/4096,/0/default.png`
-    const inViewport = areRectanglesOverlap(this.getViewBounds(), this.getImageBounds(bounds));
+    const inViewport = areRectanglesOverlap(this.getViewBounds(), this.getImageBounds(bounds))
 
     // let cancel = null
     // promise = new Promise((resolve, reject) => {
@@ -304,7 +283,7 @@ export class TileImagesLayer extends CompositeLayer {
 
     // console.log(cancel);
     // setTimeout(() => {
-    //   console.log('cancel'); 
+    //   console.log('cancel');
     //   promise.catch(()=> {})
     //   cancel()
     // }, 2000)
@@ -313,21 +292,20 @@ export class TileImagesLayer extends CompositeLayer {
 
     return [
       (inViewport && [new BitmapLayer({
-        id: `lod-image`,
+        id: 'lod-image',
         bounds: bounds,
         opacity: 1,
         pickable: false,
         autoHighlight: false,
         image: load(image)
-      })]),
-    ];
+      })])
+    ]
   }
 
-
-  loadImage(url, inViewport) {
+  loadImage (url, inViewport) {
     let cancel = null
     return new Promise((resolve, reject) => {
-      cancel = reject;
+      cancel = reject
       if (inViewport) {
         // console.log('visible')
         setTimeout(() => {
@@ -339,20 +317,17 @@ export class TileImagesLayer extends CompositeLayer {
             reject(err)
           })
         }
-          , 5000);
+        , 5000)
         // resolve()
       } else {
         // console.log('hidden')
         resolve(null)
       }
     })
-
   }
-
-
 }
 
-TileImagesLayer.layerName = 'TileImageLayer';
+TileImagesLayer.layerName = 'TileImageLayer'
 
 TileImagesLayer.defaultProps = {
   // // Shared accessors

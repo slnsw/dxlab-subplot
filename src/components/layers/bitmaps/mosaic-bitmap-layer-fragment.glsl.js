@@ -35,4 +35,4 @@ void main() {
     // vec4 color = mix(aColor, vec4(texColor.rgb, 1.0), texColor.a * 0.8);
     // gl_FragColor = color;
 }
-`;
+`
