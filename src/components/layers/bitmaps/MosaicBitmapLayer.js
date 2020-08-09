@@ -129,7 +129,7 @@ export class MosaicBitmapLayer extends Layer {
     const { calculatePositions } = this.state
 
     // Split bounds only ones
-    // Wierd solution but when I assing the values directly
+    // Weird solution but when I assign the values directly
     // to the attribute they are not pass to the vertex shader
     if (!calculatePositions) {
       const bounds = []
