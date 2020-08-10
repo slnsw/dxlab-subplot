@@ -1,11 +1,13 @@
 
 import { CompositeLayer } from 'deck.gl'
 import { ScenegraphLayer } from '@deck.gl/mesh-layers'
+
+import { GLTFLoader } from '@loaders.gl/gltf'
 import { registerLoaders } from '@loaders.gl/core'
-import { GLTFScenegraphLoader } from '@luma.gl/addons'
+// import { } from '@luma.gl/experimental'
 
 // Add the loaders that handle your mesh format here
-registerLoaders([GLTFScenegraphLoader])
+registerLoaders([GLTFLoader])
 
 export class LandmarksLayer extends CompositeLayer {
   models (year) {
@@ -34,7 +36,7 @@ export class LandmarksLayer extends CompositeLayer {
       // },
       {
         sceneURL: 'sydney_bridge.glb',
-        name: 'hardbour-bridge',
+        name: 'harbour-bridge',
         data: {
           position: [151.2106825, -33.8522605],
           orientation: [0, -28, 90],
@@ -66,7 +68,7 @@ export class LandmarksLayer extends CompositeLayer {
     sceneURL = (sceneURL) ? `/models/${sceneURL}` : testScene
     useTexture = useTexture || false
 
-    const opts = {
+    return new ScenegraphLayer({
       id: `${id}-landmark-${name}`,
       data: [{ position, orientation, translation, color, scale }],
       scenegraph: sceneURL,
@@ -87,9 +89,7 @@ export class LandmarksLayer extends CompositeLayer {
 
       // Override parameters
       ...args
-    }
-
-    return new ScenegraphLayer(opts)
+    })
   }
 
   renderLayers () {

@@ -228,7 +228,7 @@ export class TileImagesLayer extends CompositeLayer {
   }
 
   renderLayers () {
-    console.log('render images')
+    // console.log('render images')
     return this.buildLayers()
     // return this.loadImages();
   }

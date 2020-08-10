@@ -1,6 +1,11 @@
 export default `
 #define SHADER_NAME mosaic-bitmap-layer-fragment-shader
 
+
+#ifdef GL_ES
+precision highp float;
+#endif
+
 uniform sampler2D uTexture;
 
 varying vec2 vUV;
@@ -13,20 +18,20 @@ void main() {
     // gl_FragColor = vec4(vColor, 1.0);
     
     // Just render texture
-    // vec4 texColor = texture2D(uTexture, vec2(vUV.x, vUV.y));
-    // gl_FragColor = texColor;
-
-    // Load texture option 1
     vec4 texColor = texture2D(uTexture, vec2(vUV.x, vUV.y));
-    vec4 aColor = vec4(0.0, 0.0, 0.0, 1.0);
-    vec3 color = mix(texColor.rgb, aColor.rgb, 0.0);
-    float a = texColor.a * 1.0 * aColor.a;
+    gl_FragColor = texColor;
 
-    if (a < 0.05) {
-        discard;
-    }
+    // Load texture option 1 ( needs to be fix )
+    // vec4 texColor = texture2D(uTexture, vec2(vUV.x, vUV.y));
+    // vec4 aColor = vec4(0.0, 0.0, 0.0, 1.0);
+    // vec3 color = mix(texColor.rgb, aColor.rgb, 0.0);
+    // float a = texColor.a * 1.0 * aColor.a;
 
-    gl_FragColor = vec4(color, a); 
+    // if (a < 0.05) {
+    //     discard;
+    // }
+
+    // gl_FragColor = vec4(color, a); 
 
 
     // // Load texture option 2
