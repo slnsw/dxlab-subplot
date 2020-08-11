@@ -47,8 +47,8 @@ void main() {
     }
 
 
-    // geometry.worldPosition = position;
-    // geometry.uv = texCoords;
+    geometry.worldPosition = position;
+    geometry.uv = texCoords;
 
     gl_Position = project_position_to_clipspace(position, vec3(0.0), vec3(0.0), geometry.position);
     DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
@@ -64,17 +64,16 @@ void main() {
 
 
 
-    // Calculate uv
-    // vUV = texCoords;
-    vec2 uv = vec2(0.0);
+    // Calculate uv rotation if required
+    vec2 uv = texCoords;
     if (imageRotated == 1.0) {
-        uv = texCoords.yx;
-    } else {
-        uv = texCoords.xy;
+        float radAngle = radians(90.0);
+        uv = texCoords + vec2(-0.5, -0.5);
+        uv = mat2(cos(radAngle), sin(radAngle), -sin(radAngle), cos(radAngle)) * uv;
+        uv = uv + vec2(0.5, 0.5);
     } 
+
     vUV = mix(imageFrame.xy, imageFrame.xy + imageFrame.zw, uv) / uTextureDim;
-    // vUV = mix(vec2(0.0, 0.0),  vec2(0.0, 0.0) + vec2(512.0, 371.0), texCoords.xy) / vec2(1024.0, 1657.0);
-    vUV.y = 1.0 - vUV.y;
     vColor = color;
     
     

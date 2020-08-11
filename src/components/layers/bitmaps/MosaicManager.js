@@ -32,7 +32,7 @@ export default class MosaicManager {
           .catch(() => { console.error(`can not load ${url}`) })
       )
     ).then((data) => {
-      // Parse all individuals mappings into a single
+      // Parse all individuals mappings into a single index
       const images = []
       const atlas = data.reduce((result, conf) => {
         const filename = conf.filename
@@ -72,6 +72,12 @@ export default class MosaicManager {
   }
 
   getImageMapping (imageId) {
-    return this.state.atlas[imageId] || {}
+    // console.log(imageId, this.state.atlas[imageId])
+    if (this.state.atlas[imageId] && this.state.atlas[imageId].filename === 'subdivisions_0.png') {
+      return this.state.atlas[imageId] || {}
+    } else {
+      return {}
+    }
+    // return this.state.atlas[imageId] || {}
   }
 }

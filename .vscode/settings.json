@@ -8,5 +8,8 @@
     "cSpell.ignoreWords": [
         "mapbox",
         "zoomable"
-    ]
+    ],
+    "files.associations": {
+        "*.glsl.js": "glsl"
+    }
 }

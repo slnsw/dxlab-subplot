@@ -234,10 +234,10 @@ export class MosaicBitmapLayer extends Layer {
     0,1 --- 1,1
     */
     const texCoords = new Float32Array([
-      0, 0,
-      0, 1,
+      1, 0,
       1, 1,
-      1, 0
+      0, 1,
+      0, 0
     ])
 
     // Create and ID for each vertex so we can access the right vertex position
@@ -265,7 +265,6 @@ export class MosaicBitmapLayer extends Layer {
     const { uniforms } = opts
     const { model, texture } = this.state
     // const { transparentColor, tintColor } = this.props
-
     model
       .setUniforms({
         ...uniforms,

@@ -36,12 +36,13 @@ export class MapsCloudLayer extends CompositeLayer {
       const mosaicData = data.reduce(function (result, el) {
         const { geometry, properties } = el
         // if (geometry) {
-
+        // if (properties.asset_id === 'a9613015') {
         result.push({
           bounds: properties.image_bounds.coordinates[0].map((c) => [...c, 200]),
           image: properties.asset_id,
           color: [1.0, 0, 0]
         })
+        // }
 
         // }
         return result
@@ -207,7 +208,7 @@ export class MapsCloudLayer extends CompositeLayer {
       // ],
 
       imageAtlas: 'sprites/subdivisions_0.png',
-      imageMapping: 'sprites/subdivisions_0.json',
+      imageMapping: 'sprites/subdivisions_4.json',
 
       material: false,
 
