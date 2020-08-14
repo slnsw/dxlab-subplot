@@ -21,14 +21,13 @@ attribute vec4 imageFrame;
 attribute float imageRotated;
 
 attribute vec3 pickingColors;
+attribute float opacities;
 
 uniform vec2 uTextureDim;
 
 varying vec3 vColor;
 varying vec2 vUV;
-
-
-const vec3 pickingColor = vec3(1.0, 0.0, 0.0);
+varying float vOpacities;
 
 
 void main() {
@@ -85,6 +84,9 @@ void main() {
     
     vec4 color = vec4(0.0);
     DECKGL_FILTER_COLOR(color, geometry);
+
+    // Instance opacity
+    vOpacities = opacities;
     
 }
 `

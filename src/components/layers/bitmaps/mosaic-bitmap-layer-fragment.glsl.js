@@ -11,6 +11,7 @@ uniform float opacity;
 
 varying vec2 vUV;
 varying vec3 vColor;
+varying float vOpacities;
 
 
 void main() {
@@ -22,7 +23,7 @@ void main() {
     vec4 texColor = texture2D(uTexture, vec2(vUV.x, vUV.y));
     // gl_FragColor = texColor;
     // opacity
-    gl_FragColor = mix(vec4(0.0), vec4(texColor.rgb, 1.0), texColor.a * opacity);
+    gl_FragColor = mix(vec4(0.0), vec4(texColor.rgb, 1.0), texColor.a * vOpacities);
     
     geometry.uv = vUV;
     DECKGL_FILTER_COLOR(gl_FragColor, geometry);

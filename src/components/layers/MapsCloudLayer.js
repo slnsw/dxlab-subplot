@@ -210,6 +210,7 @@ export class MapsCloudLayer extends CompositeLayer {
 
       imageAtlas: 'sprites/subdivisions_0.png',
       imageMapping: 'sprites/subdivisions_4.json',
+      getOpacity: d => Math.random() * (1 - 0.5) + 0.5,
 
       material: false,
 

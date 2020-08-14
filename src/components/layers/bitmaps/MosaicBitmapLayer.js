@@ -23,6 +23,7 @@ const defaultProps = {
   getBounds: { type: 'accessor', value: x => x.bounds },
   getImage: { type: 'accessor', value: x => x.image },
   getColor: { type: 'accessor', value: x => x.color },
+  getOpacity: { type: 'accessor', value: x => x.opacity || 1 },
 
   desaturate: { type: 'number', min: 0, max: 1, value: 0 },
   // Inspired by  Deck.gl BitmapLayer implementation
@@ -103,6 +104,12 @@ export class MosaicBitmapLayer extends Layer {
         divisor: 1,
         transform: this.getImageRotated
       },
+      opacities: {
+        size: 1,
+        type: GL.FLOAT,
+        accessor: 'getOpacity',
+        divisor: 1
+      },
       pickingColors: {
         size: 3,
         type: GL.UNSIGNED_BYTE,
@@ -110,14 +117,6 @@ export class MosaicBitmapLayer extends Layer {
           return this.encodePickingColor(object && object.__source ? object.__source.index : index, value)
         },
         divisor: 1
-        // shaderAttributes: {
-        //   pickingColors: {
-        //     divisor: 0
-        //   },
-        //   instancePickingColors: {
-        //     divisor: 1
-        //   }
-        // }
       }
     })
     /* eslint-enable max-len */
