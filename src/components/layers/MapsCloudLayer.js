@@ -195,9 +195,10 @@ export class MapsCloudLayer extends CompositeLayer {
       id: `${id}-bitmap-layer-mosaic`,
 
       data: mosaicData,
-      // opacity: opacity,
-      // pickable: false,
-      // autoHighlight: false,
+      opacity: 0.5,
+      pickable: true,
+      autoHighlight: true,
+      highlightColor: [0, 255, 0, 125],
       // imageAtlas: [
       //     'sprites/subdivisions_0.png',
       //     'sprites/subdivisions_1.png'
@@ -214,7 +215,7 @@ export class MapsCloudLayer extends CompositeLayer {
 
       getBounds: (d) => d.bounds,
       parameters: {
-        // Prevent png alpha channel create artifacts when overlaping other pngs
+        // Prevent png alpha channel create artifacts when overlapping other pngs
         depthMask: false
       }
 

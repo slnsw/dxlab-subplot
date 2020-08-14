@@ -41,11 +41,14 @@ const defaultProps = {
  */
 export class MosaicBitmapLayer extends Layer {
   getShaders () {
-    return super.getShaders({ vs, fs, modules: [project32] }) // 'picking'
+    return super.getShaders({ vs, fs, modules: [project32, picking] }) // 'picking'
   }
 
   initializeState () {
     const attributeManager = this.getAttributeManager()
+
+    attributeManager.remove(['instancePickingColors'])
+
     /* eslint-disable max-len */
     attributeManager.add({
       boundX: {
@@ -99,6 +102,22 @@ export class MosaicBitmapLayer extends Layer {
         accessor: 'getImage',
         divisor: 1,
         transform: this.getImageRotated
+      },
+      pickingColors: {
+        size: 3,
+        type: GL.UNSIGNED_BYTE,
+        accessor: (object, { index, target: value }) => {
+          return this.encodePickingColor(object && object.__source ? object.__source.index : index, value)
+        },
+        divisor: 1
+        // shaderAttributes: {
+        //   pickingColors: {
+        //     divisor: 0
+        //   },
+        //   instancePickingColors: {
+        //     divisor: 1
+        //   }
+        // }
       }
     })
     /* eslint-enable max-len */

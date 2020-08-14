@@ -19,11 +19,17 @@ attribute vec4 boundZ;
 
 attribute vec4 imageFrame;
 attribute float imageRotated;
-uniform vec2 uTextureDim;
 
+attribute vec3 pickingColors;
+
+uniform vec2 uTextureDim;
 
 varying vec3 vColor;
 varying vec2 vUV;
+
+
+const vec3 pickingColor = vec3(1.0, 0.0, 0.0);
+
 
 void main() {
     // color_setColor(color);
@@ -49,6 +55,7 @@ void main() {
 
     geometry.worldPosition = position;
     geometry.uv = texCoords;
+    geometry.pickingColor = pickingColors;
 
     gl_Position = project_position_to_clipspace(position, vec3(0.0), vec3(0.0), geometry.position);
     DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
@@ -76,7 +83,8 @@ void main() {
     vUV = mix(imageFrame.xy, imageFrame.xy + imageFrame.zw, uv) / uTextureDim;
     vColor = color;
     
-    
+    vec4 color = vec4(0.0);
+    DECKGL_FILTER_COLOR(color, geometry);
     
 }
 `
