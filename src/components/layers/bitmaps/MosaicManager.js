@@ -17,7 +17,7 @@ export default class MosaicManager {
 
     // Expand const regex = /\{(\d+)-(\d+)\}/gm;
     const from = 0
-    const to = 4
+    const to = 12
     const spritePath = '/sprites/'
     const urls = Array.from({ length: (to + 1) - from }, (v, k) => `/sprites/subdivisions_${k + from}.json`)
 
@@ -73,7 +73,7 @@ export default class MosaicManager {
 
   getImageMapping (imageId) {
     // console.log(imageId, this.state.atlas[imageId])
-    if (this.state.atlas[imageId] && this.state.atlas[imageId].filename === 'subdivisions_0.png') {
+    if (this.state.atlas[imageId] && this.state.atlas[imageId].filename === 'subdivisions_2.png') {
       return this.state.atlas[imageId] || {}
     } else {
       return {}

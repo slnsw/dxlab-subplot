@@ -38,7 +38,7 @@ export class MapsCloudLayer extends CompositeLayer {
         // if (geometry) {
         // if (properties.asset_id === 'a9613015') {
         result.push({
-          bounds: properties.image_bounds.coordinates[0].map((c) => [...c, 200]),
+          bounds: properties.image_bounds.coordinates[0].map((c) => [...c]),
           image: properties.asset_id,
           color: [1.0, 0, 0]
         })
@@ -208,9 +208,10 @@ export class MapsCloudLayer extends CompositeLayer {
       //     'sprites/subdivisions_1.json'
       // ],
 
-      imageAtlas: 'sprites/subdivisions_0.png',
-      imageMapping: 'sprites/subdivisions_4.json',
+      imageAtlas: 'sprites/subdivisions_2.png',
+      imageMapping: 'sprites/subdivisions_20.json',
       getOpacity: d => Math.random() * (1 - 0.5) + 0.5,
+      getOffsetZ: d => Math.random() * (500 - 0) + 0,
 
       material: false,
 

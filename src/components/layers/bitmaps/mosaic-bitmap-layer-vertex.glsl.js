@@ -17,6 +17,7 @@ attribute vec4 boundY;
 attribute vec4 boundZ; 
 // attribute vec4 boundZ64xyLow;
 
+attribute float offsetZ;
 attribute vec4 imageFrame;
 attribute float imageRotated;
 
@@ -38,16 +39,16 @@ void main() {
     vec3 position = vec3(1.0);
     // vec3 bound64xyLow = vec3(1.0);
     if(i == 0) {
-        position = vec3(boundX.x, boundY.x, boundZ.x);
+        position = vec3(boundX.x, boundY.x, boundZ.x + offsetZ);
         // bound64xyLow = vec3(boundX64xyLow.x, boundY64xyLow.x, boundZ64xyLow.x);
     }else if(i == 1) {
-        position = vec3(boundX.y, boundY.y, boundZ.y);
+        position = vec3(boundX.y, boundY.y, boundZ.y + offsetZ);
         // bound64xyLow = vec3(boundX64xyLow.y, boundY64xyLow.y, boundZ64xyLow.y);
     }else if(i == 2) {
-        position = vec3(boundX.z, boundY.z, boundZ.z);
+        position = vec3(boundX.z, boundY.z, boundZ.z + offsetZ);
         // bound64xyLow = vec3(boundX64xyLow.z, boundY64xyLow.z, boundZ64xyLow.z);
     }else if(i == 3) {
-        position = vec3(boundX.w, boundY.w, boundZ.w);
+        position = vec3(boundX.w, boundY.w, boundZ.w + offsetZ);
         // bound64xyLow = vec3(boundX64xyLow.w, boundY64xyLow.w, boundZ64xyLow.w);
     }
 

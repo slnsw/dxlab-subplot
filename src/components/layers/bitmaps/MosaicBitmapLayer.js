@@ -24,6 +24,7 @@ const defaultProps = {
   getImage: { type: 'accessor', value: x => x.image },
   getColor: { type: 'accessor', value: x => x.color },
   getOpacity: { type: 'accessor', value: x => x.opacity || 1 },
+  getOffsetZ: { type: 'accessor', value: x => x.offsetZ || 0 },
 
   desaturate: { type: 'number', min: 0, max: 1, value: 0 },
   // Inspired by  Deck.gl BitmapLayer implementation
@@ -86,6 +87,13 @@ export class MosaicBitmapLayer extends Layer {
         divisor: 1,
         defaultValue: [0, 0, 0]
         // transform: this.trnBounds
+      },
+      offsetZ: {
+        size: 1,
+        type: GL.FLOAT,
+        accessor: 'getOffsetZ',
+        transition: true,
+        divisor: 1
       },
       color: {
         size: 3,
