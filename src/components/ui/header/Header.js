@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { PropTypes } from 'prop-types'
 
 import { get } from 'lodash'
 import { MapDataContext } from '../../../context/MapsContext'
@@ -37,7 +38,8 @@ export class Header extends Component {
     const toYear = get(state, 'maps.filters.toYear', 0)
     const data = get(state, 'maps.data', [])
 
-    let focus = get(state, 'maps.focus')
+    const [uiState] = this.props.uiContext
+    let focus = get(uiState, 'focus')
     focus = (!focus) ? {} : focus
 
     const focusProperties = get(focus, 'properties', {})
@@ -79,3 +81,7 @@ export class Header extends Component {
 }
 
 Header.contextType = MapDataContext
+
+Header.propTypes = {
+  uiContext: PropTypes.array
+}

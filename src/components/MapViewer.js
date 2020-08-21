@@ -183,6 +183,7 @@ export class MapViewer extends Component {
   };
 
   prepareLayers () {
+    const { uiContext } = this.props
     const data = this.context[0].maps.data
     const filters = this.context[0].maps.filters
     if (data.length > 0) {
@@ -191,10 +192,11 @@ export class MapViewer extends Component {
           props = {
             ...props,
             data,
-            filters
+            filters,
+            uiContext
           }
           const [state, dispatch] = this.context
-          return new L({ contextState: state, dispatch, ...props })
+          return new L({ mapsContext: state, dispatch, ...props })
         })
       ]
     } else {
@@ -296,5 +298,6 @@ MapViewer.propTypes = {
   mode: PropTypes.oneOf(['kiosk', 'master', 'slave']),
   layers: PropTypes.array,
   onResult: PropTypes.func,
-  onViewChange: PropTypes.func
+  onViewChange: PropTypes.func,
+  uiContext: PropTypes.array
 }

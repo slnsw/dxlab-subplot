@@ -84,11 +84,11 @@ export class MapExplorer extends Component {
       // [SearchResultLayer, { view: 'all' }],
       [LandmarksLayer, { view: 'master' }],
       // [MapsDistributionLayer, { view: 'master' }]
+      // [MapsLabelLayer, { view: 'master' }],
       [FootprintMapsLayer, { view: 'all' }],
       [MapsPolygonLayer, { view: 'master', ...handlers }],
       [MapsCloudLayer, { view: 'master' }]
 
-      // [MapsLabelLayer, { view: 'master' }]
       // [MapsClusterCounts, { view: 'master' }]
       // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: 'crop', view: 'all', ...handlers }]
       // [MapsBitmapLayer, { id: 'edge', name: 'edge', suffix: '_edge.png', view: 'slave', ...handlers }]
@@ -105,7 +105,10 @@ export class MapExplorer extends Component {
     return (
 
       <UIContext.Consumer>
-        {([, UIDispatch]) => {
+        {uiContext => {
+          // Weird I know but class components support for multiple context
+          // work in this way.
+          const [, UIDispatch] = uiContext
           this.UIDispatch = UIDispatch
 
           return (
@@ -118,13 +121,14 @@ export class MapExplorer extends Component {
 
               {data.length > 0 &&
                 <>
-                  <Header />
+                  <Header uiContext={uiContext} />
                   <Range />
                 </>}
 
               <MapViewer
                 mode={mode}
                 layers={layers}
+                uiContext={uiContext}
               />
             </>
 
