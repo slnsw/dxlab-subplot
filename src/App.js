@@ -12,8 +12,8 @@ function App () {
     maps: {
       data: [],
       filters: {
-        fromYear: 1880, // 1894,
-        toYear: 1900, // 1914,
+        fromYear: 1890, // 1894,
+        toYear: 1897, // 1914,
         // colored: true,
         assetIds: null,
         around: null,

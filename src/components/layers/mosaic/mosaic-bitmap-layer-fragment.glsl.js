@@ -21,8 +21,9 @@ void main() {
     
     // Just render texture with opacity
     vec4 texColor = texture2D(uTexture, vec2(vUV.x, vUV.y));
+    // vec4 texColor = vec4(vec3(1.0, 1.0, 0.0), 1.0);
     // gl_FragColor = texColor;
-    // opacity
+    // Apply opacity
     gl_FragColor = mix(vec4(0.0), vec4(texColor.rgb, 1.0), texColor.a * vOpacities);
     
     geometry.uv = vUV;

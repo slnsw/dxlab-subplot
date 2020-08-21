@@ -24,10 +24,10 @@ const directionalLight = new DirectionalLight({
 })
 
 class MyLightingEffect extends LightingEffect {
-  // preRender
-  prepare (gl, { layers, ...params }) {
-    // layers = layers.filter((l) => (l.props.material))
-    return super.prepare(gl, { layers, ...params })
+  preRender (gl, { layers, ...params }) {
+    // eslint-disable-next-line
+    layers = layers.filter((l) => (l.props.castShadow ?? true))
+    return super.preRender(gl, { layers, ...params })
   }
 }
 

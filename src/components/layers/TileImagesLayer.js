@@ -39,10 +39,10 @@ export class TileImagesLayer extends CompositeLayer {
       const featuresData = data.reduce(function (result, el) {
         const { geometry, properties } = el
         if (geometry) {
-          // const elevation = 0;
+          const elevation = 0
 
           // interpolateScale(parseInt(properties.year), toYear, fromYear) * 50;
-          const elevation = Math.floor(scaleElevation(parseInt(properties.year))) * 100
+          // const elevation = Math.floor(scaleElevation(parseInt(properties.year))) * 100
           //  mapValue(m.year, this.state.year_from, this.state.year_to, 0, this.state.year_to - this.state.year_from);
 
           const image = getImageUrl(properties.asset_id, suffix, '16')
@@ -184,6 +184,7 @@ export class TileImagesLayer extends CompositeLayer {
     // const visible = features.filter(({ properties: { image_bounds } }) => areRectanglesOverlap(viewportRect, this.getImageBounds(image_bounds)))
     // const bounds = [[151.214204, -33.864048], [151.210451, -33.864039], [151.210455, -33.859921], [151.214208, -33.859929]]
 
+    /*
     layers.push(features.map(({ properties: { asset_id, image_bounds, elevation } }) => {
       // is visible?
       const visible = areRectanglesOverlap(viewportRect, this.getImageBounds(image_bounds))
@@ -221,6 +222,7 @@ export class TileImagesLayer extends CompositeLayer {
         }
       }))
     }))
+    */
 
     // console.log('visible', countVisible);
 

@@ -110,3 +110,8 @@ export function getImageUrl (asset_id, suffix, size = '128', ext = 'png') {
   const url = `${process.env.REACT_APP_STATIC_BASE_URL}/${asset_id}_${suffix}_${size}.${ext}`
   return url
 }
+
+export function getYearElevation ({ fromYear, toYear, year, offsetZ = 0 }) {
+  const scaleElevation = scaleLinear([fromYear, toYear], [0, toYear - fromYear])
+  return Math.floor(scaleElevation(parseInt(year))) * 100 + offsetZ
+}
