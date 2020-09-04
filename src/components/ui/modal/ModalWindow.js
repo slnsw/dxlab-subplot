@@ -2,12 +2,12 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
 import { UIContext } from '../../../context/UIContext'
+import { unSelectMap } from '../../../context/UIActions'
 
 import IdleTimer from 'react-idle-timer'
 import ReactModal from 'react-modal'
 import Zoomable from './Zoomable'
 import { getImageUrl } from '../../../share/utils'
-import { unSelectMap } from '../../../context/MapsActions'
 
 import { get } from 'lodash'
 

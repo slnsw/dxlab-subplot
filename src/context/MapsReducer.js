@@ -5,29 +5,19 @@ export const ActionTypes = {
 
   MAPS_FILTER_REQUEST: 'MAPS_FILTER_REQUEST',
   MAPS_FILTER_COMPLETE: 'MAPS_FILTER_COMPLETE',
-  MAPS_FILTER_FAIL: 'MAPS_FILTER_FAIL',
-
-  MAPS_DETAIL_REQUEST: 'MAPS_DETAIL_REQUEST',
-  MAPS_DETAIL_COMPLETE: 'MAPS_DETAIL_COMPLETE',
-  MAPS_DETAIL_FAIL: 'MAPS_DETAIL_FAIL',
-
-  MAPS_SELECT: 'MAPS_SELECT',
-  MAPS_UNSELECT: 'MAPS_UNSELECT',
-
-  MAPS_FOCUS: 'MAPS_FOCUS',
-  MAPS_UNFOCUS: 'MAPS_UNFOCUS'
-
+  MAPS_FILTER_FAIL: 'MAPS_FILTER_FAIL'
 }
 
 export function mapsReducer (state, action) {
   switch (action.type) {
     case ActionTypes.MAPS_DATA_COMPLETE: {
+      const { filters, dataSet, data, meta } = action
       return {
         ...state,
-        filters: action.filters,
-        dataSet: action.dataSet, // Unfiltered data
-        data: action.data,
-        meta: action.meta
+        filters,
+        dataSet, // Unfiltered data
+        data,
+        meta
       }
     }
 
@@ -39,34 +29,6 @@ export function mapsReducer (state, action) {
           ...state.filters,
           ...action.filters
         }
-      }
-    }
-
-    case ActionTypes.MAPS_SELECT: {
-      return {
-        ...state,
-        selected: action.selected
-      }
-    }
-
-    case ActionTypes.MAPS_UNSELECT: {
-      return {
-        ...state,
-        selected: null
-      }
-    }
-
-    case ActionTypes.MAPS_FOCUS: {
-      return {
-        ...state,
-        focus: action.focus
-      }
-    }
-
-    case ActionTypes.MAPS_UNFOCUS: {
-      return {
-        ...state,
-        focus: null
       }
     }
 

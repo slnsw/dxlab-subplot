@@ -9,7 +9,7 @@ export function getMaps ({ ...query }) {
       const { around } = query
       const radius = get(around, 'properties.radius', null)
 
-      const filters = updatefilters(state.maps.filters, { radius, ...query })
+      const filters = updateFilters(state.maps.filters, { radius, ...query })
 
       loadData()
         .then((data) => {
@@ -45,7 +45,7 @@ export function applyFilters ({ ...query }) {
     const { around } = query
     const radius = get(around, 'properties.radius', null)
 
-    const filters = updatefilters(state.maps.filters, { radius, ...query })
+    const filters = updateFilters(state.maps.filters, { radius, ...query })
     const data = filterData(state.maps.dataSet, filters)
 
     dispatch({
@@ -56,7 +56,7 @@ export function applyFilters ({ ...query }) {
   }
 }
 
-function updatefilters (current, { around, radius, fromYear, toYear, assetIds, ...properties }) {
+function updateFilters (current, { around, radius, fromYear, toYear, assetIds, ...properties }) {
   return pickBy({
     ...current,
     ...(around && { around }),
@@ -115,39 +115,5 @@ export function getMapsRaw ({ around, fromYear, toYear, assetIds }) {
           error
         })
       })
-  }
-}
-
-export function selectMap (object) {
-  return (dispatch, state) => {
-    dispatch({
-      type: ActionTypes.MAPS_SELECT,
-      selected: object
-    })
-  }
-}
-
-export function unSelectMap () {
-  return (dispatch, state) => {
-    dispatch({
-      type: ActionTypes.MAPS_UNSELECT
-    })
-  }
-}
-
-export function focusMap (object) {
-  return (dispatch, state) => {
-    dispatch({
-      type: ActionTypes.MAPS_FOCUS,
-      focus: object
-    })
-  }
-}
-
-export function removeFocusMap () {
-  return (dispatch, state) => {
-    dispatch({
-      type: ActionTypes.MAPS_UNFOCUS
-    })
   }
 }

@@ -18,11 +18,11 @@ export function unSelectMap () {
 }
 
 export function focusMap (object) {
-  console.log('focus', object)
   return (dispatch, state) => {
     dispatch({
       type: ActionTypes.UI_MAP_FOCUS,
-      focus: object
+      focus: object,
+      isIdle: false
     })
   }
 }
@@ -31,6 +31,16 @@ export function removeFocusMap () {
   return (dispatch, state) => {
     dispatch({
       type: ActionTypes.UI_MAP_UNFOCUS
+    })
+  }
+}
+
+export function focusIdleMap (object) {
+  return (dispatch, state) => {
+    dispatch({
+      type: ActionTypes.UI_MAP_IDLE_FOCUS,
+      focus: object,
+      isIdle: true
     })
   }
 }

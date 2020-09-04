@@ -1,16 +1,17 @@
 
-import React, { Component } from 'react'
+import React, { useContext, useEffect, useState, useCallback } from 'react'
 import PropTypes from 'prop-types'
-
-import { MapDataContext } from '../context/MapsContext'
-
-import { MapViewer } from './MapViewer'
 
 // UI Components
 import { ModalWindow } from './ui/modal/ModalWindow'
 import { Range } from './ui/range/Range'
 import { Header } from './ui/header/Header'
-import IdleTimer from 'react-idle-timer'
+import { Fog } from './ui/fog/Fog'
+import { MapViewer } from './ui/mapViewer/MapViewer'
+// import { MapViewer } from './MapViewerOld'
+
+// Idle
+import { useIdleTimer } from 'react-idle-timer'
 
 // Data visualization and info layers
 import { LandmarksLayer } from './layers/LandmarksLayer'
@@ -24,161 +25,127 @@ import { MapsClusterCounts } from './layers/MapsClusterCounts'
 import { MapsCloudLayer } from './layers/MapsCloudLayer'
 import { TileImagesLayer } from './layers/TileImagesLayer'
 
-import { selectMap, focusMap, removeFocusMap } from '../context/UIActions'
-import { UIContext } from '../context/UIContext'
+// UI, Map actions and contexts
+import { selectMap, focusIdleMap, focusMap, removeFocusMap } from '../context/UIActions'
+import { MapDataContext } from '../context/MapsContext'
 import { getMaps } from '../context/MapsActions'
+import { UIContext } from '../context/UIContext'
+
+// Utils
 import { get, sample } from 'lodash'
 
-export class MapExplorer extends Component {
-  constructor (props) {
-    super(props)
-    this.state = {
-      showModal: false,
-      ready: false
-    }
-    this.UIDispatch = null
-    this.idleTimer = null
+export const MapExplorer = ({ mode }) => {
+  const [state, setState] = useState({ showModal: false, ready: false })
+  const [mapState, mapDispatch] = useContext(MapDataContext)
+  const [uiState, UIDispatch] = useContext(UIContext)
 
-    this.handleOnIdle = this.handleOnIdle.bind(this)
-  }
+  const _mapDispatch = useCallback(mapDispatch, [])
 
-  componentDidMount () {
-    const [, dispatch] = this.context
-    console.log('MapExploreer')
-    dispatch(getMaps({})).then(() => {
-      this.setState({ ready: true })
+  // Load map data
+  useEffect(() => {
+    _mapDispatch(getMaps({})).then(() => {
+      setState({ ready: true })
     })
-  }
+  }, [_mapDispatch])
 
-  /**
-     * Open a modal window to display map detail data
-     * @param {*} info
-     */
-  showMapDetail ({ object }) {
-    // console.log(object)
-    if (object) {
-      this.setState({
-        showModal: true
-      })
-      // Update map context to keep track with the selected map
-      this.UIDispatch(selectMap({ ...object }))
-    }
-  };
+  const { ready, showModal } = state
 
-  onHover ({ object, x, y }) {
-    // const [, dispatch] = this.context
-    if (object) {
-      // Update map context to keep track of map in focus
-      this.UIDispatch(focusMap({
-        ...object,
-        mouseX: x,
-        mouseY: y
+  // Idle logic
+  const { reset } = useIdleTimer({
+    timeout: 1000 * 30, // 60 * 0.4,
+    onIdle: (event) => {
+      // Get current filtered data and
+      // select a random map from current range
+      const selected = sample(get(mapState, 'maps.data', []))
+      // Set selected as focus
+      UIDispatch(focusIdleMap({
+        ...selected,
+        mouseX: 0,
+        mouseY: 0
       }))
-    } else {
-      this.UIDispatch(removeFocusMap())
+
+      // Restart Idle
+      reset()
     }
-  }
+  })
 
-  handleOnIdle (event) {
-    console.log('I am idle')
-    this.idleTimer.reset()
+  // Note: DeckGL creates a custom React context for managing layers data
+  // For that reason I am force to Initialize layers inside of the map explorer
+  // them inject the custom MapContext.
 
-    // Get a random map from current range
-    const [state] = this.context
-    const data = get(state, 'maps.data', [])
-    const selected = sample(data)
-    console.log(selected)
-    this.UIDispatch(focusMap({
-      ...selected,
-      mouseX: 0,
-      mouseY: 0
-    }))
-  }
+  // MapExplorer layers structure. [ Layer class, {props} ]
+  // view == main or minimap or all
+  // TODO: define a prop structure for this.
 
-  render () {
-    // Note: DeckGL creates a custom React context for managing layers data
-    // For that reason I am force to Initialize layers inside of the map explorer
-    // them inject the custom MapContext.
-
-    // MapExplorer layers structure. [ Layer class, {props} ]
-    // view == main or minimap or all
-    // TODO: define a prop structure for this.
-
-    const handlers = {
-      onClick: this.showMapDetail.bind(this),
-      onHover: this.onHover.bind(this)
-
+  const handlers = {
+    onClick: ({ object }) => {
+      // console.log(object)
+      if (object) {
+        setState({
+          showModal: true
+        })
+        // Update map context to keep track with the selected map
+        UIDispatch(selectMap({ ...object }))
+      }
+    },
+    onHover: ({ object, x, y }) => {
+      // const [, dispatch] = this.context
+      if (object) {
+        // Update map context to keep track of map in focus
+        UIDispatch(focusMap({
+          ...object,
+          mouseX: x,
+          mouseY: y
+        }))
+      } else {
+        UIDispatch(removeFocusMap())
+      }
     }
 
-    const layers = [
-      // [SearchResultLayer, { view: 'all' }],
-      [LandmarksLayer, { view: 'master' }],
-      // [MapsDistributionLayer, { view: 'master' }]
-      // [MapsLabelLayer, { view: 'master' }],
-      [FootprintMapsLayer, { view: 'all' }],
-      [MapsPolygonLayer, { view: 'master', ...handlers }],
-      [MapsCloudLayer, { view: 'master' }]
-
-      // [MapsClusterCounts, { view: 'master' }]
-      // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: 'crop', view: 'all', ...handlers }]
-      // [MapsBitmapLayer, { id: 'edge', name: 'edge', suffix: '_edge.png', view: 'slave', ...handlers }]
-      // [TileImagesLayer, { id: 'tile_crop', view: 'master', suffix: 'crop', ...handlers, material: false }],
-
-    ]
-
-    const { showModal, ready } = this.state
-
-    const { mode } = this.props
-    const [state] = this.context
-    const data = get(state, 'maps.data', [])
-
-    return (
-
-      <UIContext.Consumer>
-        {uiContext => {
-          // Weird I know but class components support for multiple context
-          // work in this way.
-          const [, UIDispatch] = uiContext
-          this.UIDispatch = UIDispatch
-
-          return (
-            <>
-              {/* <IdleTimer
-                ref={ref => { this.idleTimer = ref }}
-                timeout={1000 * 10} // 1000 * 60 * 15 = 15 Minutes
-                onIdle={this.handleOnIdle}
-                debounce={250}
-              /> */}
-              {showModal &&
-                <ModalWindow
-                  isOpen={showModal}
-                  onRequestClose={() => this.setState({ showModal: false })}
-                />}
-
-              {ready > 0 &&
-                <>
-                  <Header uiContext={uiContext} />
-                  <Range />
-                </>}
-
-              <MapViewer
-                mode={mode}
-                layers={layers}
-                uiContext={uiContext}
-              />
-
-            </>
-
-          )
-        }}
-
-      </UIContext.Consumer>
-
-    )
   }
+
+  const layers = [
+    // [SearchResultLayer, { view: 'all' }],
+    [LandmarksLayer, { view: 'master' }],
+    // [MapsDistributionLayer, { view: 'master' }]
+    // [MapsLabelLayer, { view: 'master' }],
+    [FootprintMapsLayer, { view: 'all' }],
+    [MapsPolygonLayer, { view: 'master', ...handlers }],
+    [MapsCloudLayer, { view: 'master' }]
+
+    // [MapsClusterCounts, { view: 'master' }]
+    // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: 'crop', view: 'all', ...handlers }]
+    // [MapsBitmapLayer, { id: 'edge', name: 'edge', suffix: '_edge.png', view: 'slave', ...handlers }]
+    // [TileImagesLayer, { id: 'tile_crop', view: 'master', suffix: 'crop', ...handlers, material: false }],
+
+  ]
+
+  return (
+    <>
+
+      {showModal &&
+        <ModalWindow
+          isOpen={showModal}
+          onRequestClose={() => setState({ showModal: false })}
+        />}
+
+      {ready > 0 &&
+        <>
+          <Header />
+          <Range />
+        </>}
+
+      <MapViewer
+        mode={mode}
+        layers={layers}
+        uiContext={[uiState, UIDispatch]}
+      />
+
+      <Fog />
+
+    </>)
 }
 
-MapExplorer.contextType = MapDataContext
 MapExplorer.propTypes = {
   mode: PropTypes.oneOf(['kiosk', 'master', 'slave'])
 }

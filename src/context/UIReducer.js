@@ -4,7 +4,9 @@ export const ActionTypes = {
   UI_MAP_UNSELECT: 'UI_MAP_UNSELECT',
 
   UI_MAP_FOCUS: 'UI_MAP_FOCUS',
-  UI_MAP_UNFOCUS: 'UI_MAP_UNFOCUS'
+  UI_MAP_UNFOCUS: 'UI_MAP_UNFOCUS',
+
+  UI_MAP_IDLE_FOCUS: 'UI_MAP_IDLE_FOCUS'
 
 }
 
@@ -35,6 +37,13 @@ export function UIReducer (state, action) {
       return {
         ...state,
         focus: null
+      }
+    }
+
+    case ActionTypes.UI_MAP_IDLE_FOCUS: {
+      return {
+        ...state,
+        ...action
       }
     }
 
