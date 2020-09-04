@@ -74,7 +74,7 @@ void main() {
     // Calculate uv rotation if required
     vec2 uv = texCoords;
     if (imageRotated == 1.0) {
-        float radAngle = radians(90.0);
+        float radAngle = radians(-90.0);
         uv = texCoords + vec2(-0.5, -0.5);
         uv = mat2(cos(radAngle), sin(radAngle), -sin(radAngle), cos(radAngle)) * uv;
         uv = uv + vec2(0.5, 0.5);

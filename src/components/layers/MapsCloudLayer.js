@@ -77,8 +77,8 @@ export class MapsCloudLayer extends CompositeLayer {
       id: `${id}-bitmap-layer-mosaic`,
 
       data: mapSpriteData,
-      imageAtlas: 'sprites/subdivisions_2.png',
-      imageMapping: 'sprites/subdivisions_20.json',
+      imageAtlas: 'sprites/128/subdivisions_4.png',
+      imageMapping: 'sprites/128/subdivisions_4.json',
       opacity: 0,
       // imageAtlas: [
       //     'sprites/subdivisions_0.png',
