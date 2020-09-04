@@ -4,35 +4,40 @@ import { pickBy, get, identity, some, omit, map, isNumber, max, min } from 'loda
 import { roundYearDown, roundYearUp } from './utils'
 
 export function getMaps ({ ...query }) {
-  return (dispatch, state) => {
-    const { around } = query
-    const radius = get(around, 'properties.radius', null)
+  return (dispatch, state) => (
+    new Promise((resolve, reject) => {
+      const { around } = query
+      const radius = get(around, 'properties.radius', null)
 
-    const filters = updatefilters(state.maps.filters, { radius, ...query })
+      const filters = updatefilters(state.maps.filters, { radius, ...query })
 
-    loadData()
-      .then((data) => {
-        // Get maxium and minium year
-        const years = map(data, 'properties.year').filter(d => isNumber(d) || !isNaN(d))
+      loadData()
+        .then((data) => {
+        // Get maximum and minimum year
+          const years = map(data, 'properties.year').filter(d => isNumber(d) || !isNaN(d))
 
-        dispatch({
-          type: ActionTypes.MAPS_DATA_COMPLETE,
-          filters,
-          dataSet: data,
-          data: filterData(data, filters),
-          meta: {
-            maxYear: roundYearUp(max(years)),
-            minYear: roundYearDown(min(years))
-          }
+          dispatch({
+            type: ActionTypes.MAPS_DATA_COMPLETE,
+            filters,
+            dataSet: data,
+            data: filterData(data, filters),
+            meta: {
+              maxYear: roundYearUp(max(years)),
+              minYear: roundYearDown(min(years))
+            }
+          })
+
+          resolve()
         })
-      })
-      .catch((error) => {
-        dispatch({
-          type: ActionTypes.MAPS_DATA_FAIL,
-          error
+        .catch((error) => {
+          dispatch({
+            type: ActionTypes.MAPS_DATA_FAIL,
+            error
+          })
+          reject(error)
         })
-      })
-  }
+    })
+  )
 }
 
 export function applyFilters ({ ...query }) {

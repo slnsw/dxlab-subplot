@@ -18,6 +18,7 @@ export function unSelectMap () {
 }
 
 export function focusMap (object) {
+  console.log('focus', object)
   return (dispatch, state) => {
     dispatch({
       type: ActionTypes.UI_MAP_FOCUS,

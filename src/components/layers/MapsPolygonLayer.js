@@ -98,7 +98,7 @@ export class MapsPolygonLayer extends CompositeLayer {
       data: this.state.feature,
       extruded: false,
       pickable: true,
-      autoHighlight: true,
+      autoHighlight: false,
       stroked: true,
 
       getLineWidth: 3,

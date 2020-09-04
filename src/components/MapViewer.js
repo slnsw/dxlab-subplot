@@ -109,7 +109,7 @@ export class MapViewer extends Component {
     }
 
     if (state.maps.data.length === 0) {
-      dispatch(getMaps({ around }))
+      // dispatch(getMaps({ around }))
     }
 
     const { onViewChange } = this.props
@@ -119,6 +119,8 @@ export class MapViewer extends Component {
   }
 
   handleViewStateSearchChange (viewState) {
+    console.log(JSON.stringify(viewState))
+
     this.handleViewStateChange({
       viewState: {
         ...this.state.viewState,
@@ -210,6 +212,7 @@ export class MapViewer extends Component {
   }
 
   render () {
+    console.log('render')
     const layers = this.prepareLayers()
 
     const { mode } = this.props

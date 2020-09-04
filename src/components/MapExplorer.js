@@ -10,6 +10,7 @@ import { MapViewer } from './MapViewer'
 import { ModalWindow } from './ui/modal/ModalWindow'
 import { Range } from './ui/range/Range'
 import { Header } from './ui/header/Header'
+import IdleTimer from 'react-idle-timer'
 
 // Data visualization and info layers
 import { LandmarksLayer } from './layers/LandmarksLayer'
@@ -24,16 +25,29 @@ import { MapsCloudLayer } from './layers/MapsCloudLayer'
 import { TileImagesLayer } from './layers/TileImagesLayer'
 
 import { selectMap, focusMap, removeFocusMap } from '../context/UIActions'
-import { get } from 'lodash'
 import { UIContext } from '../context/UIContext'
+import { getMaps } from '../context/MapsActions'
+import { get, sample } from 'lodash'
 
 export class MapExplorer extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      showModal: false
+      showModal: false,
+      ready: false
     }
     this.UIDispatch = null
+    this.idleTimer = null
+
+    this.handleOnIdle = this.handleOnIdle.bind(this)
+  }
+
+  componentDidMount () {
+    const [, dispatch] = this.context
+    console.log('MapExploreer')
+    dispatch(getMaps({})).then(() => {
+      this.setState({ ready: true })
+    })
   }
 
   /**
@@ -63,6 +77,22 @@ export class MapExplorer extends Component {
     } else {
       this.UIDispatch(removeFocusMap())
     }
+  }
+
+  handleOnIdle (event) {
+    console.log('I am idle')
+    this.idleTimer.reset()
+
+    // Get a random map from current range
+    const [state] = this.context
+    const data = get(state, 'maps.data', [])
+    const selected = sample(data)
+    console.log(selected)
+    this.UIDispatch(focusMap({
+      ...selected,
+      mouseX: 0,
+      mouseY: 0
+    }))
   }
 
   render () {
@@ -96,7 +126,7 @@ export class MapExplorer extends Component {
 
     ]
 
-    const { showModal } = this.state
+    const { showModal, ready } = this.state
 
     const { mode } = this.props
     const [state] = this.context
@@ -113,13 +143,19 @@ export class MapExplorer extends Component {
 
           return (
             <>
+              {/* <IdleTimer
+                ref={ref => { this.idleTimer = ref }}
+                timeout={1000 * 10} // 1000 * 60 * 15 = 15 Minutes
+                onIdle={this.handleOnIdle}
+                debounce={250}
+              /> */}
               {showModal &&
                 <ModalWindow
                   isOpen={showModal}
                   onRequestClose={() => this.setState({ showModal: false })}
                 />}
 
-              {data.length > 0 &&
+              {ready > 0 &&
                 <>
                   <Header uiContext={uiContext} />
                   <Range />
@@ -130,6 +166,7 @@ export class MapExplorer extends Component {
                 layers={layers}
                 uiContext={uiContext}
               />
+
             </>
 
           )

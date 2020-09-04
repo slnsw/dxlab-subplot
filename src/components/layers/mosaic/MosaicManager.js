@@ -18,7 +18,7 @@ export default class MosaicManager {
     // Expand const regex = /\{(\d+)-(\d+)\}/gm;
     const from = 0
     const to = 4
-    const spritePath = '/sprites/256/'
+    const spritePath = '/sprites/128/'
     const urls = Array.from({ length: (to + 1) - from }, (v, k) => `${spritePath}subdivisions_${k + from}.json`)
 
     if (this.state.atlasLoaded) {

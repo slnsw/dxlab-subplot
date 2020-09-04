@@ -1,9 +1,18 @@
 export const thunkDispatch = (dispatch, state) => {
-  return (input) => {
+  const defaults = { usePromiseCatch: true }
+  return (input, { usePromiseCatch } = defaults) => {
     if (typeof input === 'function') {
-      input(dispatch, state)
+      const res = input(dispatch, state)
+      if (res) {
+        // is a promise and usePromiseCatch is true
+        // This means we want to set the catch automatically
+        if (typeof res.then === 'function' && usePromiseCatch) {
+          res.catch(() => { })
+        }
+      }
+      return res
     } else {
-      dispatch(input)
+      return dispatch(input)
     }
   }
 }
