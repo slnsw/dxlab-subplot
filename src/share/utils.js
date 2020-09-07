@@ -29,7 +29,7 @@ export class MergeGeoJsonPolygon {
     let merge = this.cache
     if (merge) {
       // Clean coordinates to get a better render.
-      // However there are invalid coordinates comming from the
+      // However there are invalid coordinates coming from the
       // original data. To avoid loose the entry allow bypass
       // the polygon with messy data.
       try {

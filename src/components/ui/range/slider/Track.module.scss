@@ -1,0 +1,12 @@
+@import './_variables';
+
+.track {
+    position: absolute;
+    height: $TRACK_HEIGHT;
+    z-index: 1;
+    margin-top: $TRACK_MARGIN_TOP;
+    background-color: $TRACK_COLOR;
+    border-radius: $TRACK_RADIUS;
+    cursor: pointer;
+    user-select: none; 
+}

@@ -1,0 +1,23 @@
+@import './variables';
+
+.handle {
+    position: absolute;
+    margin-left: $HANDLE_MARGIN_LEFT;
+    margin-top: $HANDLE_MARGIN_TOP;
+    z-index: 2;
+    width: $HANDLE_WIDTH;
+    height: $HANDLE_HEIGHT;
+    border: 0;
+    text-align: center;
+    cursor: pointer;
+    border-radius: $HANDLE_RADIUS;
+    background-color: $HANDLE_COLOR;
+}
+
+.handle-label {
+    font-family: $HANDLE_LABEL_FONT_FAMILY;
+    font-size: $HANDLE_LABEL_FONT_SIZE;
+    margin-top: $HANDLE_LABEL_MARGIN_TOP;
+    text-align: center;
+    display: none;
+}

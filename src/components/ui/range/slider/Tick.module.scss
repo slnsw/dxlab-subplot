@@ -1,0 +1,20 @@
+@import './variables';
+
+.tick {
+    position: absolute;
+    margin-top: $TICK_MARGIN_TOP;
+    margin-left: $TICK_WIDTH * -.5;
+    width: $TICK_WIDTH;
+    height: $TICK_HEIGHT;
+    background-color: $TICK_COLOR;
+    user-select: none; 
+}
+
+.tick-label {
+    position: absolute;
+    margin-top: $TICK__LABEL_MARGIN_TOP;
+    font-size: 10px;
+    text-align: center;
+    color: $TEXT_COLOR;
+    user-select: none; 
+}

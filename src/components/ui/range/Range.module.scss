@@ -1,19 +1,25 @@
-.range {
-    z-index: 3000;
-    // overflow: hidden;
-    position: absolute;
-    color: white;
-    top: 40px;
-    left: 10px;
-    // pointer-events: none;
+@import './variables';
 
+.container {
+  position: absolute;
+  box-sizing: border-box;
+  padding: $CONTAINER_PADDING;
+  z-index: 3001;  
+  // display: flex;
+  width: 100vw;
+  bottom: 0;
+  // height: 300px;
 }
 
-.slider {
-    position: absolute !important;
-    right: 80px;
-    top: 10%;
-    // height: 80%;
-    height: 80vh;
-    z-index: 3001;
+.panel {
+  // position: relative;
+  padding: $PANEL_PADDING;
+  background-color: $PANEL_BACKGROUND_COLOR;
+  height: 100px;
+} 
+
+
+.chart {
+  height: 80px;
+  width: 100%;
 }

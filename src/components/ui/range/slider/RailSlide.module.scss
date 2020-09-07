@@ -1,0 +1,11 @@
+@import './variables';
+
+.rail {
+    position: absolute;
+    width: 100%;
+    height: $RAIL_HEIGHT;
+    margin-top: $RAIL_MARGIN_TOP;
+    background-color: $RAIL_BACKGROUND_COLOR;
+    border-radius: $RAIL_RADIUS;
+    user-select: none; 
+}

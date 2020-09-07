@@ -1,0 +1,43 @@
+@import './variables';
+
+
+.container {
+    // border: 1px solid purple;
+    position: relative;
+    box-sizing: border-box; 
+
+    color: $TEXT_COLOR;
+    // touchAction: 'none',
+    display: flex;
+    // width: 100%;
+    // border: 1px solid green;
+
+
+    &.horizontal {
+        // bottom: 0;
+        // display: flex;
+        width: 100%;
+        // height: auto;
+        // padding: 20px;
+    }  
+
+    &.vertical {
+        // border-color: green;
+        // top: 10%;
+        height: 80vh;
+        // width: 5%;
+        // left: 2%;
+    }    
+
+
+    .slider {
+        position: relative;
+        width: 100%;
+        height: 40px;
+    }
+    
+    
+
+}
+
+
