@@ -53,7 +53,7 @@ export const MapExplorer = ({ mode }) => {
   // Idle logic
   const { reset } = useIdleTimer({
     timeout: 1000 * 30, // 60 * 0.4,
-    onIdle: (event) => {
+    onIdle: (_) => {
       // Get current filtered data and
       // select a random map from current range
       const selected = sample(get(mapState, 'maps.data', []))
@@ -66,6 +66,10 @@ export const MapExplorer = ({ mode }) => {
 
       // Restart Idle
       reset()
+    },
+    onActive: (_) => {
+      // User no longer inactive
+      UIDispatch(removeFocusMap())
     }
   })
 

@@ -91,7 +91,7 @@ export class MapsPolygonLayer extends CompositeLayer {
     // TODO: Decouple this context from this layer. Option inject focus via props
     const [uiState] = uiContext
     const inFocus = get(uiState, 'focus.properties.asset_id', null)
-    // const inFocusYear = get(mapsContext, 'maps.focus.properties.year', null)
+    const inFocusYear = get(uiState, 'focus.properties.year', null)
 
     const geoJsonFillLayer = new GeoJsonLayer(this.getSubLayerProps({
       id: `${id}-geojson-cutlines`,
@@ -105,22 +105,24 @@ export class MapsPolygonLayer extends CompositeLayer {
       getFillColor: [255, 255, 255, 125],
       getLineColor: [255, 255, 255, 255]
 
-      // getLineColor: (d) => {
-      //   const currYear = get(d, 'properties.year', null);
-      //   const opacity =  (currYear > inFocusYear)? 0 : 255;
-      //   return [255, 255, 255, opacity]
-      // },
-      // getFillColor: (d) => {
-      //   const currYear = get(d, 'properties.year', null);
-      //   const opacity =  (currYear > inFocusYear)? 0 : 125;
-      //   return [255, 255, 255, opacity]
-      // },
-      // updateTriggers: {
-      //   getFillColor: [inFocus]
-      // },
-      // transitions: {
-      //   getFillColor: 300
-      // }
+      /* getFillColor: (d) => {
+        const currYear = get(d, 'properties.year', null)
+        const opacity = (currYear !== inFocusYear && inFocusYear !== null) ? 0 : 125
+        return [255, 255, 255, opacity]
+      },
+      getLineColor: (d) => {
+        const currYear = get(d, 'properties.year', null)
+        const opacity = (currYear !== inFocusYear && inFocusYear !== null) ? 0 : 255
+        return [255, 255, 255, opacity]
+      },
+      updateTriggers: {
+        getFillColor: [inFocus],
+        getLineColor: [inFocus]
+      },
+      transitions: {
+        getFillColor: 300,
+        getLineColor: 300
+      } */
 
     }))
 

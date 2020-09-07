@@ -36,7 +36,8 @@ export function UIReducer (state, action) {
     case ActionTypes.UI_MAP_UNFOCUS: {
       return {
         ...state,
-        focus: null
+        focus: null,
+        isIdle: false
       }
     }
 
