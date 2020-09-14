@@ -22,7 +22,7 @@
 - **mosaic-layer**: Implement picking and opacity
 - **mosaic-layer**: Add mosaic manger for loading multiple image mapping and images
 - **mosaic-layer**: WIP Add logic for loading and applying mapping textures
-- **mosaic-layer**: Add logic to create image bounds via Webgl intance rendering
+- **mosaic-layer**: Add logic to create image bounds via WebGL instance rendering
 - **mosaic-layer**: WIP solve how to split coordinates into multiple attributes
 
 ### Perf
