@@ -15,15 +15,18 @@ import { useIdleTimer } from 'react-idle-timer'
 
 // Data visualization and info layers
 import { LandmarksLayer } from './layers/LandmarksLayer'
-import { FootprintMapsLayer } from './layers/FootprintMapsLayer'
-import { SearchResultLayer } from './layers/SearchResultLayer'
-import { MapsDistributionLayer } from './layers/MapsDistributionLayer'
+import { FootprintShadowLayer } from './layers/FootprintShadowLayer'
 import { MapsPolygonLayer } from './layers/MapsPolygonLayer'
+import { MapsCloudLayer } from './layers/MapsCloudLayer'
+
+// Use only on development
+import { TileImagesLayer } from './layers/TileImagesLayer'
 import { MapsBitmapLayer } from './layers/MapsBitmapLayer'
 import { MapsLabelLayer } from './layers/MapsLabelLayer'
 import { MapsClusterCounts } from './layers/MapsClusterCounts'
-import { MapsCloudLayer } from './layers/MapsCloudLayer'
-import { TileImagesLayer } from './layers/TileImagesLayer'
+
+// import { FootprintMapsLayer } from './layers/FootprintMapsLayer'
+// import { MapsDistributionLayer } from './layers/MapsDistributionLayer'
 
 // UI, Map actions and contexts
 import { selectMap, focusIdleMap, focusMap, removeFocusMap } from '../context/UIActions'
@@ -109,11 +112,11 @@ export const MapExplorer = ({ mode }) => {
   }
 
   const layers = [
-    // [SearchResultLayer, { view: 'all' }],
+    [FootprintShadowLayer, { view: 'master' }],
     [LandmarksLayer, { view: 'master' }],
     // [MapsDistributionLayer, { view: 'master' }]
     // [MapsLabelLayer, { view: 'master' }],
-    [FootprintMapsLayer, { view: 'all' }],
+    // [FootprintMapsLayer, { view: 'all' }],
     [MapsPolygonLayer, { view: 'master', ...handlers }],
     [MapsCloudLayer, { view: 'master' }]
 

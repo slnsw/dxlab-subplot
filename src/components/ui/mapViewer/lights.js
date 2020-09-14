@@ -36,6 +36,6 @@ const lightingEffect = new MyLightingEffect({ ambientLight, directionalLight })
 
 // console.log(lightingEffect);
 
-lightingEffect.shadowColor = [0, 0, 0, 0.3]
+lightingEffect.shadowColor = [0, 0, 0, 0.5]
 
 export default lightingEffect
