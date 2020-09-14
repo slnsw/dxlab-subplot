@@ -31,7 +31,7 @@ export class DraggableSlider extends Slider {
   }
 
   onTrackEventMove (e) {
-    const isTouch = e instanceof TouchEvent
+    const isTouch = window.TouchEvent && e instanceof TouchEvent
     const {
       state: { handles: curr, pixelToStep, prevDragValue = 0, step, domain },
       props: { vertical }
