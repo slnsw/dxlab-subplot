@@ -5,8 +5,10 @@ import { GeoJsonLayer } from '@deck.gl/layers'
 
 import { getYearElevation } from '../../share/utils'
 
+import { sortBy } from 'lodash'
+
 export class MapsCloudLayer extends CompositeLayer {
-  updateState ({ props, changeFlags }) {
+  updateState({ props, changeFlags }) {
     if (changeFlags.dataChanged) {
       const { data } = props
 
@@ -17,24 +19,30 @@ export class MapsCloudLayer extends CompositeLayer {
       const { filters } = this.props
       const { fromYear, toYear } = filters
 
-      // Prepare data for loading sprite maps
-      const mapSpriteData = data.reduce(function (result, el) {
+      // Prepare data for loading sprite maps and sort by offsetZ.
+      // Sorting by offsetZ is important because MosaicBitmapLayer internally
+      // disable depthMask to remove artifacts created by overlapping two PNG
+      // with transparency and the zFighting.
+      const mapSpriteData = sortBy(data.reduce(function (result, el) {
         const { geometry, properties } = el
 
         if (geometry) {
           const { year } = properties
-          const elevation = getYearElevation({ fromYear, toYear, year })
+          const elevation = getYearElevation({ fromYear, toYear, year }) + 1
 
           result.push({
             bounds: properties.image_bounds.coordinates[0].map((c) => [...c]),
             image: properties.asset_id,
             color: [1.0, 0, 0],
-            offsetZ: elevation
+            offsetZ: elevation,
+            opacity: 1
           })
         }
 
         return result
-      }, [])
+      }, []), ['offsetZ'])
+
+
 
       // `${process.env.REACT_APP_SPRITE_MAPING_PATH}`
       // ()['/sprites/subdivisions_']
@@ -65,8 +73,8 @@ export class MapsCloudLayer extends CompositeLayer {
     }
   }
 
-  buildLayers () {
-    const { id, name } = this.props
+  buildLayers() {
+    const { id } = this.props
 
     const layers = []
 
@@ -77,9 +85,12 @@ export class MapsCloudLayer extends CompositeLayer {
       id: `${id}-bitmap-layer-mosaic`,
 
       data: mapSpriteData,
-      imageAtlas: 'sprites/128/subdivisions_4.png',
-      imageMapping: 'sprites/128/subdivisions_4.json',
-      opacity: 0,
+      imageAtlas: 'sprites/128/subdivisions_0.png',
+      imageMapping: 'sprites/128/subdivisions_0.json',
+      pickable: false,
+      autoHighlight: false,
+
+      // opacity: 0,
       // imageAtlas: [
       //     'sprites/subdivisions_0.png',
       //     'sprites/subdivisions_1.png'
@@ -99,15 +110,10 @@ export class MapsCloudLayer extends CompositeLayer {
       // Don't draw shadows in this layer
       shadowEnabled: false,
 
-      parameters: {
-        // Prevent png alpha channel create artifacts when overlapping other PNG files
-        depthMask: false
-      }
-
     }))
 
     // Render dummy shadow surfaces
-    const dummy = new GeoJsonLayer(this.getSubLayerProps({
+    const shadows = new GeoJsonLayer(this.getSubLayerProps({
       id: `${id}-shadow`,
       data: dummyPolygonData,
       extruded: false,
@@ -115,19 +121,15 @@ export class MapsCloudLayer extends CompositeLayer {
       getFillColor: [255, 255, 255, 0],
       getLineColor: [255, 255, 255, 0],
 
-      parameters: {
-        // Prevent png alpha channel create artifacts when overlapping other PNG files
-        depthMask: false
-      }
     }))
 
     layers.push(sprites)
-    layers.push(dummy)
+    layers.push(shadows)
 
     return layers
   }
 
-  renderLayers () {
+  renderLayers() {
     return this.buildLayers()
   }
 }

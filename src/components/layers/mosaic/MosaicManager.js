@@ -1,7 +1,7 @@
 import { loadImage } from '@loaders.gl/images'
 
 export default class MosaicManager {
-  constructor (gl, { onUpdate = () => {} }) {
+  constructor(gl, { onUpdate = () => { } }) {
     this.gl = gl
     this.onUpdate = onUpdate
     this.state = {
@@ -11,7 +11,7 @@ export default class MosaicManager {
     }
   }
 
-  loadAtlases () {
+  loadAtlases() {
     // Load mapping data
     // TODO: Should I move this to getMaps action?
 
@@ -54,11 +54,11 @@ export default class MosaicManager {
       }
 
       // Load images found in the atlases
-      this.loadImages(images)
+      // this.loadImages(images)
     })
   }
 
-  loadImages (urls) {
+  loadImages(urls) {
     Promise.all(
       urls.map(url =>
         loadImage(url)
@@ -71,9 +71,9 @@ export default class MosaicManager {
     })
   }
 
-  getImageMapping (imageId) {
+  getImageMapping(imageId) {
     // console.log(imageId, this.state.atlas[imageId])
-    if (this.state.atlas[imageId] && this.state.atlas[imageId].filename === 'subdivisions_4.png') {
+    if (this.state.atlas[imageId] && this.state.atlas[imageId].filename === 'subdivisions_0.png') {
       return this.state.atlas[imageId] || {}
     } else {
       return {}

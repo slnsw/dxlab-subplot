@@ -36,7 +36,7 @@ void main() {
 
     // See https://stackoverflow.com/questions/19529690/index-expression-must-be-constant-webgl-glsl-error
     int i = int(vertexId);
-    vec3 position = vec3(1.0);
+    vec3 position = vec3(0.0);
     // vec3 bound64xyLow = vec3(1.0);
     if(i == 0) {
         position = vec3(boundX.x, boundY.x, boundZ.x + offsetZ);
@@ -59,16 +59,6 @@ void main() {
 
     gl_Position = project_position_to_clipspace(position, vec3(0.0), vec3(0.0), geometry.position);
     DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
-
-
-
-
-    // geometry.worldPosition = bounds;
-    // geometry.uv = texCoords;
-    // gl_Position = project_position_to_clipspace(bounds, bounds64xyLow, vec3(0.0), geometry.position);
-    // gl_Position = project_position_to_clipspace(positions, vec2(0.0), vec3(0.0), geometry.position);
-    // DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
-
 
 
     // Calculate uv rotation if required
