@@ -8,7 +8,7 @@ import { getYearElevation } from '../../share/utils'
 import { sortBy } from 'lodash'
 
 export class MapsCloudLayer extends CompositeLayer {
-  updateState({ props, changeFlags }) {
+  updateState ({ props, changeFlags }) {
     if (changeFlags.dataChanged) {
       const { data } = props
 
@@ -42,8 +42,6 @@ export class MapsCloudLayer extends CompositeLayer {
         return result
       }, []), ['offsetZ'])
 
-
-
       // `${process.env.REACT_APP_SPRITE_MAPING_PATH}`
       // ()['/sprites/subdivisions_']
 
@@ -73,7 +71,7 @@ export class MapsCloudLayer extends CompositeLayer {
     }
   }
 
-  buildLayers() {
+  buildLayers () {
     const { id } = this.props
 
     const layers = []
@@ -108,7 +106,7 @@ export class MapsCloudLayer extends CompositeLayer {
       // Ignore material in lighting effect
       material: false,
       // Don't draw shadows in this layer
-      shadowEnabled: false,
+      shadowEnabled: false
 
     }))
 
@@ -119,7 +117,7 @@ export class MapsCloudLayer extends CompositeLayer {
       extruded: false,
       getLineWidth: 0,
       getFillColor: [255, 255, 255, 0],
-      getLineColor: [255, 255, 255, 0],
+      getLineColor: [255, 255, 255, 0]
 
     }))
 
@@ -129,7 +127,7 @@ export class MapsCloudLayer extends CompositeLayer {
     return layers
   }
 
-  renderLayers() {
+  renderLayers () {
     return this.buildLayers()
   }
 }

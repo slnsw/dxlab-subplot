@@ -7,7 +7,7 @@ import fs from './mosaic-bitmap-layer-fragment.glsl'
 import MosaicManager from './MosaicManager'
 
 const DEFAULT_TEXTURE_PARAMETERS = {
-  [GL.TEXTURE_MIN_FILTER]: GL.NEAREST, //GL.LINEAR_MIPMAP_LINEAR,
+  [GL.TEXTURE_MIN_FILTER]: GL.NEAREST, // GL.LINEAR_MIPMAP_LINEAR,
   [GL.TEXTURE_MAG_FILTER]: GL.NEAREST, // GL.LINEAR,
   [GL.TEXTURE_WRAP_S]: GL.CLAMP_TO_EDGE,
   [GL.TEXTURE_WRAP_T]: GL.CLAMP_TO_EDGE
@@ -42,11 +42,11 @@ const defaultProps = {
  * @param {number} props.tintColor - color bias
  */
 export class MosaicBitmapLayer extends Layer {
-  getShaders() {
+  getShaders () {
     return super.getShaders({ vs, fs, modules: [project32, picking] }) // 'picking'
   }
 
-  initializeState() {
+  initializeState () {
     const attributeManager = this.getAttributeManager()
 
     attributeManager.remove(['instancePickingColors'])
@@ -139,7 +139,7 @@ export class MosaicBitmapLayer extends Layer {
     })
   }
 
-  trnBounds(coords) {
+  trnBounds (coords) {
     const positions = []
     // [[minX, minY], [minX, maxY], [maxX, maxY], [maxX, minY]]
     for (let i = 0; i < coords.length; i++) {
@@ -151,7 +151,7 @@ export class MosaicBitmapLayer extends Layer {
     return positions
   }
 
-  calculatePositions(attribute, { data, numInstances }) {
+  calculatePositions (attribute, { data, numInstances }) {
     const { calculatePositions } = this.state
     // Split bounds only ones
     // Weird solution but when I assign the values directly
@@ -188,7 +188,7 @@ export class MosaicBitmapLayer extends Layer {
     attribute.value = new Float32Array(values)
   }
 
-  updateState({ props, oldProps, changeFlags }) {
+  updateState ({ props, oldProps, changeFlags }) {
     // console.log('update', changeFlags);
     // setup model first
     const { mosaicManager } = this.state
@@ -233,7 +233,7 @@ export class MosaicBitmapLayer extends Layer {
     }
   }
 
-  finalizeState() {
+  finalizeState () {
     super.finalizeState()
 
     // if (this.state.bitmapTexture) {
@@ -241,7 +241,7 @@ export class MosaicBitmapLayer extends Layer {
     // }
   }
 
-  _getModel(gl) {
+  _getModel (gl) {
     if (!gl) {
       return null
     }
@@ -279,7 +279,7 @@ export class MosaicBitmapLayer extends Layer {
     )
   }
 
-  draw(opts) {
+  draw (opts) {
     const { uniforms } = opts
     const { model, texture } = this.state
     // const { transparentColor, tintColor } = this.props
@@ -294,16 +294,15 @@ export class MosaicBitmapLayer extends Layer {
     // gl.uniform1iv(textureLoc, [0, 1, 2, 3, 4])
     // console.log(program, textureLoc)
 
-
-    // Temporally disable depthMask to help to prevent zFighting of 
+    // Temporally disable depthMask to help to prevent zFighting of
     // overlapping images with alpha channels. eg PNG
-    const { gl } = this.context;
+    const { gl } = this.context
     withParameters(gl, {
       blend: true,
       depthMask: false,
       depthTest: true,
       blendFunc: [GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA, GL.ONE, GL.ONE_MINUS_SRC_ALPHA],
-      blendEquation: GL.FUNC_ADD,
+      blendEquation: GL.FUNC_ADD
     }, () => {
       model
         .setUniforms({
@@ -316,15 +315,13 @@ export class MosaicBitmapLayer extends Layer {
         })
         .draw()
     })
-
-
   }
 
-  onManagerUpdate() {
+  onManagerUpdate () {
     this.setNeedsRedraw()
   }
 
-  loadTexture(imageAtlas) {
+  loadTexture (imageAtlas) {
     const { gl } = this.context
     const texture = new Texture2D(gl, {
       data: imageAtlas,
@@ -335,12 +332,12 @@ export class MosaicBitmapLayer extends Layer {
     this.setState({ texture })
   }
 
-  getImageFrame(imageId) {
+  getImageFrame (imageId) {
     const rect = this.state.mosaicManager.getImageMapping(imageId)
     return [rect.x || 0, rect.y || 0, rect.w || 0, rect.h || 0]
   }
 
-  getImageRotated(imageId) {
+  getImageRotated (imageId) {
     const { rotated } = this.state.mosaicManager.getImageMapping(imageId)
     return (rotated) ? 1 : 0
   }
