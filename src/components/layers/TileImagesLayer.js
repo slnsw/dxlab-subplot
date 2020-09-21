@@ -3,7 +3,7 @@
 import { CompositeLayer } from 'deck.gl'
 import { BitmapLayer, GeoJsonLayer } from '@deck.gl/layers'
 
-import { getImageUrl, interpolateScale, makeCancelable } from '../../share/utils'
+import { getImageUrl } from '../../share/utils/helpers'
 
 import { load } from '@loaders.gl/core'
 import { max, min, get } from 'lodash'

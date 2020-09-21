@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 import { PropTypes } from 'prop-types'
 import { MapDataContext } from '../../../context/MapsContext'
 import { UIContext } from '../../../context/UIContext'
-import { getImageUrl } from '../../../share/utils'
+import { getImageUrl } from '../../../share/utils/helpers'
 import styles from './Header.module.scss'
 
 import { get } from 'lodash'

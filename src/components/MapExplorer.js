@@ -20,10 +20,10 @@ import { MapsPolygonLayer } from './layers/MapsPolygonLayer'
 import { MapsCloudLayer } from './layers/MapsCloudLayer'
 
 // Use only on development
-import { TileImagesLayer } from './layers/TileImagesLayer'
-import { MapsBitmapLayer } from './layers/MapsBitmapLayer'
-import { MapsLabelLayer } from './layers/MapsLabelLayer'
-import { MapsClusterCounts } from './layers/MapsClusterCounts'
+// import { TileImagesLayer } from './layers/TileImagesLayer'
+// import { MapsBitmapLayer } from './layers/MapsBitmapLayer'
+// import { MapsLabelLayer } from './layers/MapsLabelLayer'
+// import { MapsClusterCounts } from './layers/MapsClusterCounts'
 
 // import { FootprintMapsLayer } from './layers/FootprintMapsLayer'
 // import { MapsDistributionLayer } from './layers/MapsDistributionLayer'
@@ -76,6 +76,17 @@ export const MapExplorer = ({ mode }) => {
       UIDispatch(removeFocusMap())
     }
   })
+
+  const handleGeoSearchResult = (result) => {
+    // console.log(result.place_name, result.geometry)
+
+    // TODO: Move this code to the map context
+    // const { geoIndex } = mapState
+    // if (geoIndex) {
+    // console.log(geoIndex.countIntersectWithin(result.geometry, 2))
+    // }
+
+  }
 
   // LAYERS CONFIGURATIONS
   // Note: DeckGL creates a custom React context for managing layers data
@@ -148,6 +159,7 @@ export const MapExplorer = ({ mode }) => {
         mode={mode}
         layers={layers}
         uiContext={[uiState, UIDispatch]}
+        onGeoLookupSearchResult={handleGeoSearchResult}
       />
 
       <Fog />

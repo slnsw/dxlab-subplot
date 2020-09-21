@@ -1,7 +1,7 @@
 
 import { CompositeLayer } from 'deck.gl'
 import { BitmapLayer, GeoJsonLayer } from '@deck.gl/layers'
-import { getImageUrl } from '../../share/utils'
+import { getImageUrl } from '../../share/utils/helpers'
 import { load } from '@loaders.gl/core'
 
 import { get } from 'lodash'

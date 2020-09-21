@@ -7,7 +7,7 @@ import { unSelectMap } from '../../../context/UIActions'
 import IdleTimer from 'react-idle-timer'
 import ReactModal from 'react-modal'
 import Zoomable from './Zoomable'
-import { getImageUrl } from '../../../share/utils'
+import { getImageUrl } from '../../../share/utils/helpers'
 
 import { get } from 'lodash'
 

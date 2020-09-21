@@ -3,7 +3,7 @@ import { CompositeLayer } from 'deck.gl'
 import { MosaicBitmapLayer } from './mosaic/MosaicBitmapLayer'
 import { GeoJsonLayer } from '@deck.gl/layers'
 
-import { getYearElevation } from '../../share/utils'
+import { getYearElevation } from '../../share/utils/helpers'
 
 import { sortBy } from 'lodash'
 

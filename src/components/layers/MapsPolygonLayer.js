@@ -3,7 +3,7 @@
 import { CompositeLayer } from 'deck.gl'
 import { GeoJsonLayer, TextLayer } from '@deck.gl/layers'
 
-import { getImageUrl, getYearElevation } from '../../share/utils'
+import { getImageUrl, getYearElevation } from '../../share/utils/helpers'
 
 import { load } from '@loaders.gl/core'
 import { max, min, get } from 'lodash'

@@ -2,7 +2,7 @@
 import { CompositeLayer } from 'deck.gl'
 import { PolygonLayer } from '@deck.gl/layers'
 
-import { MergeGeoJsonPolygon } from '../../share/utils'
+import { MergeGeoJsonPolygon } from '../../share/utils/geospatial'
 
 export class FootprintMapsLayer extends CompositeLayer {
   updateState ({ props, changeFlags }) {

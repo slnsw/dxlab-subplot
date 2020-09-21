@@ -11,20 +11,24 @@ export const ActionTypes = {
 export function mapsReducer (state, action) {
   switch (action.type) {
     case ActionTypes.MAPS_DATA_COMPLETE: {
-      const { filters, dataSet, data, meta } = action
+      const { filters, dataSet, dataSetGeoIndex, data, geoIndex, meta } = action
       return {
         ...state,
         filters,
         dataSet, // Unfiltered data
+        dataSetGeoIndex,
         data,
+        geoIndex,
         meta
       }
     }
 
     case ActionTypes.MAPS_FILTER_COMPLETE: {
+      const { data, geoIndex } = action
       return {
         ...state,
-        data: action.data,
+        data,
+        geoIndex,
         filters: {
           ...state.filters,
           ...action.filters

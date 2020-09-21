@@ -13,9 +13,7 @@ function App () {
       fromYear: 1890, // 1894,
       toYear: 1897, // 1914,
       // colored: true,
-      assetIds: null,
-      around: null,
-      aroundRadius: null
+      assetIds: null
     }
 
   }
