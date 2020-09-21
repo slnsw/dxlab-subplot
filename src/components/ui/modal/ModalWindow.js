@@ -37,7 +37,7 @@ export class ModalWindow extends Component {
 
   onRelateClick (asset_id) {
     // const [state, dispatch] = this.context
-    // const data = get(state, 'maps.data', [])
+    // const data = get(state, 'data', [])
     // const select = find(data, ['properties.asset_id', asset_id])
     // if (select) {
     //     dispatch(selectMap(select))

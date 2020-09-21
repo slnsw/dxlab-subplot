@@ -9,20 +9,15 @@ import { UIProvider } from './context/UIContext'
 
 function App () {
   const initial = {
-    maps: {
-      data: [],
-      filters: {
-        fromYear: 1890, // 1894,
-        toYear: 1897, // 1914,
-        // colored: true,
-        assetIds: null,
-        around: null,
-        aroundRadius: null
-      }
-    },
-    comm: {
-
+    filters: {
+      fromYear: 1890, // 1894,
+      toYear: 1897, // 1914,
+      // colored: true,
+      assetIds: null,
+      around: null,
+      aroundRadius: null
     }
+
   }
 
   return (

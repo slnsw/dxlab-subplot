@@ -9,7 +9,7 @@ export function getMaps ({ ...query }) {
       const { around } = query
       const radius = get(around, 'properties.radius', null)
 
-      const filters = updateFilters(state.maps.filters, { radius, ...query })
+      const filters = updateFilters(state.filters, { radius, ...query })
 
       loadData()
         .then((data) => {
@@ -45,8 +45,8 @@ export function applyFilters ({ ...query }) {
     const { around } = query
     const radius = get(around, 'properties.radius', null)
 
-    const filters = updateFilters(state.maps.filters, { radius, ...query })
-    const data = filterData(state.maps.dataSet, filters)
+    const filters = updateFilters(state.filters, { radius, ...query })
+    const data = filterData(state.dataSet, filters)
 
     dispatch({
       type: ActionTypes.MAPS_FILTER_COMPLETE,
@@ -89,7 +89,7 @@ export function getMapsRaw ({ around, fromYear, toYear, assetIds }) {
     // Get data
     // const data = [];
     const filters = pickBy({
-      ...state.maps.filters,
+      ...state.filters,
       ...(around && { around }),
       ...(radius && { aroundRadius: radius }),
       ...(fromYear && { fromYear }),

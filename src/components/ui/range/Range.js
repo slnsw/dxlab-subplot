@@ -14,9 +14,9 @@ export const Range = () => {
   const [histState, setHistState] = useState([])
   const [mapState, mapDispatch] = useContext(MapDataContext)
   // const [uiState, UIDispatch] = useContext(UIContext)
-  const dataSet = get(mapState, 'maps.dataSet', [])
-  const filters = get(mapState, 'maps.filters', {})
-  const meta = get(mapState, 'maps.meta', {})
+  const dataSet = get(mapState, 'dataSet', [])
+  const filters = get(mapState, 'filters', {})
+  const meta = get(mapState, 'meta', {})
 
   useEffect(() => {
     setState({

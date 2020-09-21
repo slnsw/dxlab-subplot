@@ -11,9 +11,9 @@ export const Header = ({ uiContext }) => {
   const [state] = useContext(MapDataContext)
   const [uiState] = useContext(UIContext)
 
-  const fromYear = get(state, 'maps.filters.fromYear', 0)
-  const toYear = get(state, 'maps.filters.toYear', 0)
-  const data = get(state, 'maps.data', [])
+  const fromYear = get(state, 'filters.fromYear', 0)
+  const toYear = get(state, 'filters.toYear', 0)
+  const data = get(state, 'data', [])
 
   let focus = get(uiState, 'focus')
   const isIdle = get(uiState, 'isIdle', false)

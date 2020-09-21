@@ -20,6 +20,7 @@ import bearing from '@turf/bearing'
 import lightingEffect from './lights'
 import styles from './MapViewer.module.scss'
 
+// TODO: Set this as a prop
 // Geocoder, execute geo-search around sydney
 const proximity = { longitude: 151.21065829636484, latitude: -33.86631790142455 }
 const mapRef = React.createRef()
@@ -64,11 +65,10 @@ export const MapViewer = ({ mode, layers, ...props }) => {
   }, [uiState.focus, uiState])
 
   // Instantiate layers and inject maps and filter data from the context.
-  // WARNING: Doing this because has a layer context and because the layers
-  // are Class components only one context can be set. At the moment of coding
+  // WARNING: Doing this because DeckGL layers had already context and they the DeckGL layers
+  // are Class components so only one context can be set. At the moment of coding
   // this projects Functional Layer components where not available.
-  const { maps = {} } = mapState
-  const { data, filters } = maps
+  const { data, filters } = mapState
   const preparedLayers = [...layers.map(([L, props]) => {
     props = {
       ...props,
@@ -79,7 +79,7 @@ export const MapViewer = ({ mode, layers, ...props }) => {
     return new L({ mapsContext: state, dispatch: mapDispatch, ...props })
   })]
 
-  // getting Mapbox viewstate and style
+  // getting Mapbox viewState and style
   const { viewState } = state
   const mapStyle = (process.env.REACT_APP_MAPBOX_STYLE) ? `${process.env.REACT_APP_MAPBOX_STYLE}` : MAP_STYLE
 
@@ -105,10 +105,11 @@ export const MapViewer = ({ mode, layers, ...props }) => {
   }
 
   const handleOnResult = (event) => {
-    const { onResult } = props
+    const { onGeoLookupSearchResult } = props
 
-    if (onResult) {
-      onResult(event)
+    if (onGeoLookupSearchResult) {
+      const { result } = event
+      onGeoLookupSearchResult(result)
     }
   }
 
@@ -186,7 +187,7 @@ export const MapViewer = ({ mode, layers, ...props }) => {
 MapViewer.propTypes = {
   mode: PropTypes.oneOf(['kiosk', 'master', 'slave']),
   layers: PropTypes.array,
-  onResult: PropTypes.func,
+  onGeoLookupSearchResult: PropTypes.func,
   onViewChange: PropTypes.func,
   uiContext: PropTypes.array
 }

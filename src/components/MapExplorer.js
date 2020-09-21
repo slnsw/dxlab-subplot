@@ -42,6 +42,7 @@ export const MapExplorer = ({ mode }) => {
   const [mapState, mapDispatch] = useContext(MapDataContext)
   const [uiState, UIDispatch] = useContext(UIContext)
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const _mapDispatch = useCallback(mapDispatch, [])
 
   // Load map data
@@ -59,7 +60,7 @@ export const MapExplorer = ({ mode }) => {
     onIdle: (_) => {
       // Get current filtered data and
       // select a random map from current range
-      const selected = sample(get(mapState, 'maps.data', []))
+      const selected = sample(get(mapState, 'data', []))
       // Set selected as focus
       UIDispatch(focusIdleMap({
         ...selected,
@@ -76,6 +77,7 @@ export const MapExplorer = ({ mode }) => {
     }
   })
 
+  // LAYERS CONFIGURATIONS
   // Note: DeckGL creates a custom React context for managing layers data
   // For that reason I am force to Initialize layers inside of the map explorer
   // them inject the custom MapContext.

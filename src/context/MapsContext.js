@@ -5,15 +5,14 @@ import { thunkDispatch } from './utils'
 export const MapDataContext = React.createContext()
 
 const initialState = {
-  maps: {
-    data: [],
-    meta: {
-      maxYear: 0,
-      minYear: 0
-    },
-    filter: {}
+  data: [],
+  dataSet: [],
+  meta: {
+    maxYear: 0,
+    minYear: 0
   },
-  comm: {}
+  filter: {},
+  status: {}
 }
 
 export function MapsProvider (props) {

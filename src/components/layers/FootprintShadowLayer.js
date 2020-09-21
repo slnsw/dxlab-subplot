@@ -3,22 +3,21 @@ import { CompositeLayer } from 'deck.gl'
 import { GeoJsonLayer } from '@deck.gl/layers'
 
 export class FootprintShadowLayer extends CompositeLayer {
-
   /**
    * Return an GeoJSON of all sydney area.
    * This layer only is use to get a shadow projection
    * of current selected maps.
    */
-  getGeoJsonSydneyArea() {
+  getGeoJsonSydneyArea () {
     return {
-      "type": "FeatureCollection",
-      "features": [
+      type: 'FeatureCollection',
+      features: [
         {
-          "type": "Feature",
-          "properties": {},
-          "geometry": {
-            "type": "Polygon",
-            "coordinates": [
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Polygon',
+            coordinates: [
               [
                 [
                   149.35638427734375,
@@ -49,11 +48,11 @@ export class FootprintShadowLayer extends CompositeLayer {
   }
 
   renderLayers () {
-    return  new GeoJsonLayer({
-      id: `roi-area`,
+    return new GeoJsonLayer({
+      id: 'roi-area',
       data: this.getGeoJsonSydneyArea(),
       // Transparent we are using this polygon only ask shadow projection
-      getFillColor: [0, 0, 0, 0], 
+      getFillColor: [0, 0, 0, 0]
     })
   }
 }
