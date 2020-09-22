@@ -1,6 +1,6 @@
 import GL from '@luma.gl/constants'
 import { Layer, project32, picking } from '@deck.gl/core'
-import { Model, Geometry, Texture2D, ProgramManager, withParameters } from '@luma.gl/core'
+import { Model, Geometry, Texture2D, withParameters } from '@luma.gl/core' // ProgramManager
 
 import vs from './mosaic-bitmap-layer-vertex.glsl'
 import fs from './mosaic-bitmap-layer-fragment.glsl'

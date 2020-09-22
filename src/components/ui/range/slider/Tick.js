@@ -29,8 +29,7 @@ Tick.propTypes = {
     value: PropTypes.number.isRequired,
     percent: PropTypes.number.isRequired
   }).isRequired,
-  count: PropTypes.number.isRequired,
-  format: PropTypes.func.isRequired
+  count: PropTypes.number.isRequired
 }
 
 Tick.defaultProps = {

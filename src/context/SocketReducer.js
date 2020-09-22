@@ -4,7 +4,7 @@ export const ActionTypes = {
   SOCKET_CONNECT_SERVER_FAILURE: 'SOCKET_CONNECT_SERVER_FAILURE',
 
   SOCKET_EMIT: 'SOCKET_EMIT',
-  SOCKET_RECIVED: 'SOCKET_RECIVED'
+  SOCKET_RECEIVED: 'SOCKET_RECEIVED'
 
 }
 
@@ -21,7 +21,7 @@ export function socketReducer (state, action) {
       return state
     }
 
-    case ActionTypes.SOCKET_RECIVED: {
+    case ActionTypes.SOCKET_RECEIVED: {
       return {
         ...state,
         [action.subject]: action.data
