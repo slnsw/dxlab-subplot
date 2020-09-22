@@ -2,6 +2,8 @@
 import RBush from 'rbush'
 import bbox from '@turf/bbox'
 import circle from '@turf/circle'
+import booleanOverlap from '@turf/boolean-overlap'
+import booleanContains from '@turf/boolean-contains'
 import GeoJsonGeometries from 'geojson-geometries'
 
 import { map } from 'lodash'
@@ -76,10 +78,7 @@ export class GeoLookups {
    * @param {*} geometry
    */
   getIntersect (geometry) {
-    const intersect = this._searchIndex(geometry)
-    // Get Intersect features using indexed Ids
-    const idxs = map(intersect, 'id')
-    return idxs.map((idx) => this.features[idx])
+    return this._searchIndex(geometry)
   }
 
   _searchIndex (geometry) {
@@ -94,6 +93,20 @@ export class GeoLookups {
     const [minX, minY, maxX, maxY] = bbox(geometry)
     const query = { minX, minY, maxX, maxY }
     // Search in the index what boundaries intersect with the geometry
-    return this.BBIndex.search(query)
+    const intersect = this.BBIndex.search(query)
+
+    // Test they overlay with the given geometry
+    const idxs = map(intersect, 'id')
+    const match = idxs.reduce((result, idx) => {
+      const geo = this.features[idx]
+      const overlay = booleanOverlap(geo, geometry)
+      const contains = booleanContains(geo, geometry) || booleanContains(geometry, geo)
+      if (overlay || contains) {
+        result.push(geo)
+      }
+      return result
+    }, [])
+
+    return match
   }
 }
