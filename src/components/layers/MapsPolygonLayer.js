@@ -80,7 +80,7 @@ export class MapsPolygonLayer extends CompositeLayer {
   }
 
   buildLayers () {
-    const { id, name, mapsContext, suffix, uiContext } = this.props
+    const { id, suffix, uiContext } = this.props
     const { feature: { features } } = this.state
     const layers = []
 

@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 import { ModalWindow } from './ui/modal/ModalWindow'
 import { Range } from './ui/range/Range'
 import { Header } from './ui/header/Header'
+import { LookupInfo } from './ui/lookups/LookupInfo'
 import { Fog } from './ui/fog/Fog'
 import { MapViewer } from './ui/mapViewer/MapViewer'
 // import { MapViewer } from './MapViewerOld'
@@ -16,6 +17,7 @@ import { useIdleTimer } from 'react-idle-timer'
 // Data visualization and info layers
 import { LandmarksLayer } from './layers/LandmarksLayer'
 import { FootprintShadowLayer } from './layers/FootprintShadowLayer'
+import { SearchAreaLayer } from './layers/SearchAreaLayer'
 import { MapsPolygonLayer } from './layers/MapsPolygonLayer'
 import { MapsCloudLayer } from './layers/MapsCloudLayer'
 
@@ -31,7 +33,7 @@ import { MapsCloudLayer } from './layers/MapsCloudLayer'
 // UI, Map actions and contexts
 import { selectMap, focusIdleMap, focusMap, removeFocusMap } from '../context/UIActions'
 import { MapDataContext } from '../context/MapsContext'
-import { getMaps } from '../context/MapsActions'
+import { getMaps, getMapsWithin, clearMapsWithin } from '../context/MapsActions'
 import { UIContext } from '../context/UIContext'
 
 // Utils
@@ -70,6 +72,9 @@ export const MapExplorer = ({ mode }) => {
 
       // Restart Idle
       reset()
+
+      // Clean search near lookups
+      // mapDispatch(clearMapsWithin())
     },
     onActive: (_) => {
       // User no longer inactive
@@ -78,14 +83,12 @@ export const MapExplorer = ({ mode }) => {
   })
 
   const handleGeoSearchResult = (result) => {
-    // console.log(result.place_name, result.geometry)
+    // Find closest maps to the search
+    mapDispatch(getMapsWithin({ center: result.geometry, radius: 2, placeName: result.place_name }))
+  }
 
-    // TODO: Move this code to the map context
-    // const { geoIndex } = mapState
-    // if (geoIndex) {
-    // console.log(geoIndex.countIntersectWithin(result.geometry, 2))
-    // }
-
+  const handleViewChange = (viewstate) => {
+    // console.log('change view')
   }
 
   // LAYERS CONFIGURATIONS
@@ -126,6 +129,7 @@ export const MapExplorer = ({ mode }) => {
 
   const layers = [
     [FootprintShadowLayer, { view: 'master' }],
+    [SearchAreaLayer, { view: 'master' }],
     [LandmarksLayer, { view: 'master' }],
     // [MapsDistributionLayer, { view: 'master' }]
     // [MapsLabelLayer, { view: 'master' }],
@@ -152,6 +156,7 @@ export const MapExplorer = ({ mode }) => {
       {ready > 0 &&
         <>
           <Header />
+          <LookupInfo />
           <Range />
         </>}
 
@@ -160,6 +165,7 @@ export const MapExplorer = ({ mode }) => {
         layers={layers}
         uiContext={[uiState, UIDispatch]}
         onGeoLookupSearchResult={handleGeoSearchResult}
+        onViewChange={handleViewChange}
       />
 
       <Fog />

@@ -12,7 +12,8 @@ const initialState = {
     minYear: 0
   },
   filter: {},
-  status: {}
+  status: {},
+  near: {}
 }
 
 export function MapsProvider (props) {

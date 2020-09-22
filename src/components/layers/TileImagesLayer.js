@@ -105,7 +105,7 @@ export class TileImagesLayer extends CompositeLayer {
   }
 
   buildLayers () {
-    const { id, name, mapsContext, suffix } = this.props
+    const { id, name, mapContext, suffix } = this.props
     const { feature: { features } } = this.state
     const layers = []
 
@@ -113,9 +113,9 @@ export class TileImagesLayer extends CompositeLayer {
     const lod = [8, 16, 32, 64, 128, 512] //, 1024]
     const scale = scaleLinear([4, 18], [0, lod.length - 1])
 
-    // TODO: Decouple this context from this layer. Option inject focus via props
-    const inFocus = get(mapsContext, 'maps.focus.properties.asset_id', null)
-    // const inFocusYear = get(mapsContext, 'maps.focus.properties.year', null)
+    const [mapState] = mapContext
+    const inFocus = get(mapState, 'focus.properties.asset_id', null)
+    // const inFocusYear = get(mapState, 'focus.properties.year', null)
 
     const geoJsonFillLayer = new GeoJsonLayer(this.getSubLayerProps({
       id: `${id}-geojson-cutlines`,

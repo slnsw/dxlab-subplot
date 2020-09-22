@@ -1,0 +1,25 @@
+$TEXT_COLOR : #ffc400;
+
+.container {
+    z-index: 200;
+    position: absolute;
+    display: block;
+    height: 100vh;
+    width: 100vw;
+    background: radial-gradient(circle, rgba(247,247,247,0) 0%, rgba(112,112,122,.1) 25%,   rgba(0,0,0,1) 100%);
+    pointer-events: none;
+ }
+
+ .info {
+    margin-left: 300px;
+    margin-top: 20px;
+    color: white;
+
+    p {
+        margin: 2px;
+
+        span {
+            color: $TEXT_COLOR;
+        }
+    }
+ }

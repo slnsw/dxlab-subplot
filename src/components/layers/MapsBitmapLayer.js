@@ -64,12 +64,12 @@ export class MapsBitmapLayer extends CompositeLayer {
   }
 
   buildLayers () {
-    const { id, name, mapsContext } = this.props
+    const { id, name, mapContext } = this.props
     const { feature: { features } } = this.state
     const layers = []
 
-    // TODO: Decouple this context from this layer. Option inject focus via props
-    const inFocus = get(mapsContext, 'maps.focus.properties.asset_id', null)
+    const [mapState] = mapContext
+    const inFocus = get(mapState, 'focus.properties.asset_id', null)
 
     layers.push(new GeoJsonLayer(this.getSubLayerProps({
       id: `${id}-bitmap-layer-${name}-cutlines`,

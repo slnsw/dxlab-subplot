@@ -1,6 +1,6 @@
 import { ActionTypes } from './MapsReducer'
 import { fetchData, loadData } from '../share/services'
-import { pickBy, get, identity, some, map, isNumber, max, min } from 'lodash'
+import { pickBy, identity, some, map, isNumber, max, min, get } from 'lodash'
 import { roundYearDown, roundYearUp } from './utils'
 
 // Geolookups
@@ -13,16 +13,19 @@ export function getMaps ({ ...query }) {
 
       loadData()
         .then((data) => {
-        // Get maximum and minimum year
-          const years = map(data, 'properties.year').filter(d => isNumber(d) || !isNaN(d))
           data = (data) || []
+          // Clean data exclude maps with out year
+          data = data.filter((d) => get(d, 'properties.year', 0) > 0)
+
+          // Get a list of years
+          const years = map(data, 'properties.year').filter(d => isNumber(d) || !isNaN(d))
 
           dispatch({
             type: ActionTypes.MAPS_DATA_COMPLETE,
             filters,
             // Full dataset
             dataSet: data,
-            dataSetGeoIndex: new GeoLookups(data),
+            fullGeoIndex: new GeoLookups(data),
 
             // dataset filter by UI options and index
             ...filterData(data, filters),
@@ -61,17 +64,46 @@ export function applyFilters ({ ...query }) {
   }
 }
 
-// export function getMapsWithin ({ center, radius = 2 }) {
-//   return (dispatch, state) => {
-//     const { dataIndex, dataSetIndex }
+export function getMapsWithin ({ center, radius = 2, placeName = '' }) {
+  return (dispatch, state) => {
+    const { geoIndex, fullGeoIndex } = state
+    if (geoIndex && fullGeoIndex) {
+      const near = geoIndex.getIntersectWithin(center, radius)
+      const nearAll = fullGeoIndex.getIntersectWithin(center, radius)
 
-//     dispatch({
-//       type: ActionTypes.MAPS_FILTER_COMPLETE,
-//       filters,
-//       data
-//     })
-//   }
-// }
+      const filterYear = d => isNumber(d) || !isNaN(d)
+      const years = map(near, 'properties.year').filter(filterYear)
+      const yearsAll = map(nearAll, 'properties.year').filter(filterYear)
+
+      dispatch({
+        type: ActionTypes.MAPS_GEO_LOOKUP_COMPLETE,
+        near: {
+          center,
+          radius,
+          placeName,
+          filtered: {
+            data: near,
+            maxYear: max(years),
+            minYear: min(years)
+          },
+          all: {
+            data: nearAll,
+            maxYear: max(yearsAll),
+            minYear: min(yearsAll)
+          }
+        }
+      })
+    }
+  }
+}
+
+export function clearMapsWithin () {
+  return (dispatch, state) => {
+    dispatch({
+      type: ActionTypes.MAPS_GEO_LOOKUP_CLEAN_COMPLETE
+    })
+  }
+}
 
 function updateFilters (current, { fromYear, toYear, assetIds, ...properties }) {
   return pickBy({

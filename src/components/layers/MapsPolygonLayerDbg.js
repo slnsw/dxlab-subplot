@@ -30,14 +30,14 @@ export class MapsPolygonLayerDbg extends CompositeLayer {
   }
 
   buildLayer () {
-    const { id, filters, mapsContext } = this.props
+    const { id, filters, mapContext } = this.props
     const { fromYear, toYear } = filters
     const yearColorScale = scaleLinear([fromYear, toYear], ['gold', 'limegreen'])
 
     const { elev } = this.state
 
-    // TODO: Decouple this context from this layer. Option inject focus via props
-    const inFocus = get(mapsContext, 'maps.focus.properties.asset_id', null)
+    const [mapState] = mapContext
+    const inFocus = get(mapState, 'focus.properties.asset_id', null)
 
     return new GeoJsonLayer({
       id: `${id}-maps-polygon-layer`,

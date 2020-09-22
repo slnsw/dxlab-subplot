@@ -1,6 +1,6 @@
 import 'react-map-gl-geocoder/dist/mapbox-gl-geocoder.css'
 
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import DeckGL from '@deck.gl/react'
@@ -74,9 +74,10 @@ export const MapViewer = ({ mode, layers, ...props }) => {
       ...props,
       data,
       filters,
-      uiContext: [uiState, UIDispatch]
+      uiContext: [uiState, UIDispatch],
+      mapContext: [mapState, mapDispatch]
     }
-    return new L({ mapsContext: state, dispatch: mapDispatch, ...props })
+    return new L({ ...props })
   })]
 
   // getting Mapbox viewState and style
@@ -84,7 +85,7 @@ export const MapViewer = ({ mode, layers, ...props }) => {
   const mapStyle = (process.env.REACT_APP_MAPBOX_STYLE) ? `${process.env.REACT_APP_MAPBOX_STYLE}` : MAP_STYLE
 
   // Handlers
-  const handleViewStateChange = ({ viewState }) => {
+  const handleViewStateChange = useCallback(({ viewState }) => {
     // Important otherwise the map becomes static
     setState({ viewState })
 
@@ -92,17 +93,19 @@ export const MapViewer = ({ mode, layers, ...props }) => {
     if (onViewChange) {
       onViewChange(viewState)
     }
-  }
+  }, [props])
 
-  const handleViewStateSearchChange = (viewState) => {
+  const handleViewStateSearchChange = useCallback((viewState) => {
     // Move map to match location
     handleViewStateChange({
       viewState: {
         ...state.viewState,
-        ...viewState
+        ...viewState,
+        transitionInterpolator: new FlyToInterpolator(),
+        transitionDuration: 3000
       }
     })
-  }
+  }, [handleViewStateChange, state.viewState])
 
   const handleOnResult = (event) => {
     const { onGeoLookupSearchResult } = props

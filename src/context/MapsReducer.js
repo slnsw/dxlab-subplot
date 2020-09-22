@@ -5,18 +5,23 @@ export const ActionTypes = {
 
   MAPS_FILTER_REQUEST: 'MAPS_FILTER_REQUEST',
   MAPS_FILTER_COMPLETE: 'MAPS_FILTER_COMPLETE',
-  MAPS_FILTER_FAIL: 'MAPS_FILTER_FAIL'
+  MAPS_FILTER_FAIL: 'MAPS_FILTER_FAIL',
+
+  MAPS_GEO_LOOKUP_REQUEST: 'MAPS_GEO_LOOKUP_REQUEST',
+  MAPS_GEO_LOOKUP_COMPLETE: 'MAPS_GEO_LOOKUP_COMPLETE',
+  MAPS_GEO_LOOKUP_FAIL: 'MAPS_GEO_LOOKUP_FAIL',
+  MAPS_GEO_LOOKUP_CLEAN_COMPLETE: 'MAPS_GEO_LOOKUP_CLEAN_COMPLETE'
 }
 
 export function mapsReducer (state, action) {
   switch (action.type) {
     case ActionTypes.MAPS_DATA_COMPLETE: {
-      const { filters, dataSet, dataSetGeoIndex, data, geoIndex, meta } = action
+      const { filters, dataSet, fullGeoIndex, data, geoIndex, meta } = action
       return {
         ...state,
         filters,
         dataSet, // Unfiltered data
-        dataSetGeoIndex,
+        fullGeoIndex,
         data,
         geoIndex,
         meta
@@ -33,6 +38,34 @@ export function mapsReducer (state, action) {
           ...state.filters,
           ...action.filters
         }
+      }
+    }
+
+    case ActionTypes.MAPS_GEO_LOOKUP_REQUEST: {
+      return {
+        ...state,
+        near: {}
+      }
+    }
+
+    case ActionTypes.MAPS_GEO_LOOKUP_COMPLETE: {
+      return {
+        ...state,
+        near: action.near
+      }
+    }
+
+    case ActionTypes.MAPS_GEO_LOOKUP_FAIL: {
+      return {
+        ...state,
+        near: {}
+      }
+    }
+
+    case ActionTypes.MAPS_GEO_LOOKUP_CLEAN_COMPLETE: {
+      return {
+        ...state,
+        near: {}
       }
     }
 

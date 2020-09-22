@@ -3,7 +3,7 @@ import { Range as Slider } from './slider/Range'
 import { BarChart } from './BarChart'
 
 import { MapDataContext } from '../../../context/MapsContext'
-import { applyFilters } from '../../../context/MapsActions'
+import { applyFilters, getMapsWithin } from '../../../context/MapsActions'
 
 // import { UIContext } from '../../context/UIContext'
 import { get, debounce } from 'lodash'
@@ -42,6 +42,12 @@ export const Range = () => {
     const [fromYear, toYear] = values
     if (fromYear > 0 && toYear > 0) {
       mapDispatch(applyFilters({ fromYear, toYear }))
+    }
+
+    // Update search lookup info if near data are in the store
+    const { near = {} } = mapState
+    if (Object.keys(near).length !== 0) {
+      mapDispatch(getMapsWithin({ ...near }))
     }
   }, 40)
 
