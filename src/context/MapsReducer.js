@@ -10,7 +10,9 @@ export const ActionTypes = {
   MAPS_GEO_LOOKUP_REQUEST: 'MAPS_GEO_LOOKUP_REQUEST',
   MAPS_GEO_LOOKUP_COMPLETE: 'MAPS_GEO_LOOKUP_COMPLETE',
   MAPS_GEO_LOOKUP_FAIL: 'MAPS_GEO_LOOKUP_FAIL',
-  MAPS_GEO_LOOKUP_CLEAN_COMPLETE: 'MAPS_GEO_LOOKUP_CLEAN_COMPLETE'
+  MAPS_GEO_LOOKUP_CLEAN_COMPLETE: 'MAPS_GEO_LOOKUP_CLEAN_COMPLETE',
+
+  MAPS_UPDATE_VIEW_STATE_COMPLETE: 'MAPS_UPDATE_VIEW_STATE_COMPLETE'
 }
 
 export function mapsReducer (state, action) {
@@ -66,6 +68,16 @@ export function mapsReducer (state, action) {
       return {
         ...state,
         near: {}
+      }
+    }
+
+    case ActionTypes.MAPS_UPDATE_VIEW_STATE_COMPLETE: {
+      return {
+        ...state,
+        viewState: {
+          ...state.viewState,
+          ...action.viewState
+        }
       }
     }
 

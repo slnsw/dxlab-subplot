@@ -42,14 +42,14 @@ export const Header = ({ uiContext }) => {
     <div className={styles.rootStyle}>
       <h1 className={styles.rangeHeaderStyle}> {fromYear} - {toYear} | {data.length}</h1>
       {title && <p className={styles.infoStyle}>[{year}] {title}</p>}
-
+      {/*
       {(showPreview && !isIdle) &&
         <img
           className={styles.imgRootStyle}
           src={url}
           alt={asset_id}
           style={imgStyle}
-        />}
+        />} */}
 
     </div>
   )

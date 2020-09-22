@@ -13,7 +13,8 @@ const initialState = {
   },
   filter: {},
   status: {},
-  near: {}
+  near: {},
+  viewState: {}
 }
 
 export function MapsProvider (props) {

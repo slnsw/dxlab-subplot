@@ -1,13 +1,13 @@
 import React, { useContext } from 'react'
 import { MapDataContext } from '../../../context/MapsContext'
-import { get } from 'lodash'
+import { get, isEmpty } from 'lodash'
 import styles from './LookupInfo.module.scss'
 
 export const LookupInfo = (props) => {
   const [mapState] = useContext(MapDataContext)
 
   const { near = {} } = mapState
-  const show = Object.keys(near).length !== 0
+  const show = !isEmpty(near)
   const { filtered = {}, all = {}, radius, placeName = '' } = near
   const placeNameShort = placeName.split(',').slice(0, 1).join(',')
 

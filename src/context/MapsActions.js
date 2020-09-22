@@ -1,6 +1,6 @@
 import { ActionTypes } from './MapsReducer'
 import { fetchData, loadData } from '../share/services'
-import { pickBy, identity, some, map, isNumber, max, min, get } from 'lodash'
+import { pickBy, identity, some, map, isNumber, max, min, get, isEmpty } from 'lodash'
 import { roundYearDown, roundYearUp } from './utils'
 
 // Geolookups
@@ -101,6 +101,15 @@ export function clearMapsWithin () {
   return (dispatch, state) => {
     dispatch({
       type: ActionTypes.MAPS_GEO_LOOKUP_CLEAN_COMPLETE
+    })
+  }
+}
+
+export function updateViewState ({ ...viewState }) {
+  return (dispatch, state) => {
+    dispatch({
+      type: ActionTypes.MAPS_UPDATE_VIEW_STATE_COMPLETE,
+      viewState
     })
   }
 }

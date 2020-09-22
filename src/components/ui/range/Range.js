@@ -6,7 +6,7 @@ import { MapDataContext } from '../../../context/MapsContext'
 import { applyFilters, getMapsWithin } from '../../../context/MapsActions'
 
 // import { UIContext } from '../../context/UIContext'
-import { get, debounce } from 'lodash'
+import { get, debounce, isEmpty } from 'lodash'
 import styles from './Range.module.scss'
 
 export const Range = () => {
@@ -42,12 +42,6 @@ export const Range = () => {
     const [fromYear, toYear] = values
     if (fromYear > 0 && toYear > 0) {
       mapDispatch(applyFilters({ fromYear, toYear }))
-    }
-
-    // Update search lookup info if near data are in the store
-    const { near = {} } = mapState
-    if (Object.keys(near).length !== 0) {
-      mapDispatch(getMapsWithin({ ...near }))
     }
   }, 40)
 

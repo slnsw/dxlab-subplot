@@ -33,11 +33,13 @@ import { MapsCloudLayer } from './layers/MapsCloudLayer'
 // UI, Map actions and contexts
 import { selectMap, focusIdleMap, focusMap, removeFocusMap } from '../context/UIActions'
 import { MapDataContext } from '../context/MapsContext'
-import { getMaps, getMapsWithin, clearMapsWithin } from '../context/MapsActions'
+import { getMaps, getMapsWithin, clearMapsWithin, updateViewState } from '../context/MapsActions'
 import { UIContext } from '../context/UIContext'
 
 // Utils
-import { get, sample } from 'lodash'
+import { get, sample, isEmpty } from 'lodash'
+import distance from '@turf/distance'
+import { point } from '@turf/helpers'
 
 export const MapExplorer = ({ mode }) => {
   const [state, setState] = useState({ showModal: false, ready: false })
@@ -74,7 +76,7 @@ export const MapExplorer = ({ mode }) => {
       reset()
 
       // Clean search near lookups
-      // mapDispatch(clearMapsWithin())
+      mapDispatch(clearMapsWithin())
     },
     onActive: (_) => {
       // User no longer inactive
@@ -82,13 +84,34 @@ export const MapExplorer = ({ mode }) => {
     }
   })
 
+  useEffect(() => {
+    // Update search lookup info if near data are in the store
+    const { near = {} } = mapState
+    if (!isEmpty(near)) {
+      const { center, radius, placeName } = near
+      mapDispatch(getMapsWithin({ center, radius, placeName }))
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapState.geoIndex])
+
   const handleGeoSearchResult = (result) => {
     // Find closest maps to the search
     mapDispatch(getMapsWithin({ center: result.geometry, radius: 2, placeName: result.place_name }))
   }
 
-  const handleViewChange = (viewstate) => {
+  const handleViewChange = (viewState) => {
     // console.log('change view')
+    mapDispatch(updateViewState(viewState))
+
+    // Calculate if we are still within the lookup zone requested by the user
+    const { near = {} } = mapState
+    if (!isEmpty(near)) {
+      const { center: lookupRoi } = near
+      const { longitude, latitude } = viewState
+      const lookupAt = point([longitude, latitude])
+      const dst = distance(lookupRoi, lookupAt, { units: 'kilometers' })
+      // console.log(dst)
+    }
   }
 
   // LAYERS CONFIGURATIONS
