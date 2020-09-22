@@ -1,6 +1,6 @@
 import { ActionTypes } from './MapsReducer'
 import { fetchData, loadData } from '../share/services'
-import { pickBy, identity, some, map, isNumber, max, min, get, isEmpty } from 'lodash'
+import { pickBy, identity, some, map, isNumber, max, min, get } from 'lodash'
 import { roundYearDown, roundYearUp } from './utils'
 
 // Geolookups

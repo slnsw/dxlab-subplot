@@ -3,10 +3,10 @@ import { Range as Slider } from './slider/Range'
 import { BarChart } from './BarChart'
 
 import { MapDataContext } from '../../../context/MapsContext'
-import { applyFilters, getMapsWithin } from '../../../context/MapsActions'
+import { applyFilters } from '../../../context/MapsActions'
 
 // import { UIContext } from '../../context/UIContext'
-import { get, debounce, isEmpty } from 'lodash'
+import { get, debounce } from 'lodash'
 import styles from './Range.module.scss'
 
 export const Range = () => {
