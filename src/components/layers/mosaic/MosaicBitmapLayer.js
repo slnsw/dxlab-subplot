@@ -6,6 +6,8 @@ import vs from './mosaic-bitmap-layer-vertex.glsl'
 import fs from './mosaic-bitmap-layer-fragment.glsl'
 import MosaicManager from './MosaicManager'
 
+import { range } from 'lodash'
+
 const DEFAULT_TEXTURE_PARAMETERS = {
   [GL.TEXTURE_MIN_FILTER]: GL.NEAREST, // GL.LINEAR_MIPMAP_LINEAR,
   [GL.TEXTURE_MAG_FILTER]: GL.NEAREST, // GL.LINEAR,
@@ -43,7 +45,29 @@ const defaultProps = {
  */
 export class MosaicBitmapLayer extends Layer {
   getShaders () {
-    return super.getShaders({ vs, fs, modules: [project32, picking] }) // 'picking'
+    const texIndex = range(0, 5)
+    const textureShaderModule = {
+      name: 'textures',
+      fs: `
+        ${texIndex.map(i => `
+        uniform sampler2D uTexture${i};`
+        ).join('')}
+
+        vec4 texture_getColor(float index, vec2 pos) { 
+          int i = int(index);
+          ${texIndex.map(i => `
+          if( i == ${i}) {
+            return texture2D(uTexture${i}, pos); 
+          } 
+          `).join('')}
+          return vec4(1.0, 1.0, 0.0, 1.0);
+        }
+      `
+    }
+
+    console.log(textureShaderModule.fs)
+
+    return super.getShaders({ vs, fs, modules: [project32, picking, textureShaderModule] }) // 'picking'
   }
 
   initializeState () {
@@ -112,6 +136,13 @@ export class MosaicBitmapLayer extends Layer {
         divisor: 1,
         transform: this.getImageRotated
       },
+      imageIndex: {
+        size: 1,
+        type: GL.FLOAT,
+        accessor: 'getImage',
+        divisor: 1,
+        transform: this.getImageIndex
+      },
       opacities: {
         size: 1,
         type: GL.FLOAT,
@@ -135,7 +166,7 @@ export class MosaicBitmapLayer extends Layer {
       boundZ: [],
       bounds: [],
       calculatePositions: true,
-      mosaicManager: new MosaicManager(this.context.gl, { onUpdate: () => this.onManagerUpdate() })
+      mosaicManager: new MosaicManager(this.context.gl, { onUpdate: (images) => this.onManagerUpdate(images) })
     })
   }
 
@@ -260,7 +291,7 @@ export class MosaicBitmapLayer extends Layer {
 
     // Create and ID for each vertex so we can access the right vertex position
     const vertexIds = new Float32Array([0, 1, 2, 3])
-
+    console.log('get_model')
     return new Model(
       gl,
       Object.assign({}, this.getShaders(), {
@@ -281,18 +312,8 @@ export class MosaicBitmapLayer extends Layer {
 
   draw (opts) {
     const { uniforms } = opts
-    const { model, texture } = this.state
+    const { model, texture, sprites = [] } = this.state
     // const { transparentColor, tintColor } = this.props
-
-    // console.log(texture.textureUnit)
-    // const { gl } = this.context
-    // // console.log(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS))
-    // // const programs = ProgramManager.getDefaultProgramManager(gl)
-    // const program = model.getProgram().handle
-    // // const program = gl.getParameter(gl.CURRENT_PROGRAM)
-    // const textureLoc = gl.getUniformLocation(program, 'uTextures')
-    // gl.uniform1iv(textureLoc, [0, 1, 2, 3, 4])
-    // console.log(program, textureLoc)
 
     // Temporally disable depthMask to help to prevent zFighting of
     // overlapping images with alpha channels. eg PNG
@@ -308,8 +329,9 @@ export class MosaicBitmapLayer extends Layer {
         .setUniforms({
           ...uniforms,
           debugging: false,
-          uTexture: texture,
-          // uTextures: [texture],
+          // uTexture0: texture,
+          // uTexture1: texture,
+          ...sprites,
           uTextureDim: new Float32Array([texture.width, texture.height])
 
         })
@@ -317,7 +339,17 @@ export class MosaicBitmapLayer extends Layer {
     })
   }
 
-  onManagerUpdate () {
+  onManagerUpdate (textures) {
+    const { gl } = this.context
+    const sprites = {}
+    textures.forEach(({ image, index }) => {
+      sprites[`uTexture${index}`] = new Texture2D(gl, {
+        data: image,
+        mipmaps: false,
+        parameters: DEFAULT_TEXTURE_PARAMETERS
+      })
+    })
+    this.setState({ sprites })
     this.setNeedsRedraw()
   }
 
@@ -340,6 +372,11 @@ export class MosaicBitmapLayer extends Layer {
   getImageRotated (imageId) {
     const { rotated } = this.state.mosaicManager.getImageMapping(imageId)
     return (rotated) ? 1 : 0
+  }
+
+  getImageIndex (imageId) {
+    const { filenameIndex } = this.state.mosaicManager.getImageMapping(imageId)
+    return filenameIndex
   }
 }
 

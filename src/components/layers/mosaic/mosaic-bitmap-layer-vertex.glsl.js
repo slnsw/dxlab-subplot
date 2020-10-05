@@ -20,6 +20,7 @@ attribute vec4 boundZ;
 attribute float offsetZ;
 attribute vec4 imageFrame;
 attribute float imageRotated;
+attribute float imageIndex;
 
 attribute vec3 pickingColors;
 attribute float opacities;
@@ -29,6 +30,7 @@ uniform vec2 uTextureDim;
 varying vec3 vColor;
 varying vec2 vUV;
 varying float vOpacities;
+varying float vImageIndex;
 
 
 void main() {
@@ -78,6 +80,7 @@ void main() {
 
     // Instance opacity
     vOpacities = opacities;
-    
+    vImageIndex = imageIndex;
+
 }
 `

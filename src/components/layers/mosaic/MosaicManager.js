@@ -36,10 +36,13 @@ export default class MosaicManager {
       const images = []
       const atlas = data.reduce((result, conf) => {
         const filename = conf.filename
-        images.push(`${spritePath}/${filename}`)
+        images.push(`${spritePath}${filename}`)
+        // TODO: Improve me . Getting image index in this way could be buggy
+        // but for now will do.
+        const filenameIndex = images.length - 1
         Object.keys(conf.frames)
           .forEach(key => {
-            result[key] = { ...conf.frames[key], filename }
+            result[key] = { ...conf.frames[key], filename, filenameIndex }
           })
 
         return result
@@ -54,26 +57,25 @@ export default class MosaicManager {
       }
 
       // Load images found in the atlases
-      // this.loadImages(images)
+      this.loadImages(images)
     })
   }
 
   loadImages (urls) {
     Promise.all(
-      urls.map(url =>
+      urls.map((url, i) =>
         loadImage(url)
-          .then(response => response)
+          .then(response => { return { image: response, index: i } })
           .catch(() => { console.error(`can not load ${url}`) })
       )
     ).then(data => {
-      console.log(data)
-      this.onUpdate()
+      this.onUpdate(data)
     })
   }
 
   getImageMapping (imageId) {
     // console.log(imageId, this.state.atlas[imageId])
-    if (this.state.atlas[imageId] && this.state.atlas[imageId].filename === 'subdivisions_0.png') {
+    if (this.state.atlas[imageId]) { // } && this.state.atlas[imageId].filename === 'subdivisions_0.png') {
       return this.state.atlas[imageId] || {}
     } else {
       return {}

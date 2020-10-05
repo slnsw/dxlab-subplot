@@ -6,7 +6,8 @@ export default `
 precision highp float;
 #endif
 
-uniform sampler2D uTexture;
+// NOTE: texture declarations are injected when loading model
+// uniform sampler2D uTexture;
 // uniform sampler2D uTextures[1];
 
 uniform float opacity;
@@ -15,6 +16,7 @@ uniform float debugging;
 varying vec2 vUV;
 varying vec3 vColor;
 varying float vOpacities; 
+varying float vImageIndex;
 
 
 void main() {
@@ -23,7 +25,7 @@ void main() {
     // gl_FragColor = vec4(vColor, vOpacities);
     
     // Just render texture with opacity
-    vec4 texColor = texture2D(uTexture, vUV.xy); 
+    vec4 texColor = texture_getColor(vImageIndex, vUV.xy); //texture2D(uTexture, vUV.xy); 
     // Apply opacity
     vec4 color = mix(vec4(0.0), vec4(texColor.rgb, 1.0), texColor.a * vOpacities);
 
