@@ -1,5 +1,5 @@
 export default `
-#define SHADER_NAME mosaic-bitmap-layer-vertex-shader
+#define SHADER_NAME sprite-bitmap-layer-vertex-shader
 
 attribute vec2 vertices;
 attribute vec2 texCoords;

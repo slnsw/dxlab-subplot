@@ -1,5 +1,5 @@
 export default `
-#define SHADER_NAME mosaic-bitmap-layer-fragment-shader
+#define SHADER_NAME sprite-bitmap-layer-fragment-shader
 
 
 #ifdef GL_ES

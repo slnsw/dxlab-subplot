@@ -2,9 +2,9 @@ import GL from '@luma.gl/constants'
 import { Layer, project32, picking } from '@deck.gl/core'
 import { Model, Geometry, Texture2D, withParameters } from '@luma.gl/core' // ProgramManager
 
-import vs from './mosaic-bitmap-layer-vertex.glsl'
-import fs from './mosaic-bitmap-layer-fragment.glsl'
-import MosaicManager from './MosaicManager'
+import vs from './sprite-bitmap-layer-vertex.glsl'
+import fs from './sprite-bitmap-layer-fragment.glsl'
+import SpriteManager from './SpriteManager'
 
 import { range } from 'lodash'
 
@@ -43,9 +43,16 @@ const defaultProps = {
  * @param {number} props.transparentColor - color to interpret transparency to
  * @param {number} props.tintColor - color bias
  */
-export class MosaicBitmapLayer extends Layer {
+export class SpriteBitmapLayer extends Layer {
   getShaders () {
-    const texIndex = range(0, 5)
+    // Looks like Luma.gl the WebGL deck.gl uses is not
+    // capable of load Array of sampler2D. For that reason
+    // I fallback to old school generation in runtime of the a fragment
+    // shader and taking advantage of Luma shader modules
+    // NOTE: props.sprites is the number of images that are required to load
+    // technically a shader has a limit of sample2D variables so maybe in the future
+    // multiple shaders will be required to load
+    const texIndex = range(0, this.props.sprites)
     const textureShaderModule = {
       name: 'textures',
       fs: `
@@ -57,15 +64,14 @@ export class MosaicBitmapLayer extends Layer {
           int i = int(index);
           ${texIndex.map(i => `
           if( i == ${i}) {
+            // return vec4(1.0, 0.${i}, 0.0, 1.0);
             return texture2D(uTexture${i}, pos); 
           } 
           `).join('')}
-          return vec4(1.0, 1.0, 0.0, 1.0);
+          return vec4(1.0, 0.5, 0.0, 1.0);
         }
       `
     }
-
-    console.log(textureShaderModule.fs)
 
     return super.getShaders({ vs, fs, modules: [project32, picking, textureShaderModule] }) // 'picking'
   }
@@ -130,6 +136,12 @@ export class MosaicBitmapLayer extends Layer {
         divisor: 1,
         transform: this.getImageFrame
       },
+      // imageFrameSize: {
+      //   size: 2,
+      //   accessor: 'getImage',
+      //   divisor: 1,
+      //   transform: this.getImageFrameSize
+      // },
       imageRotated: {
         size: 1,
         accessor: 'getImage',
@@ -166,7 +178,7 @@ export class MosaicBitmapLayer extends Layer {
       boundZ: [],
       bounds: [],
       calculatePositions: true,
-      mosaicManager: new MosaicManager(this.context.gl, { onUpdate: (images) => this.onManagerUpdate(images) })
+      spriteManager: new SpriteManager(this.context.gl, { onUpdate: (images) => this.onManagerUpdate(images) })
     })
   }
 
@@ -220,11 +232,11 @@ export class MosaicBitmapLayer extends Layer {
   }
 
   updateState ({ props, oldProps, changeFlags }) {
-    // console.log('update', changeFlags);
+    // console.log('update', changeFlags)
+
     // setup model first
-    const { mosaicManager } = this.state
+    const { spriteManager, spriteUpdated = false } = this.state
     const attributeManager = this.getAttributeManager()
-    let mosaicChanged = false
 
     if (changeFlags.extensionsChanged) {
       const { gl } = this.context
@@ -235,27 +247,18 @@ export class MosaicBitmapLayer extends Layer {
       this.getAttributeManager().invalidateAll()
     }
 
-    if (props.imageAtlas !== oldProps.imageAtlas) {
-      this.loadTexture(props.imageAtlas)
-    }
-
-    if (props.imageMapping !== oldProps.imageMapping) {
-      mosaicManager.loadAtlases()
-      mosaicChanged = true
-    }
-
-    if (
-      changeFlags.dataChanged ||
-      (changeFlags.updateTriggersChanged &&
-        (changeFlags.updateTriggersChanged.all || changeFlags.updateTriggersChanged.getImage))
+    if (props.path !== oldProps.path ||
+        props.sprite !== oldProps.sprites ||
+        props.prefix !== oldProps.prefix
     ) {
-      // iconManager.setProps({data, getIcon});
-      mosaicChanged = true
+      spriteManager.loadAtlases({ path: props.path, total: props.sprites, prefix: props.prefix })
     }
 
-    if (mosaicChanged) {
+    if (spriteUpdated) {
       attributeManager.invalidate('imageFrame')
       attributeManager.invalidate('imageRotated')
+      attributeManager.invalidate('imageIndex')
+      this.setState({ spriteUpdated: false })
     }
 
     if (props.data !== oldProps.data) {
@@ -291,7 +294,6 @@ export class MosaicBitmapLayer extends Layer {
 
     // Create and ID for each vertex so we can access the right vertex position
     const vertexIds = new Float32Array([0, 1, 2, 3])
-    console.log('get_model')
     return new Model(
       gl,
       Object.assign({}, this.getShaders(), {
@@ -312,8 +314,7 @@ export class MosaicBitmapLayer extends Layer {
 
   draw (opts) {
     const { uniforms } = opts
-    const { model, texture, sprites = [] } = this.state
-    // const { transparentColor, tintColor } = this.props
+    const { model, sprites = [], spriteSize = new Float32Array([0, 0]) } = this.state
 
     // Temporally disable depthMask to help to prevent zFighting of
     // overlapping images with alpha channels. eg PNG
@@ -329,10 +330,8 @@ export class MosaicBitmapLayer extends Layer {
         .setUniforms({
           ...uniforms,
           debugging: false,
-          // uTexture0: texture,
-          // uTexture1: texture,
           ...sprites,
-          uTextureDim: new Float32Array([texture.width, texture.height])
+          uTextureDim: spriteSize
 
         })
         .draw()
@@ -349,8 +348,18 @@ export class MosaicBitmapLayer extends Layer {
         parameters: DEFAULT_TEXTURE_PARAMETERS
       })
     })
-    this.setState({ sprites })
-    this.setNeedsRedraw()
+
+    // Get dimensions from first sprite
+    const texture = sprites.uTexture0
+    let spriteSize = new Float32Array([0, 0])
+    if (texture) {
+      spriteSize = new Float32Array([texture.width, texture.height])
+    }
+
+    this.setState({ sprites, spriteSize, spriteUpdated: true })
+    console.log('ready')
+    // Force update model
+    this.setNeedsUpdate()
   }
 
   loadTexture (imageAtlas) {
@@ -365,20 +374,26 @@ export class MosaicBitmapLayer extends Layer {
   }
 
   getImageFrame (imageId) {
-    const rect = this.state.mosaicManager.getImageMapping(imageId)
+    const rect = this.state.spriteManager.getImageMapping(imageId)
     return [rect.x || 0, rect.y || 0, rect.w || 0, rect.h || 0]
   }
 
   getImageRotated (imageId) {
-    const { rotated } = this.state.mosaicManager.getImageMapping(imageId)
+    const { rotated } = this.state.spriteManager.getImageMapping(imageId)
     return (rotated) ? 1 : 0
   }
 
   getImageIndex (imageId) {
-    const { filenameIndex } = this.state.mosaicManager.getImageMapping(imageId)
-    return filenameIndex
+    const { filenameIndex } = this.state.spriteManager.getImageMapping(imageId)
+    // console.log(filenameIndex)
+    return filenameIndex || 0
   }
+
+  // getImageFrameSize (imageId) {
+  //   const { spriteSize } = this.state.spriteManager.getImageMapping(imageId)
+  //   return spriteSize || [0, 0]
+  // }
 }
 
-MosaicBitmapLayer.layerName = 'MosaicBitmapLayer'
-MosaicBitmapLayer.defaultProps = defaultProps
+SpriteBitmapLayer.layerName = 'SpriteBitmapLayer'
+SpriteBitmapLayer.defaultProps = defaultProps

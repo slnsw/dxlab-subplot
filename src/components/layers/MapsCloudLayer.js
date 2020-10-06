@@ -1,6 +1,6 @@
 
 import { CompositeLayer } from 'deck.gl'
-import { MosaicBitmapLayer } from './mosaic/MosaicBitmapLayer'
+import { SpriteBitmapLayer } from './mosaic/SpriteBitmapLayer'
 import { GeoJsonLayer } from '@deck.gl/layers'
 
 import { getYearElevation } from '../../share/utils/helpers'
@@ -20,7 +20,7 @@ export class MapsCloudLayer extends CompositeLayer {
       const { fromYear, toYear } = filters
 
       // Prepare data for loading sprite maps and sort by offsetZ.
-      // Sorting by offsetZ is important because MosaicBitmapLayer internally
+      // Sorting by offsetZ is important because SpriteBitmapLayer internally
       // disable depthMask to remove artifacts created by overlapping two PNG
       // with transparency and the zFighting.
       const mapSpriteData = sortBy(data.reduce(function (result, el) {
@@ -79,12 +79,15 @@ export class MapsCloudLayer extends CompositeLayer {
     const { mapSpriteData, dummyPolygonData } = this.state
 
     // Render sprite maps
-    const sprites = new MosaicBitmapLayer(this.getSubLayerProps({
-      id: `${id}-bitmap-layer-mosaic`,
+    const sprites = new SpriteBitmapLayer(this.getSubLayerProps({
+      id: `${id}-sprite-bitmap-layer`,
 
       data: mapSpriteData,
-      imageAtlas: 'sprites/128/subdivisions_0.png',
-      imageMapping: 'sprites/128/subdivisions_0.json',
+      // imageAtlas: 'sprites/128/subdivisions_0.png',
+      // imageMapping: 'sprites/128/subdivisions_0.json',
+      sprites: 21,
+      path: 'sprites/512/',
+      // prefix: 'subdivisions_',
       pickable: false,
       autoHighlight: false,
 
