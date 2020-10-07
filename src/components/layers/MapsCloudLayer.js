@@ -5,7 +5,7 @@ import { GeoJsonLayer } from '@deck.gl/layers'
 
 import { getYearElevation } from '../../share/utils/helpers'
 
-import { sortBy } from 'lodash'
+import { sortBy, get } from 'lodash'
 
 export class MapsCloudLayer extends CompositeLayer {
   updateState ({ props, changeFlags }) {
@@ -75,8 +75,13 @@ export class MapsCloudLayer extends CompositeLayer {
     const { id } = this.props
 
     const layers = []
-
     const { mapSpriteData, dummyPolygonData } = this.state
+    const { uiContext } = this.props
+
+    // TODO: Decouple this context from this layer. Option inject focus via props
+    const [uiState] = uiContext
+    const inFocus = get(uiState, 'focus.properties.asset_id', null)
+    const isIdle = get(uiState, 'isIdle', false)
 
     // Render sprite maps
     const sprites = new SpriteBitmapLayer(this.getSubLayerProps({
@@ -85,31 +90,41 @@ export class MapsCloudLayer extends CompositeLayer {
       data: mapSpriteData,
       // imageAtlas: 'sprites/128/subdivisions_0.png',
       // imageMapping: 'sprites/128/subdivisions_0.json',
-      sprites: 21,
-      path: 'sprites/512/',
+      sprites: 5,
+      path: 'sprites/256/',
       // prefix: 'subdivisions_',
       pickable: false,
       autoHighlight: false,
 
-      // opacity: 0,
-      // imageAtlas: [
-      //     'sprites/subdivisions_0.png',
-      //     'sprites/subdivisions_1.png'
-      // ],
-      // imageMapping: [
-      //     'sprites/subdivisions_0.json',
-      //     'sprites/subdivisions_1.json'
-      // ],
-
-      // getOpacity: d => Math.random() * (1 - 0.5) + 0.5,
-      // getOffsetZ: 0, // d => Math.random() * (500 - 0) + 0,
+      getOpacity: d => {
+        if (inFocus !== null && !isIdle) {
+          return (d.image === inFocus) ? 1 : 0.5
+        } else {
+          return 1
+        }
+      },
+      // getOffsetZ: d => {
+      //   if (inFocus !== null) {
+      //     return (d.image === inFocus) ? d.offsetZ : 0
+      //   } else {
+      //     return d.offsetZ
+      //   }
+      // },
 
       // This layer don't cast shadows
       castShadow: false,
       // Ignore material in lighting effect
       material: false,
       // Don't draw shadows in this layer
-      shadowEnabled: false
+      shadowEnabled: false,
+      updateTriggers: {
+        getOpacity: [inFocus, isIdle]
+        // getOffsetZ: [inFocus]
+      },
+      transitions: {
+        getColor: 800
+        // getOffsetZ: 500
+      }
 
     }))
 
