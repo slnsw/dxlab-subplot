@@ -1,127 +1,125 @@
-import React, { Component } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 import { UIContext } from '../../../context/UIContext'
-import { unSelectMap } from '../../../context/UIActions'
+import { MapDataContext } from '../../../context/MapsContext'
+import { unSelectMap, selectMap } from '../../../context/UIActions'
 
 import IdleTimer from 'react-idle-timer'
 import ReactModal from 'react-modal'
 import Zoomable from './Zoomable'
 import { getImageUrl } from '../../../share/utils/helpers'
 
-import { get } from 'lodash'
+import { get, isEmpty, find } from 'lodash'
 
 import styles from './ModalWindow.module.scss'
 
-export class ModalWindow extends Component {
-  constructor () {
-    super()
-    this.state = {
-      isOpen: false
+export const ModalWindow = ({ onRequestClose = () => {} }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [{ title, year, width, height, location_name, asset_id, related = [] }, setSelected] = useState({})
+  const [uiState, uiDispatch] = useContext(UIContext)
+  const [mapState] = useContext(MapDataContext)
+  // eslint-disable-next-line no-unused-vars
+  let idleTimer = null
+
+  useEffect(() => {
+    // Update search lookup info if near data are in the store
+    const { selected = {} } = uiState
+    const open = !isEmpty(selected)
+    setIsOpen(open)
+    if (open) {
+      // const { center, radius, placeName } = near
+      // mapDispatch(getMapsWithin({ center, radius, placeName }))
+
+      const { properties = {} } = selected
+      const { similar = [], ...other } = properties
+
+      const related = similar.filter((rel) => {
+        let show = rel.asset_id !== asset_id
+        if (rel.distance) {
+          show = show && rel.distance <= 5
+        }
+
+        return show
+      })
+
+      setSelected({ related, ...other })
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uiState.selected])
 
-    this.handleCloseModal = this.handleCloseModal.bind(this)
-  }
-
-  handleCloseModal () {
-    const [, dispatch] = this.context
-    const { onRequestClose } = this.props
-    this.setState({ isOpen: false })
+  const handleCloseModal = () => {
+    uiDispatch(unSelectMap())
     if (onRequestClose) {
-      dispatch(unSelectMap())
       onRequestClose()
-    } else {
-      console.error('Please implement onRequestClose')
     }
   }
 
-  onRelateClick (asset_id) {
-    // const [state, dispatch] = this.context
-    // const data = get(state, 'data', [])
-    // const select = find(data, ['properties.asset_id', asset_id])
-    // if (select) {
-    //     dispatch(selectMap(select))
-    // }
-    // // console.log(select)
+  const handleRelateClick = () => {
+    const data = get(mapState, 'dataSet', [])
+    const select = find(data, ['properties.asset_id', asset_id])
+    if (select) {
+      uiDispatch(selectMap(select))
+    }
   }
 
-  render () {
-    const { isOpen } = this.props
+  return (
+    <>
+      <IdleTimer
+        ref={ref => { idleTimer = ref }}
+        element={document}
+        onIdle={handleCloseModal}
+        debounce={250}
+        timeout={1000 * 60 * 0.5}
+      />
 
-    if (!isOpen) { return null }
+      <ReactModal
+        isOpen={isOpen}
+        onRequestClose={handleCloseModal}
+        ariaHideApp={false}
+        className={{ base: styles.modalWindow, afterOpen: styles.afterOpen, beforeClose: styles.beforeClose }}
+        overlayClassName={styles.modalOverlay}
+        closeTimeoutMS={600}
+      >
+        <>
+          <h1 className={styles.modalTitle}> {title} </h1>
 
-    const [state] = this.context
-    let selected = get(state, 'selected')
-    selected = (!selected) ? {} : selected
+          <button className={styles.close} onClick={handleCloseModal}>X</button>
 
-    const { properties = {} } = selected
-    const { similar = [], asset_id, title, year, width, height, location_name } = properties
+          <div className={styles.zoomable}>
+            <Zoomable assetId={asset_id} id='mapZoom' />
+          </div>
 
-    const related = similar.filter((rel) => {
-      let show = rel.asset_id !== asset_id
-      if (rel.distance) {
-        show = show && rel.distance <= 5
-      }
+          <div className={styles.info}>
 
-      return show
-    })
-
-    return (
-      <>
-        <IdleTimer
-          ref={ref => { this.idleTimer = ref }}
-          element={document}
-          onIdle={this.handleCloseModal}
-          debounce={250}
-          timeout={1000 * 60 * 0.5}
-        />
-
-        <ReactModal
-          isOpen={isOpen}
-          onRequestClose={this.handleCloseModal}
-          ariaHideApp={false}
-          className={styles.modalWindow}
-          overlayClassName={styles.modalOverlay}
-        >
-          <>
-            <button className={styles.close} onClick={this.handleCloseModal}>X</button>
-
-            <div className={styles.zoomable}>
-              <Zoomable assetId={asset_id} />
-            </div>
-
-            <div className={styles.info}>
-              <h1 className={styles.modalTitle}> {title} </h1>
-              <ul className={styles.details}>
-                <li>{asset_id}</li>
-                <li>year:  {year}</li>
-                <li>location:  {location_name}</li>
-                <li>image:  ({width} x {height})</li>
+            <div className={styles.details}>
+              <ul>
+                <li><span>ID:</span> {asset_id}</li>
+                <li><span>year: </span>{year}</li>
               </ul>
 
-              <div className={styles.related}>
+              <ul>
+                <li><span>location:</span> {location_name}</li>
+                <li><span>image:</span> ({width} x {height})</li>
+              </ul>
 
-                {related.map((value, index) => {
-                  const image = getImageUrl(value.asset_id, 'uncrop', '256')
-                  return <img key={`rel${index}`} src={image} alt={value.distance} onClick={() => this.onRelateClick(value.asset_id)} />
-                })}
-
-              </div>
             </div>
-          </>
-        </ReactModal>
-      </>
-    )
-  }
-}
 
-ModalWindow.contextType = UIContext
+            <div className={styles.related}>
 
-ModalWindow.defaultProps = {
-  isOpen: false
+              {related.map((value, index) => {
+                const image = getImageUrl(value.asset_id, 'uncrop', '256')
+                return <img key={`rel${index}`} src={image} alt={value.distance} /> // onClick={() => handleRelateClick(value.asset_id)}
+              })}
+
+            </div>
+          </div>
+        </>
+      </ReactModal>
+    </>
+  )
 }
 
 ModalWindow.propTypes = {
-  isOpen: PropTypes.bool,
   onRequestClose: PropTypes.func
 }

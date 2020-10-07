@@ -6,9 +6,18 @@
   padding: $CONTAINER_PADDING;
   z-index: 3001;  
   // display: flex;
-  width: 100vw;
   bottom: 0;
+  right: 0;
   // height: 300px;
+
+  transition: width 200ms ease-in-out;
+  width: 100vw;
+  
+  &.detailMode {
+      width: 50vw;
+  }
+
+
 }
 
 .panel {

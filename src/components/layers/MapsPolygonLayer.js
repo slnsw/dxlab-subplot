@@ -5,7 +5,6 @@ import { GeoJsonLayer, TextLayer } from '@deck.gl/layers'
 
 import { getImageUrl, getYearElevation } from '../../share/utils/helpers'
 
-import { load } from '@loaders.gl/core'
 import { max, min, get } from 'lodash'
 import { scaleLinear } from 'd3-scale'
 
@@ -162,53 +161,8 @@ export class MapsPolygonLayer extends CompositeLayer {
   }
 
   renderLayers () {
-    // console.log('render images')
     return this.buildLayers()
-    // return this.loadImages();
-  }
-
-  loadImage (url, inViewport) {
-    let cancel = null
-    return new Promise((resolve, reject) => {
-      cancel = reject
-      if (inViewport) {
-        // console.log('visible')
-        setTimeout(() => {
-          load(url).then((r) => {
-            // console.log('loaded', r.src);
-            resolve(r)
-          }).catch((err) => {
-            // console.log(err);
-            reject(err)
-          })
-        }
-        , 5000)
-        // resolve()
-      } else {
-        // console.log('hidden')
-        resolve(null)
-      }
-    })
   }
 }
 
 MapsPolygonLayer.layerName = 'MapsPolygonLayer'
-
-MapsPolygonLayer.defaultProps = {
-  // // Shared accessors
-  // getPosition: {type: 'accessor', value: x => x.position},
-  // // Icon properties
-  // iconAtlas: null,
-  // iconMapping: {type: 'object', value: {}, async: true},
-  // // Icon accessors
-  // getIcon: {type: 'accessor', value: x => x.icon},
-  // getIconSize: {type: 'accessor', value: 20},
-  // getIconColor: {type: 'accessor', value: [0, 0, 0, 255]},
-  // // Text properties
-  // // fontFamily: DEFAULT_FONT_FAMILY,
-  // // fontWeight: DEFAULT_FONT_WEIGHT,
-  // // Text accessors
-  // getText: {type: 'accessor', value: x => x.text},
-  // getTextSize: {type: 'accessor', value: 12}
-  // // getTextColor: {type: 'accessor', value: [0, 0, 0, 255]}
-}

@@ -37,12 +37,14 @@ import { getMaps, getMapsWithin, clearMapsWithin, updateViewState } from '../con
 import { UIContext } from '../context/UIContext'
 
 // Utils
-import { get, sample, isEmpty } from 'lodash'
+import { get, sample, isEmpty, find } from 'lodash'
 import distance from '@turf/distance'
 import { point } from '@turf/helpers'
 
 export const MapExplorer = ({ mode }) => {
-  const [state, setState] = useState({ showModal: false, ready: false })
+  const [ready, setReady] = useState(false)
+  const [rangeStyle, setRangeStyle] = useState({})
+  const [showSearch, setShowSearch] = useState(true)
   const [mapState, mapDispatch] = useContext(MapDataContext)
   const [uiState, UIDispatch] = useContext(UIContext)
 
@@ -52,11 +54,9 @@ export const MapExplorer = ({ mode }) => {
   // Load map data
   useEffect(() => {
     _mapDispatch(getMaps({})).then(() => {
-      setState({ ready: true })
+      setReady(true)
     })
   }, [_mapDispatch])
-
-  const { ready, showModal } = state
 
   // Idle logic
   const { reset } = useIdleTimer({
@@ -110,9 +110,26 @@ export const MapExplorer = ({ mode }) => {
       const { longitude, latitude } = viewState
       const lookupAt = point([longitude, latitude])
       const dst = distance(lookupRoi, lookupAt, { units: 'kilometers' })
-      // console.log(dst)
+      // if (dst > 5) {
+      //   // Clean search near lookups
+      //   mapDispatch(clearMapsWithin())
+      // }
     }
   }
+
+  useEffect(() => {
+    const selected = get(uiState, 'selected', {})
+
+    if (!isEmpty(selected)) {
+      setRangeStyle({ width: '50vw' })
+      setShowSearch(false)
+    } else {
+      setRangeStyle({ })
+      setShowSearch(true)
+    }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uiState.selected])
 
   // LAYERS CONFIGURATIONS
   // Note: DeckGL creates a custom React context for managing layers data
@@ -122,16 +139,16 @@ export const MapExplorer = ({ mode }) => {
   // MapExplorer layers structure. [ Layer class, {props} ]
   // view == main or minimap or all
   // TODO: define a prop structure for this.
-
   const handlers = {
     onClick: ({ object }) => {
       // console.log(object)
       if (object) {
-        setState({
-          showModal: true
-        })
         // Update map context to keep track with the selected map
-        UIDispatch(selectMap({ ...object }))
+        // Find map from MapState because the data in Object is been
+        // Modify to properly render polygons
+        const asset_id = get(object, 'properties.asset_id')
+        const select = find(get(mapState, 'data', []), ['properties.asset_id', asset_id])
+        UIDispatch(selectMap({ ...select }))
       }
     },
     onHover: ({ object, x, y }) => {
@@ -170,17 +187,13 @@ export const MapExplorer = ({ mode }) => {
   return (
     <>
 
-      {showModal &&
-        <ModalWindow
-          isOpen={showModal}
-          onRequestClose={() => setState({ showModal: false })}
-        />}
+      <ModalWindow />
 
       {ready > 0 &&
         <>
           <Header />
           <LookupInfo />
-          <Range />
+          <Range style={rangeStyle} />
         </>}
 
       <MapViewer
@@ -189,6 +202,7 @@ export const MapExplorer = ({ mode }) => {
         uiContext={[uiState, UIDispatch]}
         onGeoLookupSearchResult={handleGeoSearchResult}
         onViewChange={handleViewChange}
+        showSearch={showSearch}
       />
 
       <Fog />

@@ -26,7 +26,7 @@ const proximity = { longitude: 151.21065829636484, latitude: -33.86631790142455 
 const mapRef = React.createRef()
 const geocoderContainerRef = React.createRef()
 
-export const MapViewer = ({ mode, layers, ...props }) => {
+export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
   const [mapState, mapDispatch] = useContext(MapDataContext)
   const [uiState, UIDispatch] = useContext(UIContext)
   const [state, setState] = useState({
@@ -65,9 +65,8 @@ export const MapViewer = ({ mode, layers, ...props }) => {
   }, [uiState.focus, uiState])
 
   // Instantiate layers and inject maps and filter data from the context.
-  // WARNING: Doing this because DeckGL layers had already context and they the DeckGL layers
-  // are Class components so only one context can be set. At the moment of coding
-  // this projects Functional Layer components where not available.
+  // WARNING: Doing this because DeckGL layers had already context. At the moment of coding
+  // this project DeckGL layers are Class components so only one context can be set.
   const { data, filters } = mapState
   const preparedLayers = [...layers.map(([L, props]) => {
     props = {
@@ -166,18 +165,18 @@ export const MapViewer = ({ mode, layers, ...props }) => {
           preventStyleDiffing
           ref={mapRef}
         >
-
-          <Geocoder
-            mapRef={mapRef}
-            containerRef={geocoderContainerRef}
-            onResult={handleOnResult}
-            placeholder='Lookup address'
-            countries='au'
-            proximity={proximity}
-            onViewportChange={handleViewStateSearchChange}
-            mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
-            position='top-left'
-          />
+          {showSearch &&
+            <Geocoder
+              mapRef={mapRef}
+              containerRef={geocoderContainerRef}
+              onResult={handleOnResult}
+              placeholder='Lookup address'
+              countries='au'
+              proximity={proximity}
+              onViewportChange={handleViewStateSearchChange}
+              mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
+              position='top-left'
+            />}
 
         </InteractiveMap>
 
@@ -192,5 +191,6 @@ MapViewer.propTypes = {
   layers: PropTypes.array,
   onGeoLookupSearchResult: PropTypes.func,
   onViewChange: PropTypes.func,
-  uiContext: PropTypes.array
+  uiContext: PropTypes.array,
+  showSearch: PropTypes.bool
 }

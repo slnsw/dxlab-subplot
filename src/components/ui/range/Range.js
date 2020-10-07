@@ -1,4 +1,5 @@
 import React, { useEffect, useContext, useState } from 'react'
+import { PropTypes } from 'prop-types'
 import { Range as Slider } from './slider/Range'
 import { BarChart } from './BarChart'
 
@@ -9,7 +10,7 @@ import { applyFilters } from '../../../context/MapsActions'
 import { get, debounce } from 'lodash'
 import styles from './Range.module.scss'
 
-export const Range = () => {
+export const Range = ({ style }) => {
   const [state, setState] = useState({ from: 0, to: 1, maxYear: 1, minYear: 0, histYears: [] })
   const [histState, setHistState] = useState([])
   const [mapState, mapDispatch] = useContext(MapDataContext)
@@ -48,7 +49,7 @@ export const Range = () => {
   return (
     <>
       {maxYear > 1 &&
-        <div className={styles.container}>
+        <div className={styles.container} style={style}>
           <div className={styles.panel}>
             <div className={styles.chart}>
               <BarChart
@@ -68,4 +69,8 @@ export const Range = () => {
         </div>}
     </>
   )
+}
+
+Range.propTypes = {
+  style: PropTypes.object
 }

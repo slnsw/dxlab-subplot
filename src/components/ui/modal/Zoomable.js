@@ -1,42 +1,24 @@
-import React, { Component } from 'react'
+import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
-
 import OSD from 'openseadragon'
-
+import { getImageUrl } from '../../../share/utils/helpers'
 import styles from './Zoomable.module.scss'
 
-export default class Zoomable extends Component {
-  render () {
-    const { id } = this.props
-    return (
-      <>
-        <div className={styles.openseadragon} ref={node => { this.el = node }}>
-          <div className='navigator-wrapper c-shadow'>
-            <div id='navigator' />
-          </div>
-          <div className={styles.container} id={id} />
-        </div>
-      </>
-    )
-  }
+const Zoomable = ({ id, assetId }) => {
+  // eslint-disable-next-line no-unused-vars
+  let el = null
+  // eslint-disable-next-line no-unused-vars
+  const viewer = useRef()
 
-  async initSeaDragon () {
-    const { assetId } = this.props
-    const response = await fetch(`${process.env.REACT_APP_TILED_IMAGE_BASE_URL}/${assetId}.tif/info.json`)
-    const info = await response.json()
-
-    // Temporal solution until I implement an updated version of
-    // Loris or I use another IIIF server
-    info['@id'] = `${process.env.REACT_APP_TILED_IMAGE_BASE_URL}/${assetId}.tif`
-
+  useEffect(() => {
     // Create an instance of OSD
-    const { id } = this.props
+    console.log(id)
     try {
-      if (this.viewer) {
-        this.viewer.destroy()
+      if (viewer.current) {
+        viewer.current.destroy()
       }
 
-      this.viewer = OSD({
+      viewer.current = OSD({
         id: id,
         visibilityRatio: 1.0,
         constrainDuringPan: false,
@@ -44,28 +26,29 @@ export default class Zoomable extends Component {
         minZoomLevel: 1,
         maxZoomLevel: 10,
         showNavigator: false,
-        tileSources: [
-          info
-        ]
+        tileSources: {
+          type: 'image',
+          url: getImageUrl(assetId, 'uncrop', '1024')
+        }
       })
     } catch (error) {
       console.warn(error)
     }
-  }
+  }, [id, assetId])
 
-  componentDidMount () {
-    // this.initSeaDragon()
-  }
-
-  componentDidUpdate () {
-    this.initSeaDragon()
-  }
+  return (
+    <>
+      <div className={styles.openseadragon} ref={node => { el = node }}>
+        <div className='navigator-wrapper c-shadow'>
+          <div id='navigator' />
+        </div>
+        <div className={styles.container} id={id} />
+      </div>
+    </>
+  )
 }
 
-Zoomable.defaultProps = {
-  id: 'ocd-viewer',
-  type: 'legacy-image-pyramid'
-}
+export default Zoomable
 
 Zoomable.propTypes = {
   id: PropTypes.string,

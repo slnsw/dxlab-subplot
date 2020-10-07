@@ -22,7 +22,7 @@ export function UIReducer (state, action) {
     case ActionTypes.UI_MAP_UNSELECT: {
       return {
         ...state,
-        selected: null
+        selected: {}
       }
     }
 

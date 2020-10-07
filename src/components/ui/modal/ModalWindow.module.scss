@@ -1,61 +1,84 @@
-.modalWindow {
+$TEXT_COLOR : #ffc400;
+$CONTENT_PADDING : 30px;
 
+.modalWindow {
+    z-index: 8001;
     position: absolute;
-    background-color: rgba(0, 0, 0, 0.85);
-    // border: 1px solid rgba(125, 125, 125, 0.911);
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding: 50px;
+    background-color: rgba(0, 0, 0, 0.9);
+    border-right: 1px solid rgba(255, 255, 255, .4);
+    height: 100vh;
+    width: calc(50vw - #{$CONTENT_PADDING * 2});
+    padding: $CONTENT_PADDING;
     color: white;
+    
 
     &:focus{
         outline:0;
      }
 
     .modalTitle {
-        color: #fff;
-        text-align: center;
-        font-size: 32px;
-        margin-bottom: 60px;
+        color: $TEXT_COLOR;
+        text-align: left;
+        font-size: 30px;
+        float: left;
+        margin-top: 8px;
+        max-width: 95%;
+        // margin-bottom: 60px;
     }
 
 
     .zoomable {
-        width: 49%;
-        height: 100%;
+        width: 100%;
+        height: 50%;
         background-color: #000000;
-        border: 1px solid rgba(255, 255, 255, .5);
-        float: left;
-    } 
+        // border: 1px solid rgba(255, 255, 255, .5);
+        clear: both;    } 
 
     .info {
         font-size: 20px;
-        float: right;
-        width: 49%;
+        // float: left;
+        // width: 49%;
+        margin-top: 15px;
+        display: block;
 
-        ul {
-            padding: 0;
-            margin: 0;
+        .details {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            margin-bottom: 10px;
 
-            li{
-                margin-top: 15px;
-                list-style: none
+            ul {
+                padding: 0;
+                margin: 0;
+
+                li{
+                    margin-top: 10px;
+                    list-style: none;
+                    color: $TEXT_COLOR;
+
+                    span {
+                        font-weight: 800;
+                        color: #fff;
+                    }
+                }
             }
         }
+
         .related {
             display: flex;
             flex-wrap: wrap;
             align-items: flex-start;
             align-content: center;
+            // overflow-y: auto;
+            // max-height: 300px;
     
             img {
                 margin-top: 10px;
                 margin-right: 10px;
                 cursor: pointer;
             }
-    
+
         }
     
 
@@ -63,7 +86,7 @@
 
     .close {
         font-weight: bolder;
-        font-size: 40px;
+        font-size: 30px;
         color: white;
         background: none;
         border: none;
@@ -76,15 +99,27 @@
         
     }
 
+    transition: left 200ms ease-in-out;
+    left: -56vw;
+    &.afterOpen {
+        left: 0
+    }
+
+    &.beforeClose {
+        left:  -56vw;
+    }
+
 
 }
 
 .modalOverlay {
-    background-color: #000a;
+    // background-color: #000a;
     z-index: 8000;  
     position: fixed;
     top: 0;
-    left: 0;
-    right: 0;
+    // left: 0;
+    // right: 50%;
     bottom: 0;
+    // width: 100vw;
 }
+
