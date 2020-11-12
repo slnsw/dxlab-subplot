@@ -1,0 +1,9 @@
+{
+    "python.pythonPath": "./.venv/bin/python3",
+    "editor.formatOnSave": true,
+    "python.formatting.provider": "yapf",
+    "editor.rulers": [
+        119
+    ],
+
+}

@@ -1,0 +1,16 @@
+**/data
+**/logs
+
+.env
+docker_build.sh
+docker_run.sh
+.style.yapf
+.vscode/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so

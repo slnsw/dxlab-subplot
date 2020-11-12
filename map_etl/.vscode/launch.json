@@ -1,0 +1,165 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Ingest klokan raw data",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "ingest-klokan-raw-data",
+                "--yes"
+            ]
+        },
+        {
+            "name": "Ingest klokan hidden data",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "ingest-klokan-hidden-data",
+                "--yes"
+            ]
+        },
+        {
+            "name": "Donwload klokan assoc files",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "download-klokan-assoc-files",
+                "--yes"
+            ]
+        },
+        {
+            "name": "Ingest klokan world files",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "ingest-klokan-world-files",
+                "--yes"
+            ]
+        },
+        {
+            "name": "Ingest SLNSW raw data",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "ingest-slnsw-raw-data",
+                "--yes"
+            ]
+        },
+        {
+            "name": "Ingest SLNSW comaster images",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "ingest-slnsw-comaster-data",
+                "--yes"
+            ]
+        },
+        {
+            "name": "Ingest SLNSW comaster detect duplicates",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "ingest-slnsw-comaster-duplicates",
+                "--yes"
+            ]
+        },
+        {
+            "name": "Ingest SLNSW Process comaster images",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "ingest-slnsw-comaster-processing",
+                "--yes"
+            ]
+        },
+        {
+            "name": "Ingest search engine hack raw data",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "ingest-search-engine-hack-data",
+                "--yes"
+            ]
+
+        }, {
+            "name": "Ingest search slnsw subdivision index raw data",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "ingest-slnsw-subdivision-index-raw-data",
+                "--yes"
+            ]
+
+        }, {
+            "name": "Ingest search slnsw subdivision raw data",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "ingest-slnsw-subdivision-raw-data",
+                "--yes"
+            ]
+        }, {
+            "name": "Ingest NSW suburb names data",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "ingest-nsw-suburbs-raw-data",
+                "--yes"
+            ]
+
+        }, {
+            "name": "Processing DX map data",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "processing-dx-map-data",
+                "--yes"
+            ]
+        }, {
+            "name": "Generate GEOJson file with the DX map data.",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "generate-dx-geojson-map-data",
+                "--yes"
+            ]
+        }
+
+
+
+
+    ]
+}
