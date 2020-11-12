@@ -86,12 +86,9 @@ export class MapsCloudLayer extends CompositeLayer {
     // Render sprite maps
     const sprites = new SpriteBitmapLayer(this.getSubLayerProps({
       id: `${id}-sprite-bitmap-layer`,
-
       data: mapSpriteData,
-      // imageAtlas: 'sprites/128/subdivisions_0.png',
-      // imageMapping: 'sprites/128/subdivisions_0.json',
-      sprites: 5,
-      path: 'sprites/256/',
+      sprites: process.env.REACT_APP_SPRITE_COUNT, // 5,
+      path: process.env.REACT_APP_SPRITE_PATH, // 'sprites/256/',
       // prefix: 'subdivisions_',
       pickable: false,
       autoHighlight: false,
