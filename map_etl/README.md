@@ -1,4 +1,4 @@
-DXLab Subplot sprite packer
+DXLab Subplot ETL
 ==============================
 
 What Is This?
