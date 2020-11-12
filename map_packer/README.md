@@ -47,8 +47,10 @@ Usage
 3. set MAX_WIDTH and MAX_HEIGHT at the *main.py*. **stick to powers-of-two for texture sizes**.
 
 4. In a terminal
+```
 $ map_packer > poetry shell
 $ map_packer > python main.py
+```
 
 5. in the output folder a folder with the tile size will be create with PNG files and JSON indexes.
 
