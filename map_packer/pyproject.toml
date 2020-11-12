@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "map_packer"
+version = "0.1.0"
+description = ""
+authors = ["Carlos Arroyo <dimago@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pyTexturePacker = "^1.0.1"
+sh = "^1.13.1"
+logzero = "^1.5.0"
+
+[tool.poetry.dev-dependencies]
+pylint = "^2.5.2"
+black = {version = "^19.10b0", allow-prereleases = true}
+rope = "^0.17.0"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
