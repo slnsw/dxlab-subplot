@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Module with logic to load raw NSWL data into MongoDB."""
+"""Module with logic to load to process subdivision maps."""
 
 import glob
 import imagehash
@@ -183,11 +183,10 @@ class ComasterDuplicateImageLoader(BaseComasterLoader, MongoLoader):
 
 class ComasterImageProcessLoader(BaseComasterLoader, MongoLoader):
     """Crop comaster images using cutline."""
-
     def get_cutline(self, asset_id: str) -> List[int]:
         cutline = None
 
-        # 1. Get Koklan pixels cut line
+        # 1. Get Klokan pixels cut line
         mongo = self.get_collection(KlokanHiddenDataLoader.collection)
         klokan_doc = mongo.find_one({'id': asset_id}, {'cutline': 1})
 
@@ -238,7 +237,10 @@ class ComasterImageProcessLoader(BaseComasterLoader, MongoLoader):
 
         return success
 
-    def _path(self, asset_id: str = None, suffix: str = None, ext: str = 'png',
+    def _path(self,
+              asset_id: str = None,
+              suffix: str = None,
+              ext: str = 'png',
               filename: str = None) -> Tuple[bool, str]:
 
         if filename is None:

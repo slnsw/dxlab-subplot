@@ -82,9 +82,9 @@ class KlokanGeoreferenceFilesLoader(MongoLoader):
         logger.debug('Loading {}'.format(url))
         return pq(url=url)
 
-    def donwload_file(self, nswl_id: str, georeferencer_id: str, ext: str) -> str:
+    def download_file(self, slnsw_id: str, georeferencer_id: str, ext: str) -> str:
         url = '{}/{}.{}'.format(settings.SLNSW_GEOREFERENCER_URL, georeferencer_id, ext)
-        new_filename = '{}.{}'.format(nswl_id, ext)
+        new_filename = '{}.{}'.format(slnsw_id, ext)
         r = requests.get(url, allow_redirects=True)
         to_path = os.path.join(self.download_to, new_filename)
         open(to_path, 'wb').write(r.content)
@@ -96,14 +96,14 @@ class KlokanGeoreferenceFilesLoader(MongoLoader):
         data = {'width': py_.get(d('#wld-width'), '0.value', '0'), 'height': py_.get(d('#wld-height'), '0.value', '0')}
         return data
 
-    def get_thumbnail(self, nswl_id: str, georeferencer_id: str) -> dict:
+    def get_thumbnail(self, slnsw_id: str, georeferencer_id: str) -> dict:
         d = self.load_page(georeferencer_id)
         try:
             url = d('.mymaps-content-left-thumb > a > img').attr['src']
             if url.startswith('//'):
                 url = url.replace('//', 'http://', 1)
 
-            new_filename = '{}.{}'.format(nswl_id, 'jpg')
+            new_filename = '{}.{}'.format(slnsw_id, 'jpg')
 
             r = requests.get(url, allow_redirects=True)
             to_path = os.path.join(self.download_to, new_filename)
@@ -117,22 +117,22 @@ class KlokanGeoreferenceFilesLoader(MongoLoader):
     def load_objects(self, *args, **kwargs):
         qs = self.queryset(KlokanGoogleCSVLoader.collection, {})
         for doc in qs:
-            nswl_id = doc['id']
+            slnsw_id = doc['id']
             georeferencer_id = doc['georeferencer_id']
 
-            logger.debug('Donwloading wld, kmz and thumbanil of {}'.format(nswl_id))
+            logger.debug('Downloading wld, kmz and thumbanil of {}'.format(slnsw_id))
 
             data = {
-                'id': nswl_id,
+                'id': slnsw_id,
                 # http://webhelp.esri.com/arcims/9.3/General/topics/author_world_files.htm
                 'ESRI_world': {
-                    'filename': self.donwload_file(nswl_id, georeferencer_id, 'wld'),
+                    'filename': self.download_file(slnsw_id, georeferencer_id, 'wld'),
                     'metadata': self.get_ESRI_metadata(georeferencer_id)
                 },
                 'OGC_KML': {
-                    'filename': self.donwload_file(nswl_id, georeferencer_id, 'kmz'),
+                    'filename': self.download_file(slnsw_id, georeferencer_id, 'kmz'),
                 },
-                'thumbnail': self.get_thumbnail(nswl_id, georeferencer_id)
+                'thumbnail': self.get_thumbnail(slnsw_id, georeferencer_id)
             }
 
             yield data
@@ -168,11 +168,11 @@ class KlokanWorldFileLoader(MongoLoader):
         qs = self.queryset(KlokanGoogleCSVLoader.collection, {})
 
         for doc in qs:
-            nswl_id = doc['id']
+            slnsw_id = doc['id']
 
             try:
-                wld = self.load_wld_file(nswl_id)
-                wld['asset_id'] = nswl_id
+                wld = self.load_wld_file(slnsw_id)
+                wld['asset_id'] = slnsw_id
 
                 yield wld
             except Exception as e:

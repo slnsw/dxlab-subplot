@@ -12,7 +12,7 @@ from app.tools.data_loader import BaseLoader
 
 
 class MongoLoader(BaseLoader):
-    """Store loaded data into a MongoDB colleciton."""
+    """Store loaded data into a MongoDB collection."""
 
     database = None
     collection = None

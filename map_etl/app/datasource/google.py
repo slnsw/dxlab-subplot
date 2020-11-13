@@ -25,11 +25,12 @@ from app.settings import settings
 from app.datasource.klokan import KlokanGoogleCSVLoader
 
 
-class SearchEngineHackDataLoader(MongoLoader):
+class SearchEngineDataLoader(MongoLoader):
+    """Crawl search engines looking for assets_ids."""
 
     reference_field = 'id'
     database = settings.MONGO_DATABASE
-    collection = 'raw_google_hack'
+    collection = 'raw_search_engine_data'
 
     def query_google(self, terms: str) -> list:
         tpl = 'https://google.com.au/search?q={terms}&start=0&num=100&gws_rd=cr&gl=us'
@@ -116,18 +117,19 @@ class SearchEngineHackDataLoader(MongoLoader):
                 time.sleep(wait_sec)
 
 
-# Extract from search engine raw subdivision data
-class SLNSWSubdivisionIndexLoader(MongoLoader):
+class SearchEngineSubdivisionIndexLoader(MongoLoader):
+    """Create an asset_id index with search engine data."""
+
     reference_field = 'id'
     database = settings.MONGO_DATABASE
-    collection = 'raw_slnsw_subdivision_index_hack'
+    collection = 'raw_search_engine_subdivision_index'
 
     RE_SLNSW_SUBDIVISION_URL = re.compile(
         r'https?://www2.sl.nsw.gov.au/content_lists/subdivision_plans/(?P<location>.*)\.html'
     )
 
     def get_slnsw_links(self):
-        col = self.get_collection(SearchEngineHackDataLoader.collection, SearchEngineHackDataLoader.database)
+        col = self.get_collection(SearchEngineDataLoader.collection, SearchEngineDataLoader.database)
         result = col.aggregate(
             [
                 {
@@ -170,11 +172,12 @@ class SLNSWSubdivisionIndexLoader(MongoLoader):
             yield data
 
 
-# Extract from search engine raw subdivision data
-class SLNSWSubdivisionLoader(MongoLoader):
+class SearchEngineSubdivisionLoader(MongoLoader):
+    """Extract data from urls in the search index."""
+
     reference_field = 'id'
     database = settings.MONGO_DATABASE
-    collection = 'raw_slnsw_subdivision_hack'
+    collection = 'raw_search_engine_subdivision'
 
     def conf(self):
         super().conf()
@@ -200,7 +203,7 @@ class SLNSWSubdivisionLoader(MongoLoader):
         return data
 
     def load_objects(self, *args, **kwargs):
-        qs = self.queryset(SLNSWSubdivisionIndexLoader.collection, {})
+        qs = self.queryset(SearchEngineSubdivisionIndexLoader.collection, {})
         for doc in qs:
             url = doc['url']
             location = doc['location_name'].replace('_', ' ').title()

@@ -72,6 +72,17 @@
             ]
         },
         {
+            "name": "Ingest SLNSW Collection NEXT data",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "ingest-slnsw-collection-raw-data",
+                "--yes"
+            ]
+        },
+        {
             "name": "Ingest SLNSW comaster images",
             "type": "python",
             "request": "launch",

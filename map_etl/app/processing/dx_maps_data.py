@@ -12,9 +12,10 @@ from pymongo import IndexModel, GEOSPHERE
 from toolz.itertoolz import partition
 
 from app.datasource.klokan import (KlokanGoogleCSVLoader, KlokanHiddenDataLoader, KlokanWorldFileLoader)
-from app.datasource.google import SLNSWSubdivisionLoader
-from app.datasource.suburbs import NWSSuburbsCSVLoader
+from app.datasource.google import SearchEngineSubdivisionLoader
+from app.datasource.suburbs import NSWSuburbsCSVLoader
 from app.datasource.images import BaseComasterLoader
+from app.datasource.slnsw import SLNSWLinkTitlesLoader, SLNSWCollectionWebsiteLoader
 from app.tools.mongo_loader import MongoLoader
 from app.settings import settings
 
@@ -62,10 +63,18 @@ class DXMapsData(MixinGeoJsonUtils, MongoLoader):
 
             data.update(self.find_near_assets(asset_id, data))
 
+            data.update(self.parse_slnsw_title_links(asset_id, data))
+
+            data.update(self.parse_slnsw_collection_website(asset_id, data))
+
             # select year prefer year_subdivision over year_title if exits
             year = data.get('year_subdivision', None)
             if year is None:
                 year = data.get('year_title', None)
+
+                # If year still None check if year_creation exists
+                if year is None:
+                    year = data.get('year_creation', None)
 
             data['year'] = year
 
@@ -177,9 +186,11 @@ class DXMapsData(MixinGeoJsonUtils, MongoLoader):
         return wld
 
     def parse_slnsw_subdivision(self, asset_id: str) -> dict:
-        """Parse subdivision data extracted from SLNSW website."""
+        """Parse subdivision data extracted from data collected from the search engine.
+        Data here are mainly loaded fom the SLNSW website.
+        """
         data = {}
-        mongo = self.get_collection(collection=SLNSWSubdivisionLoader.collection)
+        mongo = self.get_collection(collection=SearchEngineSubdivisionLoader.collection)
         doc = mongo.find_one({'dig_id': asset_id})
 
         if doc:
@@ -213,10 +224,10 @@ class DXMapsData(MixinGeoJsonUtils, MongoLoader):
 
             data['date_str'] = date_str
 
-            # Drop emtpy or none data
+            # Drop empty or none data
             data = {k: v for k, v in data.items() if v}
 
-            # Add sufix for now
+            # Add suffix for now
             data = {'{}_subdivision'.format(k): v for k, v in data.items()}
 
         return data
@@ -229,7 +240,7 @@ class DXMapsData(MixinGeoJsonUtils, MongoLoader):
             # '$minDistance': 500
             query = {'geo_location': {'$near': {'$geometry': center, '$maxDistance': 2000}}}
 
-            mongo = self.get_collection(collection=NWSSuburbsCSVLoader.collection)
+            mongo = self.get_collection(collection=NSWSuburbsCSVLoader.collection)
             qs = mongo.find(query, projection={'suburb': 1, 'geo_location': 1})
             # print('s ->', location_name)
             nearest = None
@@ -252,7 +263,7 @@ class DXMapsData(MixinGeoJsonUtils, MongoLoader):
                 out['location_match'] = location_match
                 # print('f ->', location_match, nearest['suburb'], location_name)
 
-            # Add sufix for now
+            # Add suffix for now
             out = {'{}_postal'.format(k): v for k, v in out.items()}
 
             return out
@@ -273,7 +284,9 @@ class DXMapsData(MixinGeoJsonUtils, MongoLoader):
         return out
 
     def find_near_assets(self, asset_id: str, data: dict) -> dict:
-        query = {'center': {'$near': {'$geometry': data['center'], '$maxDistance': 200}}}
+        """Find near assets base on centroid of the shape."""
+
+        query = {'center': {'$near': {'$geometry': data['center'], '$maxDistance': 500}}}
         qs = self.collection.find(query, {'asset_id': 1, 'year': 1})
 
         # Merge with similar and set distance as 0
@@ -289,6 +302,65 @@ class DXMapsData(MixinGeoJsonUtils, MongoLoader):
         mongo = self.get_collection(collection='dx_map_exclude')
         doc = mongo.find_one(query)
         return {'active': doc is None}
+
+    def parse_slnsw_title_links(self, asset_id: str, data: dict) -> dict:
+
+        query = {'asset_id': asset_id}
+        mongo = self.get_collection(collection=SLNSWLinkTitlesLoader.collection)
+        doc = mongo.find_one(query)
+        out = {}
+
+        if doc:
+            out = py_.pick(doc, 'collection_title', 'url_id')
+
+        return out
+
+    def parse_slnsw_collection_website(self, asset_id: str, data: dict) -> dict:
+
+        query = {'asset_id': asset_id}
+        mongo = self.get_collection(collection=SLNSWCollectionWebsiteLoader.collection)
+        doc = mongo.find_one(query)
+        out = {}
+
+        if doc:
+            errors = py_.get(doc, 'props.pageProps.errors', None)
+            if errors is not None:
+                return {'collection_url_error': errors}
+
+            props = py_.get(doc, 'props.pageProps', {})
+
+            # Zoomify URL
+            full_iiif_url = py_.get(props, 'file.image.iiifImageUrl', None)
+            out['iiif_identifier'] = full_iiif_url.split('/')[-1]
+            out['full_iiif_url'] = full_iiif_url
+
+            # Check if we have the full title
+            title = py_.get(props, 'title', '')
+            if data.get('collection_title', '') != title:
+                out['collection_title'] = title
+                out['collection_title_expanded'] = True
+
+            notes = py_.get(props, 'recordData.notes', [])
+            date_creation = py_.find(notes, {'type': 'dateCreation'})
+            if date_creation is not None:
+                date_creation = py_.get(date_creation, 'value', None)
+                out['date_creation'] = date_creation
+
+                # Extract latest year in the date_creation as option
+                # if year is null
+                if isinstance(date_creation, str):
+                    data_creation = date_creation.replace('.', '')
+                    bits = data_creation.split('-')
+
+                    try:
+                        year = bits[-1]
+                        year = year if year != '' else bits[0]
+
+                        out['year_creation'] = int(year)
+                    except:
+                        out['year_creation'] = None
+
+        return out
 
     def is_valid(self, asset_id: str, data: dict) -> bool:
 
@@ -318,18 +390,21 @@ class DXMapsGEOJSONData(MixinGeoJsonUtils, MongoLoader):
             logger.debug('DXMap creating GEOJson for {asset_id}'.format(**doc))
 
             geometry = py_.get(doc, 'cutline.coordinates', None)
+            # If cutline exists is a valid map
             if geometry:
                 poly = Polygon(geometry)
 
                 # Build feature properties
                 properties = py_.pick(
-                    doc, 'year', 'title', 'asset_id', 'colorfulness', 'colored', 'cutline_centroid', 'similar',
-                    'bbox_coord', 'location_name', 'width', 'height'
+                    doc, 'year', 'collection_title', 'asset_id', 'url_id', 'colorfulness', 'iiif_identifier',
+                    'colored', 'cutline_centroid', 'similar', 'bbox_coord', 'location_name', 'width', 'height'
                 )
                 properties = py_.rename_keys(
                     properties, {
                         'cutline_centroid': 'centroid',
-                        'bbox_coord': 'image_bounds'
+                        'bbox_coord': 'image_bounds',
+                        'collection_title': 'title',
+                        'url_id': 'collection_id'
                     }
                 )
 

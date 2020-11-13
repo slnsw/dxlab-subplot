@@ -3,6 +3,10 @@ name = "dxmaps_etl"
 version = "0.1.0"
 description = ""
 authors = ["Carlos Arroyo <dimago@gmail.com>"]
+packages = [
+    { include = "app" }
+]
+
 
 [tool.poetry.dependencies]
 python = "^3.7"

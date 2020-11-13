@@ -13,7 +13,7 @@ from app.tools.mongo_loader import MongoLoader
 from app.settings import settings
 
 
-class NWSSuburbsCSVLoader(MongoLoader):
+class NSWSuburbsCSVLoader(MongoLoader):
     """Data provided found online at https://gist.github.com/randomecho/5020859."""
 
     reference_field = 'id'

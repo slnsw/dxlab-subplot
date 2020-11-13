@@ -5,7 +5,9 @@ import os
 import csv
 import json
 
+from pydash import py_
 from logzero import logger
+from pyquery import PyQuery as pq
 
 from app.tools.mongo_loader import MongoLoader
 from app.settings import settings
@@ -39,7 +41,7 @@ class SLNSWSubdivisionsCSVLoader(MongoLoader):
         return self.walk_csv(self.filepath)
 
 
-class SLNSWLinkTitles(MongoLoader):
+class SLNSWLinkTitlesLoader(MongoLoader):
     """Data provided by Luke. 
     
     Titles and Links from SLNSW collection of the ingested Klokan records.
@@ -63,3 +65,36 @@ class SLNSWLinkTitles(MongoLoader):
 
     def load_objects(self, *args, **kwargs):
         return self.walk_json(self.filepath)
+
+
+class SLNSWCollectionWebsiteLoader(MongoLoader):
+    """Using SLNSWLinkTitlesLoader data crawl SLNSW collection website and extract data like IIIF url"""
+
+    reference_field = 'asset_id'
+    database = settings.MONGO_DATABASE
+    collection = 'raw_slnsw_collection'
+
+    SLNSW_COLLECTION = 'https://collection.sl.nsw.gov.au/digital/{url_id}'
+
+    def load_data(self, url: str) -> dict:
+        data = []
+        logger.debug('Getting hidden data from: {}'.format(url))
+
+        d = pq(url=url)
+        next_data = pq(d('script#__NEXT_DATA__')[0]).text()
+
+        return json.loads(next_data)
+
+    def load_objects(self, *args, **kwargs):
+        qs = self.queryset(SLNSWLinkTitlesLoader.collection, {})
+        for doc in qs:
+            # Select only the basic data
+            data = py_.pick(doc, 'asset_id', 'url_id')
+
+            # Build url
+            url = self.SLNSW_COLLECTION.format(**data)
+
+            # Get data and merge
+            data.update(self.load_data(url))
+
+            yield data

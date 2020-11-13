@@ -6,10 +6,10 @@ import logzero
 from app.datasource.klokan import (
     KlokanGoogleCSVLoader, KlokanHiddenDataLoader, KlokanGeoreferenceFilesLoader, KlokanWorldFileLoader
 )
-from app.datasource.slnsw import SLNSWSubdivisionsCSVLoader, SLNSWLinkTitles
+from app.datasource.slnsw import SLNSWSubdivisionsCSVLoader, SLNSWLinkTitlesLoader, SLNSWCollectionWebsiteLoader
 from app.datasource.images import (ComasterImagesLoader, ComasterDuplicateImageLoader, ComasterImageProcessLoader)
-from app.datasource.google import SearchEngineHackDataLoader, SLNSWSubdivisionIndexLoader, SLNSWSubdivisionLoader
-from app.datasource.suburbs import NWSSuburbsCSVLoader
+from app.datasource.google import SearchEngineDataLoader, SearchEngineSubdivisionIndexLoader, SearchEngineSubdivisionLoader
+from app.datasource.suburbs import NSWSuburbsCSVLoader
 from app.processing.dx_maps_data import DXMapsData, DXMapsGEOJSONData
 
 from logzero import logger
@@ -76,8 +76,16 @@ def ingest_slnsw_subdivisions_raw_data():
 @click.confirmation_option(prompt='Do you want to continue?')
 def ingest_slnsw_title_links_raw_data():
     """Ingest raw Titles and Links from SLNSW collection from ingested Klokan records"""
-    json_loader = SLNSWLinkTitles()
+    json_loader = SLNSWLinkTitlesLoader()
     json_loader.execute()
+
+
+@cli.command()
+@click.confirmation_option(prompt='Do you want to continue?')
+def ingest_slnsw_collection_raw_data():
+    """Ingest hidden NEXT data from SLNSW collection data"""
+    web_loader = SLNSWCollectionWebsiteLoader()
+    web_loader.execute()
 
 
 @cli.command()
@@ -112,7 +120,7 @@ def ingest_slnsw_comaster_processing():
 def ingest_nsw_suburbs_raw_data():
     """Load NSW suburb list of names and geocodes."""
     # Ingest SLNSW provided data to Klokan
-    csv_loader = NWSSuburbsCSVLoader()
+    csv_loader = NSWSuburbsCSVLoader()
     csv_loader.execute()
 
 
@@ -120,7 +128,7 @@ def ingest_nsw_suburbs_raw_data():
 @click.confirmation_option(prompt='Do you want to continue?')
 def ingest_search_engine_hack_data():
     """Use google or duckduckgo to get more information for each asset"""
-    google_loader = SearchEngineHackDataLoader()
+    google_loader = SearchEngineDataLoader()
     google_loader.execute()
 
 
@@ -128,7 +136,7 @@ def ingest_search_engine_hack_data():
 @click.confirmation_option(prompt='Do you want to continue?')
 def ingest_slnsw_subdivision_index_raw_data():
     """Using search engine create an index of  subdivision data from SLNSW"""
-    google_loader = SLNSWSubdivisionIndexLoader()
+    google_loader = SearchEngineSubdivisionIndexLoader()
     google_loader.execute()
 
 
@@ -136,7 +144,7 @@ def ingest_slnsw_subdivision_index_raw_data():
 @click.confirmation_option(prompt='Do you want to continue?')
 def ingest_slnsw_subdivision_raw_data():
     """Using search engine data extract subdivision data from SLNSW"""
-    google_loader = SLNSWSubdivisionLoader()
+    google_loader = SearchEngineSubdivisionLoader()
     google_loader.execute()
 
 
