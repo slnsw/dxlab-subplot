@@ -1,6 +1,8 @@
+@import '../../../global';
+
 .rootStyle {
     position: absolute;
-    color: white;
+    color: $PRIMARY_COLOR;
     top: 20;
     right: 7%;
     z-index: 3010;

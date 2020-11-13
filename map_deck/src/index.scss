@@ -1,3 +1,5 @@
+@import './global';
+
 // @import url('https://fonts.googleapis.com/css?family=Bitter|Roboto+Slab&display=swap');
 @import url('https://fonts.googleapis.com/css?family=Lekton&display=swap');
 
@@ -12,3 +14,11 @@ body {
   margin: 0;
 }
 
+a {
+  color: $PRIMARY_COLOR;
+  text-decoration: none;
+
+  &:hover {
+      text-decoration: underline;
+  }
+}

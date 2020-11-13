@@ -1,10 +1,9 @@
 import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import OSD from 'openseadragon'
-import { getImageUrl } from '../../../share/utils/helpers'
 import styles from './Zoomable.module.scss'
 
-const Zoomable = ({ id, assetId }) => {
+const Zoomable = ({ id, assetId, iiifIdentifier = '' }) => {
   // eslint-disable-next-line no-unused-vars
   let el = null
   // eslint-disable-next-line no-unused-vars
@@ -20,21 +19,14 @@ const Zoomable = ({ id, assetId }) => {
 
       viewer.current = OSD({
         id: id,
-        visibilityRatio: 1.0,
-        constrainDuringPan: false,
-        defaultZoomLevel: 1,
-        minZoomLevel: 1,
-        maxZoomLevel: 10,
-        showNavigator: false,
-        tileSources: {
-          type: 'image',
-          url: getImageUrl(assetId, 'uncrop', '1024')
-        }
+        tileSources: [
+          `${process.env.REACT_APP_IIIF_BASE_URL}${iiifIdentifier}/info.json`
+        ]
       })
     } catch (error) {
       console.warn(error)
     }
-  }, [id, assetId])
+  }, [id, iiifIdentifier])
 
   return (
     <>
@@ -52,5 +44,6 @@ export default Zoomable
 
 Zoomable.propTypes = {
   id: PropTypes.string,
-  assetId: PropTypes.string
+  assetId: PropTypes.string,
+  iiifIdentifier: PropTypes.string
 }

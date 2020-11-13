@@ -1,5 +1,7 @@
-$TEXT_COLOR : #ffc400;
-$CONTENT_PADDING : 30px;
+@import '../../../global';
+
+$CONTENT_PADDING : 2px;
+$CONTENT_MARGIN: 30px;
 
 .modalWindow {
     z-index: 8001;
@@ -9,104 +11,123 @@ $CONTENT_PADDING : 30px;
     height: 100vh;
     width: calc(50vw - #{$CONTENT_PADDING * 2});
     padding: $CONTENT_PADDING;
-    color: white;
-    
+    color: $PRIMARY_COLOR;
 
-    &:focus{
-        outline:0;
-     }
 
-    .modalTitle {
-        color: $TEXT_COLOR;
-        text-align: left;
-        font-size: 30px;
-        float: left;
-        margin-top: 8px;
-        max-width: 95%;
-        // margin-bottom: 60px;
+    &:focus {
+        outline: 0;
+    }
+
+    .header {
+        margin: $CONTENT_MARGIN;
+
+        .title {
+            color: $PRIMARY_COLOR;
+            text-align: left;
+            font-size: 25px;
+
+            max-width: 95%;
+            font-weight: bolder;
+            margin-bottom: 0;
+            display: block;
+
+
+        }
+
+        .info {
+            font-size: 20px;
+            // float: left;
+            // width: 49%;
+            margin: 5px 0 25px 0;
+            display: block;
+            color: $ACCENT_COLOR;
+        }
+
     }
 
 
     .zoomable {
         width: 100%;
         height: 50%;
-        background-color: #000000;
+        background-color: #393b3acc;
         // border: 1px solid rgba(255, 255, 255, .5);
-        clear: both;    } 
+        clear: both;
 
-    .info {
-        font-size: 20px;
-        // float: left;
-        // width: 49%;
-        margin-top: 15px;
-        display: block;
+        .imageInfo {
+            margin: 10px $CONTENT_MARGIN;
+            text-align: right;
+            color: $PRIMARY_COLOR;
+        }
+    }
 
-        .details {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: nowrap;
-            justify-content: space-between;
-            margin-bottom: 10px;
 
-            ul {
-                padding: 0;
-                margin: 0;
 
-                li{
-                    margin-top: 10px;
-                    list-style: none;
-                    color: $TEXT_COLOR;
+    .details {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        margin-bottom: 10px;
 
-                    span {
-                        font-weight: 800;
-                        color: #fff;
-                    }
+        ul {
+            padding: 0;
+            margin: 0;
+
+            li {
+                margin-top: 10px;
+                list-style: none;
+                color: $PRIMARY_COLOR;
+
+                span {
+                    font-weight: 800;
+                    color: $ACCENT_COLOR;
                 }
             }
         }
+    }
 
-        .related {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: flex-start;
-            align-content: center;
-            // overflow-y: auto;
-            // max-height: 300px;
-    
-            img {
-                margin-top: 10px;
-                margin-right: 10px;
-                cursor: pointer;
-            }
+    .related {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        align-content: center;
+        // overflow-y: auto;
+        // max-height: 300px;
 
+        img {
+            margin-top: 10px;
+            margin-right: 10px;
+            cursor: pointer;
         }
-    
 
-    } 
+    }
+
 
     .close {
         font-weight: bolder;
         font-size: 30px;
-        color: white;
+        color: $PRIMARY_COLOR;
         background: none;
         border: none;
         float: right;
+        margin: 30px;
 
-        &:focus{
+        &:focus {
             outline: 0;
         }
 
-        
+
     }
 
     transition: left 200ms ease-in-out;
     left: -56vw;
+
     &.afterOpen {
         left: 0
     }
 
     &.beforeClose {
-        left:  -56vw;
+        left: -56vw;
     }
 
 
@@ -114,7 +135,7 @@ $CONTENT_PADDING : 30px;
 
 .modalOverlay {
     // background-color: #000a;
-    z-index: 8000;  
+    z-index: 8000;
     position: fixed;
     top: 0;
     // left: 0;
@@ -122,4 +143,3 @@ $CONTENT_PADDING : 30px;
     bottom: 0;
     // width: 100vw;
 }
-

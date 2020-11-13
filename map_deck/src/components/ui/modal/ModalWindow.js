@@ -16,7 +16,7 @@ import styles from './ModalWindow.module.scss'
 
 export const ModalWindow = ({ onRequestClose = () => {} }) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [{ title, year, width, height, location_name, asset_id, related = [] }, setSelected] = useState({})
+  const [{ title, year, width, height, location_name, asset_id, iiif_identifier, url, collection_id, related = [] }, setSelected] = useState({})
   const [uiState, uiDispatch] = useContext(UIContext)
   const [mapState] = useContext(MapDataContext)
   // eslint-disable-next-line no-unused-vars
@@ -43,7 +43,9 @@ export const ModalWindow = ({ onRequestClose = () => {} }) => {
         return show
       })
 
-      setSelected({ related, ...other })
+      const url = `${process.env.REACT_APP_SLNSW_COLLECTION_BASE_URL}${collection_id}`
+
+      setSelected({ related, url, ...other })
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uiState.selected])
@@ -82,38 +84,35 @@ export const ModalWindow = ({ onRequestClose = () => {} }) => {
         closeTimeoutMS={600}
       >
         <>
-          <h1 className={styles.modalTitle}> {title} </h1>
 
           <button className={styles.close} onClick={handleCloseModal}>X</button>
 
+          <div className={styles.header}>
+            <h1 className={styles.title}>
+              <a href={url} target='_blank' rel='noreferrer'>
+                {title}
+              </a>
+            </h1>
+
+            <h3 className={styles.info}>{year} - {location_name}</h3>
+          </div>
+
           <div className={styles.zoomable}>
-            <Zoomable assetId={asset_id} id='mapZoom' />
-          </div>
-
-          <div className={styles.info}>
-
-            <div className={styles.details}>
-              <ul>
-                <li><span>ID:</span> {asset_id}</li>
-                <li><span>year: </span>{year}</li>
-              </ul>
-
-              <ul>
-                <li><span>location:</span> {location_name}</li>
-                <li><span>image:</span> ({width} x {height})</li>
-              </ul>
-
-            </div>
-
-            <div className={styles.related}>
-
-              {related.map((value, index) => {
-                const image = getImageUrl(value.asset_id, 'uncrop', '256')
-                return <img key={`rel${index}`} src={image} alt={value.distance} /> // onClick={() => handleRelateClick(value.asset_id)}
-              })}
-
+            <Zoomable assetId={asset_id} iiifIdentifier={iiif_identifier} id='mapZoom' />
+            <div className={styles.imageInfo}>
+              <span> {asset_id} | ({width} x {height})</span>
             </div>
           </div>
+
+          <div className={styles.related}>
+
+            {related.map((value, index) => {
+              const image = getImageUrl(value.asset_id, 'uncrop', '256')
+              return <img key={`rel${index}`} src={image} alt={value.distance} onClick={() => handleRelateClick(value.asset_id)} />
+            })}
+
+          </div>
+
         </>
       </ReactModal>
     </>

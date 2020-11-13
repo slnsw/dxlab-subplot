@@ -1,13 +1,23 @@
 {
-    "npm.enableScriptExplorer": true,
     "npm.packageManager": "yarn",
     "editor.formatOnSave": false,
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
     },
     "cSpell.ignoreWords": [
+        "SLNSW",
+        "app",
+        "base",
         "bbox",
+        "collection",
+        "identifier",
+        "iiif",
+        "iiif identifier",
         "mapbox",
+        "openseadragon",
+        "react",
+        "slnsw",
+        "url",
         "zoomable"
     ],
     "files.associations": {
