@@ -50,13 +50,24 @@
             ]
         },
         {
-            "name": "Ingest SLNSW raw data",
+            "name": "Ingest SLNSW raw subdivisions data",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/cli.py",
             "console": "integratedTerminal",
             "args": [
-                "ingest-slnsw-raw-data",
+                "ingest-slnsw-subdivisions-raw-data",
+                "--yes"
+            ]
+        },
+        {
+            "name": "Ingest SLNSW raw title and links data",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "ingest-slnsw-title-links-raw-data",
                 "--yes"
             ]
         },

@@ -6,7 +6,7 @@ import logzero
 from app.datasource.klokan import (
     KlokanGoogleCSVLoader, KlokanHiddenDataLoader, KlokanGeoreferenceFilesLoader, KlokanWorldFileLoader
 )
-from app.datasource.slnsw import SLNWSCSVLoader
+from app.datasource.slnsw import SLNSWSubdivisionsCSVLoader, SLNSWLinkTitles
 from app.datasource.images import (ComasterImagesLoader, ComasterDuplicateImageLoader, ComasterImageProcessLoader)
 from app.datasource.google import SearchEngineHackDataLoader, SLNSWSubdivisionIndexLoader, SLNSWSubdivisionLoader
 from app.datasource.suburbs import NWSSuburbsCSVLoader
@@ -19,7 +19,7 @@ log_file = './logs/output.log'
 
 # Configure aggregator logs to use logzero
 
-# Defautl Configure log file
+# Default Configure log file
 logzero.logfile(log_file, **log_kwargs)
 
 
@@ -40,7 +40,7 @@ def ingest_klokan_raw_data():
 @cli.command()
 @click.confirmation_option(prompt='Do you want to continue?')
 def ingest_klokan_hidden_data():
-    """Load hidded data from GeoReferencer website."""
+    """Load hidden data from GeoReferencer website."""
     # 1. Ingest control points
     web_loader = KlokanHiddenDataLoader()
     web_loader.execute()
@@ -66,18 +66,25 @@ def ingest_klokan_world_files():
 
 @cli.command()
 @click.confirmation_option(prompt='Do you want to continue?')
-def ingest_slnsw_raw_data():
-    """Extract files and metadata associated to klokan maps on the GeoReferencer website."""
-    # Ingest SLNWS provided data to Klokan
-    csv_loader = SLNWSCSVLoader()
+def ingest_slnsw_subdivisions_raw_data():
+    """Ingest raw subdivision data of SLNSW collection."""
+    csv_loader = SLNSWSubdivisionsCSVLoader()
     csv_loader.execute()
+
+
+@cli.command()
+@click.confirmation_option(prompt='Do you want to continue?')
+def ingest_slnsw_title_links_raw_data():
+    """Ingest raw Titles and Links from SLNSW collection from ingested Klokan records"""
+    json_loader = SLNSWLinkTitles()
+    json_loader.execute()
 
 
 @cli.command()
 @click.confirmation_option(prompt='Do you want to continue?')
 def ingest_slnsw_comaster_data():
     """Load and process comaster images."""
-    # Ingest SLNWS provided data to Klokan
+    # Ingest SLNSW provided data to Klokan
     image_loader = ComasterImagesLoader()
     image_loader.execute()
 
@@ -86,7 +93,7 @@ def ingest_slnsw_comaster_data():
 @click.confirmation_option(prompt='Do you want to continue?')
 def ingest_slnsw_comaster_duplicates():
     """Detect duplicates within the comaster images."""
-    # Ingest SLNWS provided data to Klokan
+    # Ingest SLNSW provided data to Klokan
     image_loader = ComasterDuplicateImageLoader()
     image_loader.execute()
 
@@ -95,7 +102,7 @@ def ingest_slnsw_comaster_duplicates():
 @click.confirmation_option(prompt='Do you want to continue?')
 def ingest_slnsw_comaster_processing():
     """Apply cut line, edge detection, etc of comaster images."""
-    # Ingest SLNWS provided data to Klokan
+    # Ingest SLNSW provided data to Klokan
     image_loader = ComasterImageProcessLoader()
     image_loader.execute()
 
@@ -104,7 +111,7 @@ def ingest_slnsw_comaster_processing():
 @click.confirmation_option(prompt='Do you want to continue?')
 def ingest_nsw_suburbs_raw_data():
     """Load NSW suburb list of names and geocodes."""
-    # Ingest SLNWS provided data to Klokan
+    # Ingest SLNSW provided data to Klokan
     csv_loader = NWSSuburbsCSVLoader()
     csv_loader.execute()
 
@@ -120,7 +127,7 @@ def ingest_search_engine_hack_data():
 @cli.command()
 @click.confirmation_option(prompt='Do you want to continue?')
 def ingest_slnsw_subdivision_index_raw_data():
-    """Using search engine create an index of  sudivision data from SLNSW"""
+    """Using search engine create an index of  subdivision data from SLNSW"""
     google_loader = SLNSWSubdivisionIndexLoader()
     google_loader.execute()
 
@@ -128,7 +135,7 @@ def ingest_slnsw_subdivision_index_raw_data():
 @cli.command()
 @click.confirmation_option(prompt='Do you want to continue?')
 def ingest_slnsw_subdivision_raw_data():
-    """Using search engine data extract sudivision data from SLNSW"""
+    """Using search engine data extract subdivision data from SLNSW"""
     google_loader = SLNSWSubdivisionLoader()
     google_loader.execute()
 
@@ -137,7 +144,7 @@ def ingest_slnsw_subdivision_raw_data():
 @click.confirmation_option(prompt='Do you want to continue?')
 def processing_dx_map_data():
     """Clean, match, data to use with DX Map R&D."""
-    # Ingest SLNWS provided data to Klokan
+    # Ingest SLNSW provided data to Klokan
     dx_map = DXMapsData()
     dx_map.execute()
 
