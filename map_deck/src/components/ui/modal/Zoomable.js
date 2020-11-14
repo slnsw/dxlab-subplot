@@ -11,7 +11,6 @@ const Zoomable = ({ id, assetId, iiifIdentifier = '' }) => {
 
   useEffect(() => {
     // Create an instance of OSD
-    console.log(id)
     try {
       if (viewer.current) {
         viewer.current.destroy()
@@ -31,9 +30,9 @@ const Zoomable = ({ id, assetId, iiifIdentifier = '' }) => {
   return (
     <>
       <div className={styles.openseadragon} ref={node => { el = node }}>
-        <div className='navigator-wrapper c-shadow'>
+        {/* <div>
           <div id='navigator' />
-        </div>
+        </div> */}
         <div className={styles.container} id={id} />
       </div>
     </>

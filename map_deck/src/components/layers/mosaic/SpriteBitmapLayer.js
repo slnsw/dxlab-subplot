@@ -357,7 +357,7 @@ export class SpriteBitmapLayer extends Layer {
     }
 
     this.setState({ sprites, spriteSize, spriteUpdated: true })
-    console.log('ready', textures.length)
+    // console.log('ready', textures.length)
     // Force update model
     this.setNeedsUpdate()
   }

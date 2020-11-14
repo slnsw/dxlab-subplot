@@ -110,10 +110,10 @@ export const MapExplorer = ({ mode }) => {
       const { longitude, latitude } = viewState
       const lookupAt = point([longitude, latitude])
       const dst = distance(lookupRoi, lookupAt, { units: 'kilometers' })
-      // if (dst > 5) {
-      //   // Clean search near lookups
-      //   mapDispatch(clearMapsWithin())
-      // }
+      if (dst > 5) {
+        // Clean search near lookups
+        // mapDispatch(clearMapsWithin())
+      }
     }
   }
 
