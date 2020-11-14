@@ -51,7 +51,8 @@ $CONTENT_MARGIN: 30px;
         height: 50%;
         background-color: #393b3acc;
         // border: 1px solid rgba(255, 255, 255, .5);
-        clear: both;
+        
+        display: block;
 
         .imageInfo {
             margin: 10px $CONTENT_MARGIN;
@@ -68,36 +69,25 @@ $CONTENT_MARGIN: 30px;
         flex-wrap: nowrap;
         justify-content: space-between;
         margin-bottom: 10px;
-
-        ul {
-            padding: 0;
-            margin: 0;
-
-            li {
-                margin-top: 10px;
-                list-style: none;
-                color: $PRIMARY_COLOR;
-
-                span {
-                    font-weight: 800;
-                    color: $ACCENT_COLOR;
-                }
-            }
-        }
     }
 
     .related {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-start;
-        align-content: center;
-        // overflow-y: auto;
-        // max-height: 300px;
+        margin-top: 25px;
+        margin: 60px $CONTENT_MARGIN + 10;
 
-        img {
-            margin-top: 10px;
-            margin-right: 10px;
-            cursor: pointer;
+        .container {
+            height: 150px;
+
+            .thumb {
+                // max-width: 50%;
+                width: 90%;
+                height: 100%;
+ 
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-color: rgba(255, 255, 255, .4);
+            }
         }
 
     }

@@ -8,11 +8,15 @@ import { unSelectMap, selectMap } from '../../../context/UIActions'
 import IdleTimer from 'react-idle-timer'
 import ReactModal from 'react-modal'
 import Zoomable from './Zoomable'
+import Slider from 'react-slick'
+
 import { getImageUrl } from '../../../share/utils/helpers'
 
 import { get, isEmpty, find } from 'lodash'
 
 import styles from './ModalWindow.module.scss'
+
+const slideRef = React.createRef()
 
 export const ModalWindow = ({ onRequestClose = () => {} }) => {
   const [isOpen, setIsOpen] = useState(false)
@@ -30,6 +34,10 @@ export const ModalWindow = ({ onRequestClose = () => {} }) => {
     if (open) {
       // const { center, radius, placeName } = near
       // mapDispatch(getMapsWithin({ center, radius, placeName }))
+
+      if (slideRef.current) {
+        slideRef.current.slickGoTo(0)
+      }
 
       const { properties = {} } = selected
       const { similar = [], ...other } = properties
@@ -57,11 +65,12 @@ export const ModalWindow = ({ onRequestClose = () => {} }) => {
     }
   }
 
-  const handleRelateClick = () => {
+  const handleRelateClick = (asset_id) => {
     const data = get(mapState, 'dataSet', [])
     const select = find(data, ['properties.asset_id', asset_id])
+
     if (select) {
-      uiDispatch(selectMap(select))
+      uiDispatch(selectMap({ ...select }))
     }
   }
 
@@ -105,11 +114,30 @@ export const ModalWindow = ({ onRequestClose = () => {} }) => {
           </div>
 
           <div className={styles.related}>
+            <Slider
+              dots={false}
+              infinite={false}
+              slidesToShow={5}
+              ref={slider => (slideRef.current = slider)}
+            >
 
-            {related.map((value, index) => {
-              const image = getImageUrl(value.asset_id, 'uncrop', '256')
-              return <img key={`rel${index}`} src={image} alt={value.distance} onClick={() => handleRelateClick(value.asset_id)} />
-            })}
+              {related.map((value, index) => {
+                const image = getImageUrl(value.asset_id, 'uncrop', '256')
+                return (
+                  <div key={`rel${index}`}>
+                    <div className={styles.container}>
+                      <div
+                        className={styles.thumb}
+                        style={{ backgroundImage: `url(${image})` }}
+                        onClick={() => handleRelateClick(value.asset_id)}
+                      />
+                      {/* <img src={image} alt={value.distance} onClick={() => handleRelateClick(value.asset_id)} /> */}
+                      {/* <img src={image} alt={value.distance} /> */}
+                    </div>
+                  </div>
+                )
+              })}
+            </Slider>
 
           </div>
 
