@@ -19,6 +19,7 @@ export function getMaps ({ ...query }) {
 
           // Get a list of years
           const years = map(data, 'properties.year').filter(d => isNumber(d) || !isNaN(d))
+          const filtered = filterData(data, filters)
 
           dispatch({
             type: ActionTypes.MAPS_DATA_COMPLETE,
@@ -28,7 +29,7 @@ export function getMaps ({ ...query }) {
             fullGeoIndex: new GeoLookups(data),
 
             // dataset filter by UI options and index
-            ...filterData(data, filters),
+            ...filtered,
 
             // General information of the dataset
             meta: {
@@ -37,7 +38,7 @@ export function getMaps ({ ...query }) {
             }
           })
 
-          resolve()
+          resolve(filtered)
         })
         .catch((error) => {
           dispatch({
@@ -101,15 +102,6 @@ export function clearMapsWithin () {
   return (dispatch, state) => {
     dispatch({
       type: ActionTypes.MAPS_GEO_LOOKUP_CLEAN_COMPLETE
-    })
-  }
-}
-
-export function updateViewState ({ ...viewState }) {
-  return (dispatch, state) => {
-    dispatch({
-      type: ActionTypes.MAPS_UPDATE_VIEW_STATE_COMPLETE,
-      viewState
     })
   }
 }

@@ -98,7 +98,7 @@ export const ModalWindow = ({ onRequestClose = () => {} }) => {
 
           <div className={styles.header}>
             <h1 className={styles.title}>
-              <a href={url} target='_blank' rel='noreferrer'>
+              <a href={url} target='_blank' rel='noopener noreferrer'>
                 {title}
               </a>
             </h1>
@@ -131,8 +131,6 @@ export const ModalWindow = ({ onRequestClose = () => {} }) => {
                         style={{ backgroundImage: `url(${image})` }}
                         onClick={() => handleRelateClick(value.asset_id)}
                       />
-                      {/* <img src={image} alt={value.distance} onClick={() => handleRelateClick(value.asset_id)} /> */}
-                      {/* <img src={image} alt={value.distance} /> */}
                     </div>
                   </div>
                 )

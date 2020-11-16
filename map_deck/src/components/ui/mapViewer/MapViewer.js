@@ -12,9 +12,10 @@ import { InteractiveMap } from 'react-map-gl'
 import MAP_STYLE from './styles/dxmaps_v2.json'
 
 import { MapDataContext } from '../../../context/MapsContext'
+import { updateViewState } from '../../../context/UIActions'
 import { UIContext } from '../../../context/UIContext'
 
-import { get } from 'lodash'
+import { get, isEmpty, debounce } from 'lodash'
 import bearing from '@turf/bearing'
 
 import lightingEffect from './lights'
@@ -41,13 +42,13 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
   })
 
   useEffect(() => {
-    const centroid = get(uiState, 'focus.properties.centroid', null)
-    const isIdle = get(uiState, 'isIdle', false)
+    const focus = uiState.focus || {}
+    const centroid = get(focus, 'properties.centroid', null)
 
-    if (centroid && isIdle) {
+    if (centroid && uiState.isIdle) {
       const [longitude, latitude] = centroid.coordinates || []
       if (longitude && latitude) {
-        const bounds = get(uiState, 'focus.properties.image_bounds.coordinates', [[], [], [], []])
+        const bounds = get(focus, 'properties.image_bounds.coordinates', [[], [], [], []])
         const focusBearing = bearing(bounds[0][0], bounds[0][3])
         const goTo = {
           longitude,
@@ -62,11 +63,21 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uiState.focus, uiState])
+  }, [uiState.focus, uiState.isIdle])
+
+  // Update local and global map view state
+  // NOTE: looks dogy however I need to be able to change
+  // State from outside of the component and DeckGL don't
+  // work correctly if the state is not local
+  useEffect(() => {
+    if (!isEmpty(uiState.viewState) && uiState.viewState.goTo) {
+      setState({ viewState: uiState.viewState })
+    }
+  }, [uiState.viewState])
 
   // Instantiate layers and inject maps and filter data from the context.
-  // WARNING: Doing this because DeckGL layers had already context. At the moment of coding
-  // this project DeckGL layers are Class components so only one context can be set.
+  // WARNING: Doing this because DeckGL layers had already a context. At the moment of coding
+  // this project, DeckGL layers are Class components so only one context can be set.
   const { data, filters } = mapState
   const preparedLayers = [...layers.map(([L, props]) => {
     props = {
@@ -82,26 +93,38 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
   // getting Mapbox viewState and style
   const { viewState } = state
   const mapStyle = (process.env.REACT_APP_MAPBOX_STYLE) ? `${process.env.REACT_APP_MAPBOX_STYLE}` : MAP_STYLE
+  const { onViewChange } = props
+
+  // Refresh global viewState without interfering with the
+  // map rendering
+  const refreshGlobalViewState = debounce((viewState) => {
+    UIDispatch(updateViewState(viewState))
+  }, 40)
 
   // Handlers
   const handleViewStateChange = useCallback(({ viewState }) => {
     // Important otherwise the map becomes static
     setState({ viewState })
 
-    const { onViewChange } = props
+    // NOTE: When updating UI context directly
+    // without debounce cause rendering issues.
+    refreshGlobalViewState(viewState)
+
     if (onViewChange) {
       onViewChange(viewState)
     }
-  }, [props])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleViewStateSearchChange = useCallback((viewState) => {
     // Move map to match location
     handleViewStateChange({
       viewState: {
-        ...state.viewState,
-        ...viewState,
         transitionInterpolator: new FlyToInterpolator(),
-        transitionDuration: 3000
+        transitionDuration: 3000,
+        ...state.viewState,
+        ...viewState
+
       }
     })
   }, [handleViewStateChange, state.viewState])
