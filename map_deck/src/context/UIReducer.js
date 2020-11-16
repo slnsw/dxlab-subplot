@@ -6,7 +6,8 @@ export const ActionTypes = {
   UI_MAP_FOCUS: 'UI_MAP_FOCUS',
   UI_MAP_UNFOCUS: 'UI_MAP_UNFOCUS',
 
-  UI_MAP_IDLE_FOCUS: 'UI_MAP_IDLE_FOCUS'
+  UI_MAP_IDLE_FOCUS: 'UI_MAP_IDLE_FOCUS',
+  UI_MAPS_UPDATE_VIEW_STATE_COMPLETE: 'UI_MAPS_UPDATE_VIEW_STATE_COMPLETE'
 
 }
 
@@ -45,6 +46,16 @@ export function UIReducer (state, action) {
       return {
         ...state,
         ...action
+      }
+    }
+
+    case ActionTypes.UI_MAPS_UPDATE_VIEW_STATE_COMPLETE: {
+      return {
+        ...state,
+        viewState: {
+          ...state.viewState,
+          ...action.viewState
+        }
       }
     }
 

@@ -1,25 +1,21 @@
-.rootStyle {
-    position: absolute;
-    color: white;
-    top: 20;
-    right: 7%;
-    z-index: 3010;
-  }
-  
-  .rangeHeaderStyle {
+@import '../../../global';
+
+.root {
+  position: absolute;
+  color: $PRIMARY_COLOR;
+  top: 20;
+  right: 7%;
+  z-index: 3010;
+
+  .range {
     text-align: right;
     margin-bottom: 0;
   }
-  
-  .infoStyle {
+
+  .info {
+    width: 40vw;
     text-align: right;
     margin-top: 0;
+    float: right;
   }
-  
-  .imgRootStyle {
-    position: fixed;
-    border: 2px solid rgba(255, 255, 255, .5);
-    background-color: rgba(255, 255, 255, .2);
-    margin: 20px;
-    width: 512px;
-  }
+}

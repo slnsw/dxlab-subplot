@@ -44,3 +44,21 @@ export function focusIdleMap (object) {
     })
   }
 }
+
+export function updateViewState ({ ...viewState }) {
+  return (dispatch, state) => {
+    dispatch({
+      type: ActionTypes.UI_MAPS_UPDATE_VIEW_STATE_COMPLETE,
+      viewState
+    })
+  }
+}
+
+export function goToViewState ({ ...viewState }) {
+  return (dispatch, state) => {
+    dispatch({
+      type: ActionTypes.UI_MAPS_UPDATE_VIEW_STATE_COMPLETE,
+      viewState: { ...viewState, goTo: true }
+    })
+  }
+}

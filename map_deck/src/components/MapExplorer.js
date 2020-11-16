@@ -1,5 +1,5 @@
 
-import React, { useContext, useEffect, useState, useCallback } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 
 // UI Components
@@ -9,7 +9,6 @@ import { Header } from './ui/header/Header'
 import { LookupInfo } from './ui/lookups/LookupInfo'
 import { Fog } from './ui/fog/Fog'
 import { MapViewer } from './ui/mapViewer/MapViewer'
-// import { MapViewer } from './MapViewerOld'
 
 // Idle
 import { useIdleTimer } from 'react-idle-timer'
@@ -33,7 +32,7 @@ import { MapsCloudLayer } from './layers/MapsCloudLayer'
 // UI, Map actions and contexts
 import { selectMap, focusIdleMap, focusMap, removeFocusMap } from '../context/UIActions'
 import { MapDataContext } from '../context/MapsContext'
-import { getMaps, getMapsWithin, clearMapsWithin, updateViewState } from '../context/MapsActions'
+import { getMapsWithin, clearMapsWithin } from '../context/MapsActions'
 import { UIContext } from '../context/UIContext'
 
 // Utils
@@ -41,22 +40,16 @@ import { get, sample, isEmpty, find } from 'lodash'
 import distance from '@turf/distance'
 import { point } from '@turf/helpers'
 
-export const MapExplorer = ({ mode }) => {
+export const MapExplorer = ({ mode = 'kiosk' }) => {
   const [ready, setReady] = useState(false)
   const [rangeStyle, setRangeStyle] = useState({})
   const [showSearch, setShowSearch] = useState(true)
   const [mapState, mapDispatch] = useContext(MapDataContext)
   const [uiState, UIDispatch] = useContext(UIContext)
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const _mapDispatch = useCallback(mapDispatch, [])
-
-  // Load map data
   useEffect(() => {
-    _mapDispatch(getMaps({})).then(() => {
-      setReady(true)
-    })
-  }, [_mapDispatch])
+    setReady(true)
+  }, [mapState.dataSet])
 
   // Idle logic
   const { reset } = useIdleTimer({
@@ -100,8 +93,8 @@ export const MapExplorer = ({ mode }) => {
   }
 
   const handleViewChange = (viewState) => {
-    // console.log('change view')
-    mapDispatch(updateViewState(viewState))
+    // UIDispatch(updateViewState(viewState))
+    // mapDispatch(updateViewState(viewState))
 
     // Calculate if we are still within the lookup zone requested by the user
     const { near = {} } = mapState
@@ -110,10 +103,10 @@ export const MapExplorer = ({ mode }) => {
       const { longitude, latitude } = viewState
       const lookupAt = point([longitude, latitude])
       const dst = distance(lookupRoi, lookupAt, { units: 'kilometers' })
-      // if (dst > 5) {
-      //   // Clean search near lookups
-      //   mapDispatch(clearMapsWithin())
-      // }
+      if (dst > 5) {
+        // Clean search near lookups
+        // mapDispatch(clearMapsWithin())
+      }
     }
   }
 

@@ -1,4 +1,4 @@
-$TEXT_COLOR : #ffc400;
+@import '../../../global';
 
 .container {
     z-index: 200;
@@ -19,7 +19,7 @@ $TEXT_COLOR : #ffc400;
         margin: 2px;
 
         span {
-            color: $TEXT_COLOR;
+            color: $ACCENT_COLOR;
         }
     }
  }
