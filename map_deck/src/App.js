@@ -2,11 +2,20 @@ import './App.scss'
 
 import React from 'react'
 import { Route, Switch, BrowserRouter } from 'react-router-dom'
+import { createBrowserHistory as createHistory } from 'history'
 
 import { MapsProvider } from './context/MapsContext'
 import { UIProvider } from './context/UIContext'
 
 import { MapRoutes } from './Routes'
+
+// Only for S3 to allow deep linking
+const history = createHistory()
+
+const path = (/#!(\/.*)$/.exec(window.location.hash) || [])[1]
+if (path) {
+  history.replace(path)
+}
 
 function App () {
   const initial = {
