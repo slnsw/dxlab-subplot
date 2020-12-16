@@ -8,6 +8,7 @@ import { Range } from './ui/range/Range'
 import { Header } from './ui/header/Header'
 import { LookupInfo } from './ui/lookups/LookupInfo'
 import { Fog } from './ui/fog/Fog'
+import { NavigationControl } from './ui/navigation/Navigation'
 import { MapViewer } from './ui/mapViewer/MapViewer'
 
 // Idle
@@ -197,6 +198,8 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
         onViewChange={handleViewChange}
         showSearch={showSearch}
       />
+
+      <NavigationControl />
 
       <Fog />
 

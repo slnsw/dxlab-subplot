@@ -1,0 +1,55 @@
+@import '../../../global';
+
+.root {
+  perspective: 1000px;
+  position: absolute;
+  right: 50px;
+  bottom: 200px;
+  z-index: 3020;
+
+  
+  .container {
+    cursor: grab;
+    opacity: .8;
+
+    background-color: $ACCENT_COLOR;
+    width: 120px;
+    height: 120px;
+
+    // transition: transform 100ms linear;
+    transform-style: preserve-3d;
+    border-radius: 50%;
+    overflow: hidden;
+    
+    &::before {
+      content: 'N';
+      font-family: 'Courier New', Courier, monospace;
+
+      font-size: 15px;
+      color: black;
+      font-weight: 700;
+      width: 100%;
+      text-align: center;
+      display: block;
+      margin-top: 10px;
+    } 
+  }
+
+  .arrow {
+    position: relative;
+    transform: translateX(-50%);
+    left: 50%;
+    top: 10px;
+    width: 0; 
+    height: 0; 
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    
+    border-bottom: 50px solid black;
+    opacity: .5;
+
+
+  }
+
+}
+

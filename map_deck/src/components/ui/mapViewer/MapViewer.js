@@ -99,7 +99,7 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
   // map rendering
   const refreshGlobalViewState = debounce((viewState) => {
     UIDispatch(updateViewState(viewState))
-  }, 40)
+  }, 10)
 
   // Handlers
   const handleViewStateChange = useCallback(({ viewState }) => {
@@ -111,7 +111,7 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
     refreshGlobalViewState(viewState)
 
     if (onViewChange) {
-      onViewChange(viewState)
+      // onViewChange(viewState)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
