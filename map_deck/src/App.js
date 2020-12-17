@@ -10,7 +10,7 @@ import { UIProvider } from './context/UIContext'
 import { MapRoutes } from './Routes'
 
 // Only for S3 to allow deep linking
-const history = createHistory()
+const history = createHistory({ basename: process.env.PUBLIC_URL })
 
 const path = (/#!(\/.*)$/.exec(window.location.hash) || [])[1]
 if (path) {
@@ -30,7 +30,7 @@ function App () {
 
   return (
     <>
-      <BrowserRouter>
+      <BrowserRouter basename={process.env.PUBLIC_URL}>
         <MapsProvider {...initial}>
           <UIProvider>
             <Switch>
