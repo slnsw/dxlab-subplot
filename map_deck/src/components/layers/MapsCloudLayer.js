@@ -18,7 +18,7 @@ export class MapsCloudLayer extends CompositeLayer {
 
       const { filters } = this.props
       const { fromYear, toYear } = filters
-
+      let elevationOffset = 0
       // Prepare data for loading sprite maps and sort by offsetZ.
       // Sorting by offsetZ is important because SpriteBitmapLayer internally
       // disable depthMask to remove artifacts created by overlapping two PNG
@@ -27,8 +27,9 @@ export class MapsCloudLayer extends CompositeLayer {
         const { geometry, properties } = el
 
         if (geometry) {
+          elevationOffset = elevationOffset + 0.01
           const { year } = properties
-          const elevation = getYearElevation({ fromYear, toYear, year }) + 1
+          const elevation = getYearElevation({ fromYear, toYear, year }) + (1 + elevationOffset)
 
           result.push({
             bounds: properties.image_bounds.coordinates[0].map((c) => [...c]),
