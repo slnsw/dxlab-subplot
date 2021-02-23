@@ -17,3 +17,7 @@
 .rc-slider-tooltip {
   z-index: 3002;
 }
+
+body, html{
+  overflow:hidden  // scrolling.
+}
