@@ -7,7 +7,7 @@ import { getMaps } from './context/MapsActions'
 import { selectMap, goToViewState } from './context/UIActions'
 import { MapExplorer } from './components/MapExplorer'
 
-import { find } from 'lodash'
+import { find, debounce } from 'lodash'
 
 /**
  * Component to control URL deep linking of the
@@ -24,6 +24,14 @@ export const MapRoutes = () => {
   const _mapDispatch = useCallback(mapDispatch, [])
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _uiDispatch = useCallback(uiDispatch, [])
+
+  // Update location history
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const updateHistory = useCallback(
+    debounce((url) => {
+      history.replace(url)
+    }, 1000)
+    , [])
 
   // Kick loading of the data as soon as the router path
   // is loaded
@@ -82,9 +90,10 @@ export const MapRoutes = () => {
       // Build final URL
       const urlParts = [newRange, newLocation, asset_id]
       const newUrl = `/${urlParts.filter(p => p).join('/')}`
-      history.replace(newUrl)
+      // history.replace(newUrl)
+      updateHistory(newUrl)
     }
-  }, [mapState.filters, uiState.viewState, uiState.selected, init, history, id, location])
+  }, [mapState.filters, uiState.viewState, uiState.selected, init, history, id, location, updateHistory])
 
   return (
     <>

@@ -101,6 +101,12 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
     UIDispatch(updateViewState(viewState))
   }, 10)
 
+  // Set initial map viewState globally
+  useEffect(() => {
+    refreshGlobalViewState(viewState)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // Handlers
   const handleViewStateChange = useCallback(({ viewState }) => {
     // Important otherwise the map becomes static
