@@ -33,7 +33,7 @@ export class DraggableSlider extends Slider {
   onTrackEventMove (e) {
     const isTouch = window.TouchEvent && e instanceof TouchEvent
     const {
-      state: { handles: curr, pixelToStep, prevDragValue = 0, step, domain },
+      state: { handles: curr, pixelToStep, prevDragValue = 0, step, domain, offsetValues },
       props: { vertical }
     } = this
 
@@ -49,35 +49,39 @@ export class DraggableSlider extends Slider {
     // find the closest value (aka step) to the event location
     const updateValue = (!isTouch) ? pixelToStep.getValue(vertical ? e.clientY : e.pageX) : pixelToStep.getValue(getTouchPosition(vertical, e))
 
+    let offsets = offsetValues
+    if (!offsetValues) {
+      const currValues = curr.map(v => v.val)
+      offsets = [-(updateValue - min(currValues)), max(currValues) - updateValue]
+      this.setState({ offsetValues: offsets })
+    }
+
     if (updateValue !== prevDragValue) {
-      let direction = 0
-      if (prevDragValue !== 0) {
-        direction = ((updateValue - prevDragValue) < 0) ? -step : step
-      }
       // Store current drag value for next calculation
       this.setState({ prevDragValue: updateValue })
 
-      // Update handlers if direction detected
-      if (direction !== 0) {
-        const values = []
-        const next = curr.map((h) => {
-          const val = h.val + direction
-          values.push(val)
-          return {
-            ...h,
-            val
-          }
-        })
+      // sort handlers
+      curr.sort((a, b) => a.val - b.val)
 
-        if (min(values) >= domain[0] && max(values) <= domain[1]) {
-          this.submitUpdate(next, true)
+      // Apply offsets
+      const values = []
+      const next = curr.map((h, i) => {
+        const nextVal = updateValue + offsets[i]
+        values.push(nextVal)
+        return {
+          ...h,
+          val: nextVal
         }
+      })
+
+      if (min(values) >= domain[0] && max(values) <= domain[1]) {
+        this.submitUpdate(next, true)
       }
     }
   }
 
   onTrackMouseUp (event) {
-    this.setState({ dragRefValue: null })
+    this.setState({ dragRefValue: null, offsetValues: null })
     if (isBrowser) {
       document.removeEventListener('mousemove', this.onTrackEventMove)
       document.removeEventListener('mouseup', this.onTrackMouseUp)
@@ -85,7 +89,7 @@ export class DraggableSlider extends Slider {
   }
 
   onTrackTouchEnd (event) {
-    this.setState({ dragRefValue: null })
+    this.setState({ dragRefValue: null, offsetValues: null })
     if (isBrowser) {
       document.removeEventListener('touchmove', this.onTrackEventMove)
       document.removeEventListener('touchend', this.onTrackMouseUp)
