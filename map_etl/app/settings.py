@@ -17,6 +17,7 @@ class Settings(object):
 
     # COMMASTER IMAGES MAINLY TIF FILES
     SLNSW_COMASTERS_PATH = env('SLNSW_COMASTERS_PATH', './data/SLNSW/comaster')
+    SLNSW_TILED_IMAGE_BASE_URL = env('SLNSW_TILED_IMAGE_BASE_URL')
 
     # Use for crawling the crawler
     GOOGLE_API_KEY = env('GOOGLE_API_KEY')

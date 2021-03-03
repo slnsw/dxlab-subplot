@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """Module with logic to load raw SLNSW data into MongoDB."""
 
-import os
 import csv
 import json
+import requests
 
 from pydash import py_
 from logzero import logger
@@ -98,3 +98,54 @@ class SLNSWCollectionWebsiteLoader(MongoLoader):
             data.update(self.load_data(url))
 
             yield data
+
+
+class SLNSWTestIIFUrls(MongoLoader):
+    """Check if IIIF url found in SLNSW collection are active"""
+
+    reference_field = 'asset_id'
+    database = settings.MONGO_DATABASE
+    collection = 'raw_slnsw_ifff_urls'
+
+    SLNSW_IFFF = '{settings.SLNSW_TILED_IMAGE_BASE_URL}/{url_id}'
+
+    # def load_data(self, url: str) -> dict:
+    #     data = []
+    #     logger.debug('Getting hidden data from: {}'.format(url))
+
+    #     d = pq(url=url)
+    #     next_data = pq(d('script#__NEXT_DATA__')[0]).text()
+
+    #     return json.loads(next_data)
+
+    def load_objects(self, *args, **kwargs):
+        qs = self.queryset(SLNSWCollectionWebsiteLoader.collection, {})
+
+        for doc in qs:
+            url = py_.get(doc, 'props.pageProps.file.image.iiifImageUrl', None)
+            asset_id = py_.get(doc, 'asset_id')
+
+            # not really friendly
+            if self.collection.find_one({"asset_id": asset_id}) is not None:
+                logger.debug(f'skip -> {asset_id}')
+                continue
+
+            ok = False
+            if url is not None:
+                # print(asset_id, url)
+                res = requests.get(url)
+                ok = res.status_code == 200
+                if not ok:
+                    print(asset_id, ok)
+
+            # iiifImageUrl
+            # Select only the basic data
+            # data = py_.pick(doc, 'asset_id', 'url_id')
+
+            # # Build url
+            # url = self.SLNSW_IFFF.format(**data)
+
+            # # Get data and merge
+            # data.update(self.load_data(url))
+
+            yield {'asset_id': asset_id, 'url': url, 'ok': ok}

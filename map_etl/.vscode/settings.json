@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "./.venv/bin/python3",
+    "python.pythonPath": ".venv/bin/python3.8",
     "editor.formatOnSave": true,
     "python.formatting.provider": "yapf",
     "editor.rulers": [

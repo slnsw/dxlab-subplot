@@ -6,7 +6,9 @@ import logzero
 from app.datasource.klokan import (
     KlokanGoogleCSVLoader, KlokanHiddenDataLoader, KlokanGeoreferenceFilesLoader, KlokanWorldFileLoader
 )
-from app.datasource.slnsw import SLNSWSubdivisionsCSVLoader, SLNSWLinkTitlesLoader, SLNSWCollectionWebsiteLoader
+from app.datasource.slnsw import (
+    SLNSWSubdivisionsCSVLoader, SLNSWLinkTitlesLoader, SLNSWCollectionWebsiteLoader, SLNSWTestIIFUrls
+)
 from app.datasource.images import (ComasterImagesLoader, ComasterDuplicateImageLoader, ComasterImageProcessLoader)
 from app.datasource.google import SearchEngineDataLoader, SearchEngineSubdivisionIndexLoader, SearchEngineSubdivisionLoader
 from app.datasource.suburbs import NSWSuburbsCSVLoader
@@ -85,6 +87,14 @@ def ingest_slnsw_title_links_raw_data():
 def ingest_slnsw_collection_raw_data():
     """Ingest hidden NEXT data from SLNSW collection data"""
     web_loader = SLNSWCollectionWebsiteLoader()
+    web_loader.execute()
+
+
+@cli.command()
+@click.confirmation_option(prompt='Do you want to continue?')
+def test_slnsw_iiif_urls_raw_data():
+    """Test SLNSW IIIF Urls from raw data"""
+    web_loader = SLNSWTestIIFUrls()
     web_loader.execute()
 
 

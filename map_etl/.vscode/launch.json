@@ -83,6 +83,17 @@
             ]
         },
         {
+            "name": "Test IIIF urls from SLNSW Collection data",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "test-slnsw-iiif-urls-raw-data",
+                "--yes"
+            ]
+        },
+        {
             "name": "Ingest SLNSW comaster images",
             "type": "python",
             "request": "launch",
