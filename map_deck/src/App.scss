@@ -30,3 +30,12 @@ body, html{
   -webkit-user-select: none; /* Chrome, Safari, and Opera */
   -webkit-touch-callout: none; /* Disable Android and iOS callouts*/
 }
+
+
+// Fix timeline not clickable in kiosk mode 
+
+.chartjs-size-monitor {
+  pointer-events: auto !important;
+  visibility: visible !important;
+  z-index: auto !important;
+}
