@@ -2,12 +2,9 @@
 @import './slick.scss';
 @import './slick-theme.scss';
 
-// @import url('https://fonts.googleapis.com/css?family=Bitter|Roboto+Slab&display=swap');
-@import url('https://fonts.googleapis.com/css?family=Lekton&display=swap');
 
 * {
-  font-family: 'Lekton', sans-serif;
-  /* font-family: 'Bitter', serif; */
+  font-family: $FONT_PRIMARY;
 }
 
 body {

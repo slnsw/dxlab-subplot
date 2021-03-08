@@ -23,7 +23,7 @@
     
     &::before {
       content: 'N';
-      font-family: 'Courier New', Courier, monospace;
+      font-family: $FONT_SECONDARY;
 
       font-size: 15px;
       color: black;

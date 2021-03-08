@@ -4,8 +4,9 @@
   position: absolute;
   color: $PRIMARY_COLOR;
   top: 20;
-  right: 7%;
+  right: 70px;
   z-index: 3010;
+  line-height: $LINE_HEIGHT_MD;
 
   .range {
     text-align: right;
@@ -17,5 +18,6 @@
     text-align: right;
     margin-top: 0;
     float: right;
+    color: $PRIMARY_COLOR;
   }
 }

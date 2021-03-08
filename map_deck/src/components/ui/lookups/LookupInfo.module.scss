@@ -13,12 +13,17 @@
  .info {
     margin-left: 300px;
     margin-top: 20px;
-    color: white;
+    color: $PRIMARY_COLOR;
 
     p {
-        margin: 2px;
+        margin: 4px;
+        list-style: $LINE_HEIGHT_MD;
 
         span {
+            color: $ACCENT_COLOR;
+            font-size: $FONT_SIZE_SM;
+            font-family: $FONT_SECONDARY;
+            line-height: $LINE_HEIGHT_SM;
             color: $ACCENT_COLOR;
         }
     }

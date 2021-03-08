@@ -24,7 +24,8 @@ $CONTENT_MARGIN: 30px;
         .title {
             color: $PRIMARY_COLOR;
             text-align: left;
-            font-size: 25px;
+            font-size: $FONT_SIZE_LG;
+            line-height: $LINE_HEIGHT_MD;
 
             max-width: 95%;
             font-weight: bolder;
@@ -35,12 +36,14 @@ $CONTENT_MARGIN: 30px;
         }
 
         .info {
-            font-size: 20px;
+            // font-size: 20px;
+            font-size: $FONT_SIZE_SM;
             // float: left;
             // width: 49%;
             margin: 5px 0 25px 0;
             display: block;
             color: $ACCENT_COLOR;
+            font-family: $FONT_SECONDARY;
         }
 
     }
