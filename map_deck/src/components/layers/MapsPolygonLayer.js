@@ -3,7 +3,7 @@
 import { CompositeLayer } from 'deck.gl'
 import { GeoJsonLayer, TextLayer } from '@deck.gl/layers'
 
-import { getImageUrl, getYearElevation } from '../../share/utils/helpers'
+import { getYearElevation } from '../../share/utils/helpers'
 
 import { max, min, get } from 'lodash'
 import { scaleLinear } from 'd3-scale'
@@ -26,7 +26,7 @@ export class MapsPolygonLayer extends CompositeLayer {
           const { year } = properties
           const elevation = getYearElevation({ fromYear, toYear, year, offsetZ: 0 })
 
-          const image = getImageUrl(properties.asset_id, suffix, '16')
+          // const image = getImageUrl(properties.asset_id, suffix, '16')
           const feature = {
             ...el,
             geometry: {
@@ -36,7 +36,7 @@ export class MapsPolygonLayer extends CompositeLayer {
             properties: {
               ...properties,
               elevation,
-              image_url: image,
+              // image_url: image,
               // IMPORTANT: Change image bound structure to a single array
               // Deck.gl API needs image bounds in a single array.
               image_bounds: properties.image_bounds.coordinates[0].map((c) => ([...c, elevation])),
@@ -84,13 +84,13 @@ export class MapsPolygonLayer extends CompositeLayer {
     const layers = []
 
     const zoom = this.context.viewport.zoom
-    const lod = [8, 16, 32, 64, 128, 512] //, 1024]
-    const scale = scaleLinear([4, 18], [0, lod.length - 1])
+    // const lod = [8, 16, 32, 64, 128, 512] //, 1024]
+    // const scale = scaleLinear([4, 18], [0, lod.length - 1])
 
     // TODO: Decouple this context from this layer. Option inject focus via props
     const [uiState] = uiContext
     const inFocus = get(uiState, 'focus.properties.asset_id', null)
-    const inFocusYear = get(uiState, 'focus.properties.year', null)
+    // const inFocusYear = get(uiState, 'focus.properties.year', null)
 
     const geoJsonFillLayer = new GeoJsonLayer(this.getSubLayerProps({
       id: `${id}-geojson-cutlines`,
@@ -155,7 +155,7 @@ export class MapsPolygonLayer extends CompositeLayer {
     }))
 
     layers.push(geoJsonFillLayer)
-    layers.push(mapLabels)
+    // layers.push(mapLabels)
 
     return layers
   }

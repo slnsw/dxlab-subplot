@@ -19,7 +19,7 @@ export class LandmarksLayer extends CompositeLayer {
           position: [151.2149685, -33.857158999999996],
           orientation: [0, 0, 90],
           translation: [28, 38, 0],
-          color: [200, 200, 200, 125]
+          color: [200, 200, 200, 200]
         },
         useTexture: false,
         sizeScale: 1
@@ -72,6 +72,7 @@ export class LandmarksLayer extends CompositeLayer {
       id: `${id}-landmark-${name}`,
       data: [{ position, orientation, translation, color, scale }],
       scenegraph: sceneURL,
+      material: false,
 
       // Default use 'args' to override values
       sizeScale: 4000,
