@@ -6,12 +6,22 @@
     display: block;
     // height: 100vh;
     width: 100vw;
-    bottom: 200px;
+    bottom: 230px;
  }
 
  .keyboardContainer {
         position: absolute;
-        left: 120px;
-        top: -180px;
+        left: 3vw;
+        top: -152px;
         width: 33vw;
+ }
+
+ .fab {
+    background-color: $ACCENT_COLOR !important;
+    width: 80px !important;
+    height: 80px !important; 
+ }
+
+ .geocoder {
+    margin-top: -56px !important;
  }

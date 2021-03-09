@@ -101,6 +101,7 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
       ...uiState.viewState,
       latitude: center[1],
       longitude: center[0],
+      zoom: 14,
       bearing: Math.floor(Math.random() * Math.floor(360)),
       transitionInterpolator: new FlyToInterpolator(),
       transitionDuration: 3000
@@ -197,7 +198,6 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
 
   return (
     <>
-
       <ModalWindow />
 
       {ready > 0 &&
@@ -220,7 +220,6 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
       />
 
       <NavigationControl />
-
       {/* <Fog /> */}
 
     </>)

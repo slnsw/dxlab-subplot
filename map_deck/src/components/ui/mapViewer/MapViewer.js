@@ -2,9 +2,7 @@ import React, { useContext, useEffect, useState, useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import DeckGL from '@deck.gl/react'
-// import Geocoder from 'react-map-gl-geocoder'
 import { FlyToInterpolator } from 'deck.gl'
-// import MapGL, { InteractiveMap } from 'react-map-gl'
 import { InteractiveMap } from 'react-map-gl'
 
 // Custom mapbox style
@@ -27,8 +25,8 @@ const INITIAL_VIEW_STATE = {
   longitude: 151.2101,
   bearing: -163,
   pitch: 60,
-  zoom: 14 //
-  // reuseMaps: true
+  zoom: 14, //
+  reuseMaps: true
 }
 
 export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
@@ -168,14 +166,16 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
     <>
       <DeckGL
         // initialViewState={INITIAL_VIEW_STATE}
+        // layerFilter={layerViewVisibility}
         viewState={viewState}
         effects={[lightingEffect]}
+        layers={preparedLayers}
         // onViewStateChange={e => setViewState(e.viewState)}
         onViewStateChange={handleViewStateChange}
         controller={{ inertia: true, touchRotate: true }}
-        layers={preparedLayers}
         useDevicePixels={false}
         _animate
+        far={20}
 
       >
         <InteractiveMap
@@ -185,39 +185,6 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
           preventStyleDiffing
         />
       </DeckGL>
-      {/* <DeckGL
-        layerFilter={layerViewVisibility}
-        effects={[lightingEffect]}
-        layers={preparedLayers}
-        viewState={viewState}
-        controller
-        onViewStateChange={(handleViewStateChange)}
-        far={20}
-      >
-
-        <InteractiveMap
-          reuseMaps
-          mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
-          mapStyle={mapStyle}
-          preventStyleDiffing
-          ref={mapRef}
-        >
-          {showSearch &&
-            <Geocoder
-              mapRef={mapRef}
-              containerRef={geocoderContainerRef}
-              onResult={handleOnResult}
-              placeholder='Lookup address'
-              countries='au'
-              proximity={proximity}
-              onViewportChange={handleViewStateSearchChange}
-              mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
-              position='top-left'
-            />}
-
-        </InteractiveMap>
-
-      </DeckGL> */}
 
     </>
   )

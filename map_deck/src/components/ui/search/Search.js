@@ -1,13 +1,15 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react'
+import React, { useState, useCallback, useRef, useEffect, useContext } from 'react'
 import PropTypes from 'prop-types'
 
 import { Fab, Grid, Zoom } from '@material-ui/core'
 import SearchIcon from '@material-ui/icons/Search'
-import { get } from 'lodash'
+import { get, isEmpty } from 'lodash'
 
 import styles from './Search.module.scss'
-import { Geocoder } from '../geocoder/geocoder'
+import { Geocoder } from '../geocoder/Geocoder'
 import { ScreenKeyboard } from '../screenKeyboard/ScreenKeyboard'
+import { MapDataContext } from '../../../context/MapsContext'
+import { clearMapsWithin } from '../../../context/MapsActions'
 
 // Geocoder, execute geo-search around sydney
 const proximity = { longitude: 151.21065829636484, latitude: -33.86631790142455 }
@@ -19,6 +21,8 @@ export const Search = ({ onGeoLookupSearchResult, useVirtualKeyboard = false }) 
   const keyboardRef = useRef()
   const keyboardWrapperRef = useRef()
   const geocoderRef = useRef()
+
+  const [mapState, mapDispatch] = useContext(MapDataContext)
 
   const handleToggle = useCallback(() => {
     setToggleSearch(!toggleSearch)
@@ -35,7 +39,18 @@ export const Search = ({ onGeoLookupSearchResult, useVirtualKeyboard = false }) 
 
   const handleOnClear = useCallback(() => {
     setToggleSearch(true)
+    // Clean search near lookups
+    mapDispatch(clearMapsWithin())
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Clean search if Idle is trigger
+  useEffect(() => {
+    // near
+    if (isEmpty(mapState.near)) {
+      reset()
+    }
+  }, [mapState.near])
 
   const handleOnBlur = useCallback((value) => {
     if (value === null && !useVirtualKeyboard) {
@@ -66,6 +81,7 @@ export const Search = ({ onGeoLookupSearchResult, useVirtualKeyboard = false }) 
     // updateKeyboard('')
   })
 
+  // Control virtual keyboard display
   useEffect(() => {
     if (useVirtualKeyboard) {
       setToggleKeyboard(toggleSearch)
@@ -81,6 +97,12 @@ export const Search = ({ onGeoLookupSearchResult, useVirtualKeyboard = false }) 
     if (keyboardRef.current) {
       keyboardRef.current.setInput(value)
     }
+  }
+
+  const reset = () => {
+    setToggleSearch(true)
+    setScreenKeyboardValue('')
+    updateKeyboard('')
   }
 
   return (
@@ -99,9 +121,9 @@ export const Search = ({ onGeoLookupSearchResult, useVirtualKeyboard = false }) 
               aria-label='add'
               disableRipple
               onClick={handleToggle}
-            //   style={{ width: '80px', height: '80px' }}
+              className={styles.fab}
             >
-              <SearchIcon />
+              <SearchIcon fontSize='large' />
             </Fab>
           </Grid>
         </Zoom>
@@ -111,7 +133,7 @@ export const Search = ({ onGeoLookupSearchResult, useVirtualKeyboard = false }) 
             if (!useVirtualKeyboard) geocoderRef.current.focus()
           }}
         >
-          <Grid item id='geocoder' style={{ marginTop: '-40px' }}>
+          <Grid item id='geocoder' className={styles.geocoder}>
             <Geocoder
               ref={geocoderRef}
               accessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}

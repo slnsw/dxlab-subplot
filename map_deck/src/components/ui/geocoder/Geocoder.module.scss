@@ -1,0 +1,34 @@
+@import '../../../global';
+
+.paper {
+   background-color: rgba(black, .5) !important;
+   border-radius: 0 !important;
+   padding: 10px !important;
+}
+
+.root {
+   color: rgba($PRIMARY_COLOR, .7) !important;
+
+   &::before {
+      border-bottom-color: rgba($PRIMARY_COLOR, .4) !important;
+   }
+
+   &::after {
+      border-bottom-color: $ACCENT_COLOR !important;
+   }
+
+   input {
+      text-align: center;
+   }
+
+   button {
+      visibility: visible !important;
+      color:rgba($PRIMARY_COLOR, .4) !important;
+   }
+}
+
+
+.popper {
+   // background-color: black !important;
+   // border-radius: 0 !important;
+}
