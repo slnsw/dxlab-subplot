@@ -7,12 +7,15 @@ import { ModalWindow } from './ui/modal/ModalWindow'
 import { Range } from './ui/range/Range'
 import { Header } from './ui/header/Header'
 import { LookupInfo } from './ui/lookups/LookupInfo'
+import { Search } from './ui/search/Search'
 import { Fog } from './ui/fog/Fog'
 import { NavigationControl } from './ui/navigation/Navigation'
 import { MapViewer } from './ui/mapViewer/MapViewer'
 
 // Idle
 import { useIdleTimer } from 'react-idle-timer'
+
+import { FlyToInterpolator } from 'deck.gl'
 
 // Data visualization and info layers
 import { LandmarksLayer } from './layers/LandmarksLayer'
@@ -31,7 +34,7 @@ import { MapsCloudLayer } from './layers/MapsCloudLayer'
 // import { MapsDistributionLayer } from './layers/MapsDistributionLayer'
 
 // UI, Map actions and contexts
-import { selectMap, focusIdleMap, focusMap, removeFocusMap } from '../context/UIActions'
+import { selectMap, focusIdleMap, focusMap, removeFocusMap, goToViewState } from '../context/UIActions'
 import { MapDataContext } from '../context/MapsContext'
 import { getMapsWithin, clearMapsWithin } from '../context/MapsActions'
 import { UIContext } from '../context/UIContext'
@@ -91,6 +94,20 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
   const handleGeoSearchResult = (result) => {
     // Find closest maps to the search
     mapDispatch(getMapsWithin({ center: result.geometry, radius: 2, placeName: result.place_name }))
+
+    const { center } = result
+
+    const viewState = {
+      ...uiState.viewState,
+      latitude: center[1],
+      longitude: center[0],
+      bearing: Math.floor(Math.random() * Math.floor(360)),
+      transitionInterpolator: new FlyToInterpolator(),
+      transitionDuration: 3000
+
+    }
+
+    UIDispatch(goToViewState(viewState))
   }
 
   const handleViewChange = (viewState) => {
@@ -164,13 +181,13 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
   const layers = [
     [FootprintShadowLayer, { view: 'master' }],
     [SearchAreaLayer, { view: 'master' }],
-    [LandmarksLayer, { view: 'master' }],
-    // [MapsDistributionLayer, { view: 'master' }]
-    // [MapsLabelLayer, { view: 'master' }],
-    // [FootprintMapsLayer, { view: 'all' }],
+    [LandmarksLayer, { view: 'master', material: false }],
     [MapsPolygonLayer, { view: 'master', ...handlers }],
     [MapsCloudLayer, { view: 'master' }]
 
+    // // // [MapsDistributionLayer, { view: 'master' }]
+    // // // [MapsLabelLayer, { view: 'master' }],
+    // // // [FootprintMapsLayer, { view: 'all' }],
     // [MapsClusterCounts, { view: 'master' }]
     // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: 'crop', view: 'all', ...handlers }]
     // [MapsBitmapLayer, { id: 'edge', name: 'edge', suffix: '_edge.png', view: 'slave', ...handlers }]
@@ -187,6 +204,10 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
         <>
           <Header />
           <LookupInfo />
+          <Search
+            useVirtualKeyboard
+            onGeoLookupSearchResult={handleGeoSearchResult}
+          />
           <Range style={rangeStyle} />
         </>}
 
@@ -194,14 +215,13 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
         mode={mode}
         layers={layers}
         uiContext={[uiState, UIDispatch]}
-        onGeoLookupSearchResult={handleGeoSearchResult}
         onViewChange={handleViewChange}
         showSearch={showSearch}
       />
 
       <NavigationControl />
 
-      <Fog />
+      {/* <Fog /> */}
 
     </>)
 }

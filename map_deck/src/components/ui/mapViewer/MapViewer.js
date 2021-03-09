@@ -1,11 +1,10 @@
-import 'react-map-gl-geocoder/dist/mapbox-gl-geocoder.css'
-
 import React, { useContext, useEffect, useState, useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import DeckGL from '@deck.gl/react'
-import Geocoder from 'react-map-gl-geocoder'
+// import Geocoder from 'react-map-gl-geocoder'
 import { FlyToInterpolator } from 'deck.gl'
+// import MapGL, { InteractiveMap } from 'react-map-gl'
 import { InteractiveMap } from 'react-map-gl'
 
 // Custom mapbox style
@@ -21,24 +20,28 @@ import bearing from '@turf/bearing'
 import lightingEffect from './lights'
 import styles from './MapViewer.module.scss'
 
-// TODO: Set this as a prop
-// Geocoder, execute geo-search around sydney
-const proximity = { longitude: 151.21065829636484, latitude: -33.86631790142455 }
 const mapRef = React.createRef()
-const geocoderContainerRef = React.createRef()
+
+const INITIAL_VIEW_STATE = {
+  latitude: -33.8589,
+  longitude: 151.2101,
+  bearing: -163,
+  pitch: 60,
+  zoom: 14 //
+  // reuseMaps: true
+}
 
 export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
   const [mapState, mapDispatch] = useContext(MapDataContext)
   const [uiState, UIDispatch] = useContext(UIContext)
-  const [state, setState] = useState({
-    viewState: {
-      latitude: -33.8589,
-      longitude: 151.2101,
-      bearing: -163,
-      pitch: 60,
-      zoom: 14, // 15
-      reuseMaps: true
-    }
+  // const [state, setState] = useState({
+  //   viewState: {
+  //     ...INITIAL_VIEW_STATE
+  //   }
+  // })
+
+  const [viewState, setViewState] = useState({
+    ...INITIAL_VIEW_STATE
   })
 
   useEffect(() => {
@@ -59,7 +62,7 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
           pitch: Math.floor(Math.random() * Math.floor(60)),
           transitionInterpolator: new FlyToInterpolator()
         }
-        handleViewStateSearchChange(goTo)
+        flyToViewState(goTo)
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -71,7 +74,8 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
   // work correctly if the state is not local
   useEffect(() => {
     if (!isEmpty(uiState.viewState) && uiState.viewState.goTo) {
-      setState({ viewState: uiState.viewState })
+      // setState({ viewState: uiState.viewState })
+      setViewState({ ...uiState.viewState })
     }
   }, [uiState.viewState])
 
@@ -91,7 +95,7 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
   })]
 
   // getting Mapbox viewState and style
-  const { viewState } = state
+  // const { viewState } = state
   const mapStyle = (process.env.REACT_APP_MAPBOX_STYLE) ? `${process.env.REACT_APP_MAPBOX_STYLE}` : MAP_STYLE
   const { onViewChange } = props
 
@@ -110,7 +114,8 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
   // Handlers
   const handleViewStateChange = useCallback(({ viewState }) => {
     // Important otherwise the map becomes static
-    setState({ viewState })
+    // setState({ viewState })
+    setViewState(viewState)
 
     // NOTE: When updating UI context directly
     // without debounce cause rendering issues.
@@ -122,27 +127,18 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const handleViewStateSearchChange = useCallback((viewState) => {
+  const flyToViewState = useCallback((newViewState) => {
     // Move map to match location
     handleViewStateChange({
       viewState: {
-        transitionInterpolator: new FlyToInterpolator(),
-        transitionDuration: 3000,
-        ...state.viewState,
-        ...viewState
+        // transitionInterpolator: new FlyToInterpolator(),
+        transitionDuration: 1000,
+        ...viewState,
+        ...newViewState
 
       }
     })
-  }, [handleViewStateChange, state.viewState])
-
-  const handleOnResult = (event) => {
-    const { onGeoLookupSearchResult } = props
-
-    if (onGeoLookupSearchResult) {
-      const { result } = event
-      onGeoLookupSearchResult(result)
-    }
-  }
+  }, [handleViewStateChange, viewState])
 
   // Layer visibility
   const getParent = (layer) => {
@@ -170,14 +166,26 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
 
   return (
     <>
-      {/* :P ;( horrible Geocoder needs to be a child of InteractiveMap for that
-    reason Geocoder provides containerRef to allow render it outside */}
-      <div
-        ref={geocoderContainerRef}
-        className={styles.geoCoder}
-      />
-
       <DeckGL
+        // initialViewState={INITIAL_VIEW_STATE}
+        viewState={viewState}
+        effects={[lightingEffect]}
+        // onViewStateChange={e => setViewState(e.viewState)}
+        onViewStateChange={handleViewStateChange}
+        controller={{ inertia: true, touchRotate: true }}
+        layers={preparedLayers}
+        useDevicePixels={false}
+        _animate
+
+      >
+        <InteractiveMap
+          ref={mapRef}
+          mapStyle={mapStyle}
+          mapboxApiAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
+          preventStyleDiffing
+        />
+      </DeckGL>
+      {/* <DeckGL
         layerFilter={layerViewVisibility}
         effects={[lightingEffect]}
         layers={preparedLayers}
@@ -209,7 +217,7 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
 
         </InteractiveMap>
 
-      </DeckGL>
+      </DeckGL> */}
 
     </>
   )
@@ -218,7 +226,6 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
 MapViewer.propTypes = {
   mode: PropTypes.oneOf(['kiosk', 'master', 'slave']),
   layers: PropTypes.array,
-  onGeoLookupSearchResult: PropTypes.func,
   onViewChange: PropTypes.func,
   uiContext: PropTypes.array,
   showSearch: PropTypes.bool

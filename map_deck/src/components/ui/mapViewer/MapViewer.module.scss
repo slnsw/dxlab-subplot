@@ -3,7 +3,16 @@
     position: absolute;
     align-items: center;
     margin: 20px;
-    z-index: 4001;
-    bottom: 150px;
+    z-index: 5001;
+    bottom: 200px;
+    left: 50%;
+    transform: translate(-50%, 0);
+
+
+    // .mapboxgl-ctrl-geocoder--input{
+    //   border-radius: 0;
+    //   border: 1px solid transparent;
+    // }
+
   }
   

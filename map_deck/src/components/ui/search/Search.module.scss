@@ -1,0 +1,17 @@
+@import '../../../global';
+
+.container {
+    z-index: 8000;
+    position: absolute;
+    display: block;
+    // height: 100vh;
+    width: 100vw;
+    bottom: 200px;
+ }
+
+ .keyboardContainer {
+        position: absolute;
+        left: 120px;
+        top: -180px;
+        width: 33vw;
+ }
