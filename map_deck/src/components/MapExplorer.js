@@ -57,8 +57,9 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
   }, [mapState.dataSet])
 
   // Idle logic
-  const { reset } = useIdleTimer({
-    timeout: 1000 * 30, // 60 * 0.4,
+  const { reset, isIdle } = useIdleTimer({
+    timeout: 1000 * 15, // 60 * 0.4,
+    stopOnIdle: true,
     onIdle: (_) => {
       // Select a random time range
       const { maxYear, minYear } = get(mapState, 'meta', {})
@@ -85,13 +86,16 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
         mouseY: 0
       }))
 
-      // Restart Idle
-      reset()
-
       // Clean search near lookups
       mapDispatch(clearMapsWithin())
+
+      // Restart Idle
+      // reset()
+
+      // console.log('idle', isIdle())
     },
     onActive: (_) => {
+      // console.log('user is active')
       // User no longer inactive
       UIDispatch(removeFocusMap())
     }
@@ -203,7 +207,7 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
   }
 
   const layers = [
-    // [FootprintShadowLayer, { view: 'master' }],
+    [FootprintShadowLayer, { view: 'master' }],
     [SearchAreaLayer, { view: 'master' }],
     [LandmarksLayer, { view: 'master', material: false }],
     // [MapsPolygonLayerOld, { view: 'master', ...handlers }],

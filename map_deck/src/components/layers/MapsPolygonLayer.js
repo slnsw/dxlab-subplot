@@ -1,6 +1,6 @@
 
 import { CompositeLayer, SolidPolygonLayer } from 'deck.gl'
-import { get } from 'lodash'
+import { get, isEmpty } from 'lodash'
 import { getYearElevation } from '../../share/utils'
 
 export class MapsPolygonLayer extends CompositeLayer {
@@ -13,7 +13,15 @@ export class MapsPolygonLayer extends CompositeLayer {
         return
       }
 
-      const featuresData = data.reduce((result, el) => {
+      // Don't process data if state is complete
+      let { features } = this.state
+
+      // Don't process data if not needed
+      if (!isEmpty(features)) {
+        return
+      }
+
+      features = data.reduce((result, el) => {
         const { geometry, properties } = el
         if (geometry) {
           result.push({
@@ -24,7 +32,7 @@ export class MapsPolygonLayer extends CompositeLayer {
         return result
       }, [])
 
-      this.setState({ features: featuresData })
+      this.setState({ features })
     }
   }
 
@@ -53,6 +61,8 @@ export class MapsPolygonLayer extends CompositeLayer {
 
   buildLayer () {
     const { features } = this.state
+    const { filters } = this.props
+
     return new SolidPolygonLayer({
       id: 'shd-layer',
       data: features,
@@ -79,7 +89,7 @@ export class MapsPolygonLayer extends CompositeLayer {
       // getLineColor: (d) => this.getColor(d, 255),
       getFillColor: (d) => this.getColor(d),
       updateTriggers: {
-        // getPolygon: [inFocus]
+        getPolygon: [filters.fromYear, filters.toYear]
 
       },
       transitions: {
