@@ -159,6 +159,7 @@ export class SpriteBitmapLayer extends Layer {
         size: 1,
         type: GL.FLOAT,
         accessor: 'getOpacity',
+        transition: true,
         divisor: 1
       },
       pickingColors: {

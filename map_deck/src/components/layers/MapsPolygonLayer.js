@@ -1,167 +1,91 @@
-/* eslint-disable no-unused-vars */
 
-import { CompositeLayer } from 'deck.gl'
-import { GeoJsonLayer, TextLayer } from '@deck.gl/layers'
-
-import { getYearElevation } from '../../share/utils/helpers'
-
-import { max, min, get } from 'lodash'
-import { scaleLinear } from 'd3-scale'
+import { CompositeLayer, SolidPolygonLayer } from 'deck.gl'
+import { getYearElevation } from '../../share/utils'
 
 export class MapsPolygonLayer extends CompositeLayer {
   updateState ({ props, changeFlags }) {
+    // if (changeFlags.propsChanged === 'props.dataSet changed shallowly') {
     if (changeFlags.dataChanged) {
-      const { data, suffix } = props
+      const { dataSet: data } = props
 
       if (!data) {
         return
       }
 
-      const { filters } = this.props
-      const { fromYear, toYear } = filters
-
-      const featuresData = data.reduce(function (result, el) {
+      const featuresData = data.reduce((result, el) => {
         const { geometry, properties } = el
         if (geometry) {
-          const { year } = properties
-          const elevation = getYearElevation({ fromYear, toYear, year, offsetZ: 0 })
-
-          // const image = getImageUrl(properties.asset_id, suffix, '16')
-          const feature = {
-            ...el,
-            geometry: {
-              ...geometry,
-              coordinates: [geometry.coordinates[0].map((c) => ([...c, elevation]))]
-            },
-            properties: {
-              ...properties,
-              elevation,
-              // image_url: image,
-              // IMPORTANT: Change image bound structure to a single array
-              // Deck.gl API needs image bounds in a single array.
-              image_bounds: properties.image_bounds.coordinates[0].map((c) => ([...c, elevation])),
-              centroid: [...properties.centroid.coordinates, elevation]
-              // bearing: bearing(properties.image_bounds.coordinates[0][0], properties.image_bounds.coordinates[0][1]),
-            }
-
-          }
-          result.push(feature)
+          result.push({
+            geometry,
+            properties
+          })
         }
         return result
       }, [])
 
-      const feature = {
-        type: 'FeatureCollection',
-        features: featuresData
-
-      }
-      this.setState({ feature })
+      this.setState({ features: featuresData })
     }
   }
 
-  getImageBounds (bounds) {
-    const points = bounds.map(p => this.context.viewport.project(p))
-    const longs = points.map((c) => c[0])
-    const lats = points.map((c) => c[1])
-
-    // console.log(points)
-
-    const left = max(longs)
-    const right = min(longs)
-    const top = max(lats)
-    const bottom = min(lats)
-    return { top, right, bottom, left }
+  getMapElevation (year) {
+    const { filters } = this.props
+    const { fromYear, toYear } = filters
+    return getYearElevation({ fromYear, toYear, year, offsetZ: 0 })
   }
 
-  getViewBounds () {
-    const viewport = this.context.viewport
-    return { top: 0, right: viewport.width, bottom: viewport.height, left: 0 }
+  getColor (d, maxOpacity = 125) {
+    const { filters } = this.props
+    const { fromYear, toYear } = filters
+    const { year } = d.properties
+    const opacity = (year >= fromYear && year <= toYear) ? maxOpacity : 0
+    // console.log(opacity, year, fromYear, toYear)
+    return [255, 255, 255, opacity]
   }
 
-  buildLayers () {
-    const { id, suffix, uiContext } = this.props
-    const { feature: { features } } = this.state
-    const layers = []
-
-    const zoom = this.context.viewport.zoom
-    // const lod = [8, 16, 32, 64, 128, 512] //, 1024]
-    // const scale = scaleLinear([4, 18], [0, lod.length - 1])
-
-    // TODO: Decouple this context from this layer. Option inject focus via props
-    const [uiState] = uiContext
-    const inFocus = get(uiState, 'focus.properties.asset_id', null)
-    // const inFocusYear = get(uiState, 'focus.properties.year', null)
-
-    const geoJsonFillLayer = new GeoJsonLayer(this.getSubLayerProps({
-      id: `${id}-geojson-cutlines`,
-      data: this.state.feature,
-      extruded: false,
-      pickable: true,
-      autoHighlight: false,
-      stroked: true,
-
-      getLineWidth: 3,
-      getFillColor: [255, 255, 255, 125],
-      getLineColor: [255, 255, 255, 255]
-
-      /* getFillColor: (d) => {
-        const currYear = get(d, 'properties.year', null)
-        const opacity = (currYear !== inFocusYear && inFocusYear !== null) ? 0 : 125
-        return [255, 255, 255, opacity]
-      },
-      getLineColor: (d) => {
-        const currYear = get(d, 'properties.year', null)
-        const opacity = (currYear !== inFocusYear && inFocusYear !== null) ? 0 : 255
-        return [255, 255, 255, opacity]
-      },
-      updateTriggers: {
-        getFillColor: [inFocus],
-        getLineColor: [inFocus]
-      },
-      transitions: {
-        getFillColor: 300,
-        getLineColor: 300
-      } */
-
-    }))
-
-    const mapLabels = new TextLayer(this.getSubLayerProps({
-      id: `${id}-bitmap-label-${suffix}`,
+  buildLayer () {
+    const { features } = this.state
+    return new SolidPolygonLayer({
+      id: 'shd-layer',
       data: features,
-      pickable: false,
-      billboard: true,
-      getSize: 16,
-      sizeScale: 20 / 16,
+      extruded: false,
+      stroked: false,
+      getLineWidth: 0,
+      material: false,
+      castShadow: false,
+      pickable: true,
 
-      fontWeight: 800,
-      fontFamily: 'Lekton',
-      getPixelOffset: [0, -10, 0],
-      getColor: (d) => {
-        const opacity = (zoom < 13.5 || !inFocus || inFocus === d.properties.asset_id) ? 0 : 255
-        return [255, 255, 255, opacity]
+      getPolygon: (d) => {
+        const { filters } = this.props
+        const { fromYear, toYear } = filters
+
+        const { year } = d.properties
+        let coors = d.geometry.coordinates || []
+        if (coors) {
+          let elevation = this.getMapElevation(year)
+          elevation = (year >= fromYear && year <= toYear) ? elevation : -1
+          coors = [coors[0].map((c) => [...c, elevation])]
+          // console.log(coors)
+        } else {
+          return []
+        }
+        return coors || []
       },
-
-      // autoHighlight: true,
-      // getAngle: (d) => d.properties.bearing,
-      getText: (d) => (d.properties.year.toString()),
-      getPosition: (d) => d.properties.centroid,
+      // getLineColor: (d) => this.getColor(d, 255),
+      getFillColor: (d) => this.getColor(d),
       updateTriggers: {
-        getColor: [zoom, inFocus]
+        // getPolygon: [inFocus]
+
       },
       transitions: {
-        getColor: 300
+        getPolygon: 300,
+        getFillColor: 300
+        // getLineColor: 100
       }
-
-    }))
-
-    layers.push(geoJsonFillLayer)
-    // layers.push(mapLabels)
-
-    return layers
+    })
   }
 
   renderLayers () {
-    return this.buildLayers()
+    return this.buildLayer()
   }
 }
 

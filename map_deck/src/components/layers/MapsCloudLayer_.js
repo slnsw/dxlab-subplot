@@ -10,7 +10,7 @@ import { sortBy, get } from 'lodash'
 export class MapsCloudLayer extends CompositeLayer {
   updateState ({ props, changeFlags }) {
     if (changeFlags.dataChanged) {
-      const { dataSet: data } = props
+      const { data } = props
 
       if (!data) {
         return
@@ -18,7 +18,7 @@ export class MapsCloudLayer extends CompositeLayer {
 
       const { filters } = this.props
       const { fromYear, toYear } = filters
-      const elevationOffset = 0
+      let elevationOffset = 0
       // Prepare data for loading sprite maps and sort by offsetZ.
       // Sorting by offsetZ is important because SpriteBitmapLayer internally
       // disable depthMask to remove artifacts created by overlapping two PNG
@@ -27,11 +27,10 @@ export class MapsCloudLayer extends CompositeLayer {
         const { geometry, properties } = el
 
         if (geometry) {
+          elevationOffset = elevationOffset + 0.01
           const { year } = properties
-          // elevationOffset = elevationOffset + 0.01
-
-          // const elevation = getYearElevation({ fromYear, toYear, year }) + (1 + elevationOffset)
-          const elevation = 0
+          const elevation = getYearElevation({ fromYear, toYear, year }) + (1 + elevationOffset)
+          // const elevation = 0
 
           result.push({
             bounds: properties.image_bounds.coordinates[0].map((c) => [...c]),
@@ -44,7 +43,7 @@ export class MapsCloudLayer extends CompositeLayer {
         }
 
         return result
-      }, []), ['year'])
+      }, []), ['offsetZ'])
 
       // `${process.env.REACT_APP_SPRITE_MAPING_PATH}`
       // ()['/sprites/subdivisions_']
@@ -53,34 +52,34 @@ export class MapsCloudLayer extends CompositeLayer {
       // // We get the API response and receive data in JSON format...
       // .then(response => response.json())
 
-      // const dummyPolygonData = data.reduce(function (result, el) {
-      //   const { geometry, properties } = el
-      //   if (geometry) {
-      //     const { year } = properties
-      //     const elevation = getYearElevation({ fromYear, toYear, year, offsetZ: 0 })
-
-      //     const feature = {
-      //       ...el,
-      //       geometry: {
-      //         ...geometry,
-      //         coordinates: [geometry.coordinates[0].map((c) => ([...c, elevation]))]
-      //       }
-      //     }
-      //     result.push(feature)
-      //   }
-      //   return result
-      // }, [])
-
-      const dummyPolygonData = data.reduce((result, el) => {
+      const dummyPolygonData = data.reduce(function (result, el) {
         const { geometry, properties } = el
         if (geometry) {
-          result.push({
-            geometry,
-            properties
-          })
+          const { year } = properties
+          const elevation = getYearElevation({ fromYear, toYear, year, offsetZ: 0 })
+
+          const feature = {
+            ...el,
+            geometry: {
+              ...geometry,
+              coordinates: [geometry.coordinates[0].map((c) => ([...c, elevation]))]
+            }
+          }
+          result.push(feature)
         }
         return result
       }, [])
+
+      // const dummyPolygonData = data.reduce((result, el) => {
+      //   const { geometry, properties } = el
+      //   if (geometry) {
+      //     result.push({
+      //       geometry,
+      //       properties
+      //     })
+      //   }
+      //   return result
+      // }, [])
 
       this.setState({ mapSpriteData, dummyPolygonData })
     }
@@ -174,8 +173,8 @@ export class MapsCloudLayer extends CompositeLayer {
     }))
 
     layers.push(sprites)
-    layers.push(this.buildShadows())
-    // layers.push(shadows)
+    // layers.push(this.buildShadows())
+    layers.push(shadows)
 
     return layers
   }
@@ -207,8 +206,8 @@ export class MapsCloudLayer extends CompositeLayer {
       extruded: false,
       stroked: false,
       getLineWidth: 0,
-      material: false,
-      castShadow: false,
+      // material: false,
+      castShadow: true,
 
       getPolygon: (d) => {
         const { filters } = this.props

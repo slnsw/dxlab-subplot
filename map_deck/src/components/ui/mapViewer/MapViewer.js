@@ -80,11 +80,12 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
   // Instantiate layers and inject maps and filter data from the context.
   // WARNING: Doing this because DeckGL layers had already a context. At the moment of coding
   // this project, DeckGL layers are Class components so only one context can be set.
-  const { data, filters } = mapState
+  const { data, dataSet, filters } = mapState
   const preparedLayers = [...layers.map(([L, props]) => {
     props = {
       ...props,
       data,
+      dataSet,
       filters,
       uiContext: [uiState, UIDispatch],
       mapContext: [mapState, mapDispatch]

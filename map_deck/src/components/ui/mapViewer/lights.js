@@ -26,7 +26,8 @@ const directionalLight = new DirectionalLight({
 class MyLightingEffect extends LightingEffect {
   preRender (gl, { layers, ...params }) {
     // eslint-disable-next-line
-    layers = layers.filter((l) => (l.props.castShadow !== null ? true : l.props.castShadow))
+    layers = layers.filter((l) => (l.props.castShadow !== null? true : l.props.castShadow))
+
     return super.preRender(gl, { layers, ...params })
   }
 }

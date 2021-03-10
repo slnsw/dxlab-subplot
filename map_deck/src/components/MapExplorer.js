@@ -21,6 +21,7 @@ import { FlyToInterpolator } from 'deck.gl'
 import { LandmarksLayer } from './layers/LandmarksLayer'
 import { FootprintShadowLayer } from './layers/FootprintShadowLayer'
 import { SearchAreaLayer } from './layers/SearchAreaLayer'
+import { MapsPolygonLayerOld } from './layers/MapsPolygonLayerOld'
 import { MapsPolygonLayer } from './layers/MapsPolygonLayer'
 import { MapsCloudLayer } from './layers/MapsCloudLayer'
 
@@ -202,15 +203,16 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
   }
 
   const layers = [
-    [FootprintShadowLayer, { view: 'master' }],
+    // [FootprintShadowLayer, { view: 'master' }],
     [SearchAreaLayer, { view: 'master' }],
     [LandmarksLayer, { view: 'master', material: false }],
+    // [MapsPolygonLayerOld, { view: 'master', ...handlers }],
     [MapsPolygonLayer, { view: 'master', ...handlers }],
     [MapsCloudLayer, { view: 'master' }]
 
-    // // // [MapsDistributionLayer, { view: 'master' }]
-    // // // [MapsLabelLayer, { view: 'master' }],
-    // // // [FootprintMapsLayer, { view: 'all' }],
+    // [MapsDistributionLayer, { view: 'master' }]
+    // [MapsLabelLayer, { view: 'master' }],
+    // [FootprintMapsLayer, { view: 'all' }],
     // [MapsClusterCounts, { view: 'master' }]
     // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: 'crop', view: 'all', ...handlers }]
     // [MapsBitmapLayer, { id: 'edge', name: 'edge', suffix: '_edge.png', view: 'slave', ...handlers }]
