@@ -108,7 +108,13 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
 
   const handleGeoSearchResult = (result) => {
     // Find closest maps to the search
-    mapDispatch(getMapsWithin({ center: result.geometry, radius: 2, placeName: result.place_name }))
+    const near = mapDispatch(getMapsWithin({ center: result.geometry, radius: 2, placeName: result.place_name }))
+    let { all: { maxYear, minYear } = {} } = near
+
+    if (maxYear && minYear) {
+      minYear = (minYear === maxYear) ? minYear - 2 : minYear
+      mapDispatch(applyFilters({ fromYear: minYear, toYear: maxYear }))
+    }
 
     const { center } = result
 

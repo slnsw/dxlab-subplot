@@ -78,24 +78,28 @@ export function getMapsWithin ({ center, radius = 2, placeName = '' }) {
       const years = map(near, 'properties.year').filter(filterYear)
       const yearsAll = map(nearAll, 'properties.year').filter(filterYear)
 
+      const result = {
+        center,
+        radius,
+        placeName,
+        filtered: {
+          data: near,
+          maxYear: max(years),
+          minYear: min(years)
+        },
+        all: {
+          data: nearAll,
+          maxYear: max(yearsAll),
+          minYear: min(yearsAll)
+        }
+      }
+
       dispatch({
         type: ActionTypes.MAPS_GEO_LOOKUP_COMPLETE,
-        near: {
-          center,
-          radius,
-          placeName,
-          filtered: {
-            data: near,
-            maxYear: max(years),
-            minYear: min(years)
-          },
-          all: {
-            data: nearAll,
-            maxYear: max(yearsAll),
-            minYear: min(yearsAll)
-          }
-        }
+        near: result
       })
+
+      return result
     }
   }
 }
