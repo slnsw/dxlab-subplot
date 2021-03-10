@@ -122,8 +122,14 @@ export class MapsCloudLayer extends CompositeLayer {
         const { filters } = this.props
         const { fromYear, toYear } = filters
         const { year } = d
-        const opacity = (year >= fromYear && year <= toYear) ? 1 : 0
+        let opacity = (year >= fromYear && year <= toYear) ? 1 : 0
         // console.log(opacity, year, fromYear, toYear)
+        if (opacity !== 0) {
+          // Is visible check if inFocus
+          if (inFocus !== null && !isIdle) {
+            opacity = (d.image === inFocus) ? opacity : 0.5
+          }
+        }
         return opacity
       },
       getOffsetZ: d => {
@@ -154,7 +160,7 @@ export class MapsCloudLayer extends CompositeLayer {
         // getOffsetZ: [inFocus]
       },
       transitions: {
-        getColor: 800,
+        // getColor: 800,
         getOffsetZ: 300,
         getOpacity: 300
       }
