@@ -47,6 +47,7 @@ import { point } from '@turf/helpers'
 
 export const MapExplorer = ({ mode = 'kiosk' }) => {
   const [ready, setReady] = useState(false)
+  const [idleId, setIdleId] = useState(null)
   const [rangeStyle, setRangeStyle] = useState({})
   const [showSearch, setShowSearch] = useState(true)
   const [mapState, mapDispatch] = useContext(MapDataContext)
@@ -57,49 +58,56 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
   }, [mapState.dataSet])
 
   // Idle logic
-  const { reset, isIdle } = useIdleTimer({
-    timeout: 1000 * 15, // 60 * 0.4,
-    stopOnIdle: true,
+  const idleTimeout = 1000 * 30 // 60 * 0.4,
+  const { isIdle } = useIdleTimer({
+    timeout: idleTimeout,
     onIdle: (_) => {
-      // Select a random time range
-      const { maxYear, minYear } = get(mapState, 'meta', {})
-      const sizeRange = Math.floor((Math.random() * 15) + 5)
-      let startYear = Math.floor(Math.random() * (maxYear - minYear + 1) + minYear)
-      let endYear = startYear + sizeRange
-
-      endYear = (endYear > maxYear) ? maxYear : endYear
-      startYear = (endYear - sizeRange > startYear) ? startYear - sizeRange : startYear
-
-      const { data } = mapDispatch(applyFilters({ fromYear: startYear, toYear: endYear }))
-
-      // Get current filtered data and
-      // select a random map from current range
-      // const selected = sample(get(mapState, 'data', []))
-
-      // Select a random map of the random range
-      const selected = sample(data)
-
-      // Set selected as focus
-      UIDispatch(focusIdleMap({
-        ...selected,
-        mouseX: 0,
-        mouseY: 0
-      }))
-
-      // Clean search near lookups
-      mapDispatch(clearMapsWithin())
-
-      // Restart Idle
-      // reset()
-
-      // console.log('idle', isIdle())
+      // Run actually idle action in timeout loop
+      setIdleId(runIdle())
     },
     onActive: (_) => {
-      // console.log('user is active')
+      clearTimeout(idleId)
       // User no longer inactive
       UIDispatch(removeFocusMap())
     }
   })
+
+  const runIdle = () => {
+    // Select a random time range
+    const { maxYear, minYear } = get(mapState, 'meta', {})
+    const sizeRange = Math.floor((Math.random() * 15) + 5)
+    let startYear = Math.floor(Math.random() * (maxYear - minYear + 1) + minYear)
+    let endYear = startYear + sizeRange
+
+    endYear = (endYear > maxYear) ? maxYear : endYear
+    startYear = (endYear - sizeRange > startYear) ? startYear - sizeRange : startYear
+
+    const { data } = mapDispatch(applyFilters({ fromYear: startYear, toYear: endYear }))
+
+    // Get current filtered data and
+    // select a random map from current range
+    // const selected = sample(get(mapState, 'data', []))
+
+    // Select a random map of the random range
+    const selected = sample(data)
+
+    // Set selected as focus
+    UIDispatch(focusIdleMap({
+      ...selected,
+      mouseX: 0,
+      mouseY: 0
+    }))
+
+    // Clean search near lookups
+    mapDispatch(clearMapsWithin())
+
+    // re-run idle if user still idle
+    return setTimeout(() => {
+      if (isIdle()) {
+        runIdle()
+      }
+    }, idleTimeout)
+  }
 
   useEffect(() => {
     // Update search lookup info if near data are in the store
