@@ -62,6 +62,8 @@ export function applyFilters ({ ...query }) {
       data,
       geoIndex
     })
+
+    return { data, geoIndex }
   }
 }
 

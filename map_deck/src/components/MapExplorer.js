@@ -36,7 +36,7 @@ import { MapsCloudLayer } from './layers/MapsCloudLayer'
 // UI, Map actions and contexts
 import { selectMap, focusIdleMap, focusMap, removeFocusMap, goToViewState } from '../context/UIActions'
 import { MapDataContext } from '../context/MapsContext'
-import { getMapsWithin, clearMapsWithin } from '../context/MapsActions'
+import { getMapsWithin, clearMapsWithin, applyFilters } from '../context/MapsActions'
 import { UIContext } from '../context/UIContext'
 
 // Utils
@@ -59,9 +59,24 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
   const { reset } = useIdleTimer({
     timeout: 1000 * 30, // 60 * 0.4,
     onIdle: (_) => {
+      // Select a random time range
+      const { maxYear, minYear } = get(mapState, 'meta', {})
+      const sizeRange = Math.floor((Math.random() * 15) + 5)
+      let startYear = Math.floor(Math.random() * (maxYear - minYear + 1) + minYear)
+      let endYear = startYear + sizeRange
+
+      endYear = (endYear > maxYear) ? maxYear : endYear
+      startYear = (endYear - sizeRange > startYear) ? startYear - sizeRange : startYear
+
+      const { data } = mapDispatch(applyFilters({ fromYear: startYear, toYear: endYear }))
+
       // Get current filtered data and
       // select a random map from current range
-      const selected = sample(get(mapState, 'data', []))
+      // const selected = sample(get(mapState, 'data', []))
+
+      // Select a random map of the random range
+      const selected = sample(data)
+
       // Set selected as focus
       UIDispatch(focusIdleMap({
         ...selected,
@@ -101,7 +116,8 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
       ...uiState.viewState,
       latitude: center[1],
       longitude: center[0],
-      zoom: 14,
+      zoom: 13.5,
+      pitch: Math.floor(Math.random() * Math.floor(30)),
       bearing: Math.floor(Math.random() * Math.floor(360)),
       transitionInterpolator: new FlyToInterpolator(),
       transitionDuration: 3000
