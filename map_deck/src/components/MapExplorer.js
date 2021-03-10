@@ -215,7 +215,6 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
   }
 
   const layers = [
-    [FootprintShadowLayer, { view: 'master' }],
     [SearchAreaLayer, { view: 'master' }],
     [LandmarksLayer, { view: 'master', material: false }],
     // [MapsPolygonLayerOld, { view: 'master', ...handlers }],
