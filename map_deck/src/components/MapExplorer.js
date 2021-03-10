@@ -244,7 +244,7 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
       />
 
       <NavigationControl />
-      {/* <Fog /> */}
+      <Fog />
 
     </>)
 }

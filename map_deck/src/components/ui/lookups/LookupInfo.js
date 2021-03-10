@@ -46,7 +46,7 @@ export const LookupInfo = (props) => {
           <div className={styles.info}>
 
             <p>Total <span>{allInfo.count}</span> maps from <span>{allInfo.minYear}</span> to <span>{allInfo.maxYear}</span>.</p>
-            <p>Visible <span>{filteredInfo.count}</span> maps around <span>{radius}</span> km of <span>{placeNameShort}</span></p>
+            <p>Visible <span>{filteredInfo.count}</span> maps around <span>{radius}</span> km of search. {/* of <span>{placeNameShort}</span> */}</p>
             <p>earliest <span>{filteredInfo.minYear}</span>, oldest <span>{filteredInfo.maxYear}</span></p>
           </div>
         </div>}
