@@ -22,8 +22,22 @@ export const Header = ({ uiContext }) => {
 
   return (
     <div className={styles.root}>
-      <h1 className={styles.range}> {fromYear} - {toYear} | {data.length}</h1>
-      {title && <p className={styles.info}>[{year}] {title}</p>}
+
+      <div className={styles.logoHolder}>
+        <a href='https://dxlab.sl.nsw.gov.au'>
+          <img src='./images/logo-dxlab.png' alt='DX Lab website' className={styles.logoDxLab} />
+        </a>
+        <div className={styles.divider} />
+        <a href='https://www.sl.nsw.gov.au/'>
+          <img src='./images/logo-slnsw-white.png' alt='State Library New South Wales website' className={styles.logoSLNSW} />
+        </a>
+      </div>
+
+      <div className={styles.containerInfo}>
+        <h1 className={styles.range}> {fromYear} - {toYear} | {data.length}</h1>
+        {title && <p className={styles.info}>[{year}] {title}</p>}
+      </div>
+
     </div>
   )
 }

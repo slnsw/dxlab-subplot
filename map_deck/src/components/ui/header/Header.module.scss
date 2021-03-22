@@ -2,22 +2,62 @@
 
 .root {
   position: absolute;
-  color: $PRIMARY_COLOR;
-  top: 20;
-  right: 70px;
   z-index: 3010;
-  line-height: $LINE_HEIGHT_MD;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
 
-  .range {
-    text-align: right;
-    margin-bottom: 0;
+
+  .containerInfo {
+    position: absolute;
+    color: $PRIMARY_COLOR;
+    top: 20px;
+    right: 70px;
+  
+
+    .range {
+      text-align: right;
+      margin-bottom: 0;
+      font-size: $FONT_SIZE_LG;
+    }
+
+    .info {
+      width: 40vw;
+      text-align: right;
+      margin-top: 10px;
+      float: right;
+      color: $PRIMARY_COLOR;
+      line-height: $LINE_HEIGHT_XS;
+      font-size: $FONT_SIZE_MD;
+    }
+
   }
 
-  .info {
-    width: 40vw;
-    text-align: right;
-    margin-top: 0;
-    float: right;
-    color: $PRIMARY_COLOR;
+  .logoHolder {
+    position: absolute;
+    top: 30px;
+    left: 70px;
+    pointer-events: auto;
+
+    .divider {
+      border-left: 2px solid white;
+      display: block;
+      height: 30px;
+      float: left;
+      margin: 0 15px;
+    }
+
+    .logoDxLab {
+      width: 100px;
+      height: auto;
+      float: left;
+      margin-top: 2px;
+    }
+
+    .logoSLNSW {
+      width: 150px;
+      height: auto;
+      float: left;
+    }
   }
 }
