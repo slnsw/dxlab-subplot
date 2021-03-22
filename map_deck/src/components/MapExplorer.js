@@ -15,7 +15,7 @@ import { MapViewer } from './ui/mapViewer/MapViewer'
 // Idle
 import { useIdleTimer } from 'react-idle-timer'
 
-import { FlyToInterpolator } from 'deck.gl'
+import { FlyToInterpolator, WebMercatorViewport } from 'deck.gl'
 
 // Data visualization and info layers
 import { LandmarksLayer } from './layers/LandmarksLayer'
@@ -130,7 +130,6 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
     }
 
     const { center } = result
-
     const viewState = {
       ...uiState.viewState,
       latitude: center[1],
@@ -140,7 +139,23 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
       bearing: Math.floor(Math.random() * Math.floor(360)),
       transitionInterpolator: new FlyToInterpolator(),
       transitionDuration: 3000
+    }
 
+    try {
+      const { width, height } = viewState
+      // If width or height not found it means we just initialize the app
+      if (!width || !height) {
+        viewState.width = window.innerWidth
+        viewState.height = window.innerHeight
+      }
+
+      const viewport = new WebMercatorViewport(viewState)
+      const bbox = near.all.bbox
+      // console.log(viewport.fitBounds(near.all.bbox))
+      const { zoom } = viewport.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]])
+      viewState.zoom = zoom
+    } catch (e) {
+      console.warn('can\'t calculate zoom')
     }
 
     UIDispatch(goToViewState(viewState))
@@ -150,18 +165,18 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
     // UIDispatch(updateViewState(viewState))
     // mapDispatch(updateViewState(viewState))
 
-    // Calculate if we are still within the lookup zone requested by the user
-    const { near = {} } = mapState
-    if (!isEmpty(near)) {
-      const { center: lookupRoi } = near
-      const { longitude, latitude } = viewState
-      const lookupAt = point([longitude, latitude])
-      const dst = distance(lookupRoi, lookupAt, { units: 'kilometers' })
-      if (dst > 5) {
-        // Clean search near lookups
-        // mapDispatch(clearMapsWithin())
-      }
-    }
+    // // Calculate if we are still within the lookup zone requested by the user
+    // const { near = {} } = mapState
+    // if (!isEmpty(near)) {
+    //   const { center: lookupRoi } = near
+    //   const { longitude, latitude } = viewState
+    //   const lookupAt = point([longitude, latitude])
+    //   const dst = distance(lookupRoi, lookupAt, { units: 'kilometers' })
+    //   if (dst > 5) {
+    //     // Clean search near lookups
+    //     // mapDispatch(clearMapsWithin())
+    //   }
+    // }
   }
 
   useEffect(() => {

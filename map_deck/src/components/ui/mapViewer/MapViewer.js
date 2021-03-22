@@ -72,7 +72,8 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
   // work correctly if the state is not local
   useEffect(() => {
     if (!isEmpty(uiState.viewState) && uiState.viewState.goTo) {
-      // setState({ viewState: uiState.viewState })
+      // Avoid loop by setting goTo false
+      uiState.viewState.goTo = false
       setViewState({ ...uiState.viewState })
     }
   }, [uiState.viewState])

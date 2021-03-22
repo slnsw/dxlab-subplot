@@ -34,7 +34,7 @@ export class MapsCloudLayer extends CompositeLayer {
         const { geometry, properties } = el
 
         if (geometry) {
-          const { year } = properties
+          const { year, asset_id } = properties
           // elevationOffset = elevationOffset + 0.01
 
           // const elevation = getYearElevation({ fromYear, toYear, year }) + (1 + elevationOffset)
@@ -46,7 +46,8 @@ export class MapsCloudLayer extends CompositeLayer {
             color: [1.0, 0, 0],
             offsetZ: elevation,
             opacity: 1,
-            year
+            year,
+            asset_id
           })
         }
 
@@ -79,7 +80,7 @@ export class MapsCloudLayer extends CompositeLayer {
     // const {}
     // console.log(meta)
     const { fromYear, toYear } = filters
-    return getYearElevation({ fromYear, toYear, year, offsetZ: 1 })
+    return getYearElevation({ fromYear, toYear, year, offsetZ: 2 })
   }
 
   isVisible (year) {
@@ -92,17 +93,33 @@ export class MapsCloudLayer extends CompositeLayer {
     }
   }
 
+  // Duplicated code
+  inSearchRange (asset_id) {
+    const { mapContext } = this.props
+    const [mapState] = mapContext
+    const { near } = mapState
+    if (!isEmpty(near)) {
+      const { all: { ids = [] } = {} } = near
+      return ids.includes(asset_id)
+    }
+    // There is not active search so return is visible
+    return true
+  }
+
   buildLayers () {
     const { id, filters } = this.props
 
     const layers = []
     const { mapSpriteData } = this.state
-    const { uiContext } = this.props
+    const { mapContext, uiContext } = this.props
 
     // TODO: Decouple this context from this layer. Option inject focus via props
     const [uiState] = uiContext
     const inFocus = get(uiState, 'focus.properties.asset_id', null)
     const isIdle = get(uiState, 'isIdle', false)
+
+    const [mapState] = mapContext
+    const { near } = mapState
 
     // Render sprite maps
     const sprites = new SpriteBitmapLayer(this.getSubLayerProps({
@@ -115,25 +132,27 @@ export class MapsCloudLayer extends CompositeLayer {
       autoHighlight: false,
 
       getOpacity: d => {
-        const { year } = d
+        const { year, asset_id } = d
         let opacity = this.isVisible(year) ? 1 : 0
         // console.log(opacity, year, fromYear, toYear)
-        if (opacity !== 0) {
-          // Is visible check if inFocus
-          if (inFocus !== null && !isIdle) {
-            opacity = (d.image === inFocus) ? opacity : 0.5
-          }
+        // Is visible check if inFocus
+        if (opacity !== 0 && inFocus !== null && !isIdle) {
+          opacity = (d.image === inFocus) ? opacity : 0.5
         }
+
+        // Search if in search range
+        opacity = this.inSearchRange(asset_id) ? opacity : 0
+
         return opacity
       },
       getOffsetZ: d => {
-        const { year, bounds } = d
+        const { year, bounds, asset_id } = d
         const coors = bounds || []
         let elevation = 0
         if (coors) {
           elevation = this.getMapElevation(year)
           elevation = this.isVisible(year) ? elevation : 0
-          // console.log(coors)
+          elevation = this.inSearchRange(asset_id) ? elevation : 0
         } else {
           return 0
         }
@@ -147,8 +166,8 @@ export class MapsCloudLayer extends CompositeLayer {
       // Don't draw shadows in this layer
       shadowEnabled: false,
       updateTriggers: {
-        getOpacity: [inFocus, isIdle, filters.fromYear, filters.toYear],
-        getOffsetZ: [filters.fromYear, filters.toYear]
+        getOpacity: [inFocus, isIdle, filters.fromYear, filters.toYear, near.all],
+        getOffsetZ: [filters.fromYear, filters.toYear, near.all]
       },
       transitions: {
         // getColor: 800,
@@ -165,16 +184,6 @@ export class MapsCloudLayer extends CompositeLayer {
     return layers
   }
 
-  // getMapElevation (year) {
-  //   const { filters, mapContext } = this.props
-  //   // const [mapState] = mapContext
-  //   // const { meta } = mapState
-  //   // const {}
-  //   // console.log(meta)
-  //   const { fromYear, toYear } = filters
-  //   return getYearElevation({ fromYear, toYear, year, offsetZ: 0 })
-  // }
-
   getShadowColor (d, maxOpacity = 125) {
     const { filters } = this.props
     const { fromYear, toYear } = filters
@@ -186,7 +195,9 @@ export class MapsCloudLayer extends CompositeLayer {
 
   buildShadows () {
     const { dummyPolygonData } = this.state
-    const { filters } = this.props
+    const { filters, mapContext } = this.props
+    const [mapState] = mapContext
+    const { near } = mapState
 
     return new SolidPolygonLayer({
       // id: 'footprint-layer',
@@ -198,11 +209,12 @@ export class MapsCloudLayer extends CompositeLayer {
       castShadow: false,
 
       getPolygon: (d) => {
-        const { year } = d.properties
+        const { year, asset_id } = d.properties
         let coors = d.geometry.coordinates || []
         if (coors) {
           let elevation = this.getMapElevation(year)
           elevation = this.isVisible(year) ? elevation : -1
+          elevation = this.inSearchRange(asset_id) ? elevation : -1
           coors = [coors[0].map((c) => [...c, elevation])]
         } else {
           return []
@@ -212,7 +224,7 @@ export class MapsCloudLayer extends CompositeLayer {
       // getLineColor: (d) => this.getColor(d, 255),
       getFillColor: (d) => this.getShadowColor(d, 0),
       updateTriggers: {
-        getPolygon: [filters.fromYear, filters.toYear]
+        getPolygon: [filters.fromYear, filters.toYear, near.all]
       },
       transitions: {
         getPolygon: 300

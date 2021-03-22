@@ -53,15 +53,31 @@ export class MapsPolygonLayer extends CompositeLayer {
   }
 
   getColor (d, maxOpacity = 125) {
-    const { year } = d.properties
-    const opacity = this.isVisible(year) ? maxOpacity : 0
+    const { year, asset_id } = d.properties
+    let opacity = this.isVisible(year) ? maxOpacity : 0
+    opacity = this.inSearchRange(asset_id) ? opacity : 0
     // console.log(opacity, year, fromYear, toYear)
     return [255, 255, 255, opacity]
   }
 
+  // Duplicated code
+  inSearchRange (asset_id) {
+    const { mapContext } = this.props
+    const [mapState] = mapContext
+    const { near } = mapState
+    if (!isEmpty(near)) {
+      const { all: { ids = [] } = {} } = near
+      return ids.includes(asset_id)
+    }
+    // There is not active search so return is visible
+    return true
+  }
+
   buildLayer () {
     const { features } = this.state
-    const { filters } = this.props
+    const { filters, mapContext } = this.props
+    const [mapState] = mapContext
+    const { near } = mapState
 
     return new SolidPolygonLayer({
       id: 'shd-layer',
@@ -74,11 +90,12 @@ export class MapsPolygonLayer extends CompositeLayer {
       pickable: true,
 
       getPolygon: (d) => {
-        const { year } = d.properties
+        const { year, asset_id } = d.properties
         let coors = d.geometry.coordinates || []
         if (coors) {
           let elevation = this.getMapElevation(year)
           elevation = this.isVisible(year) ? elevation : -1
+          elevation = this.inSearchRange(asset_id) ? elevation : -1
           coors = [coors[0].map((c) => [...c, elevation])]
           // console.log(coors)
         } else {
@@ -89,7 +106,8 @@ export class MapsPolygonLayer extends CompositeLayer {
       // getLineColor: (d) => this.getColor(d, 255),
       getFillColor: (d) => this.getColor(d),
       updateTriggers: {
-        getPolygon: [filters.fromYear, filters.toYear]
+        getPolygon: [filters.fromYear, filters.toYear, near.all],
+        getFillColor: [filters.fromYear, filters.toYear, near.all]
 
       },
       transitions: {

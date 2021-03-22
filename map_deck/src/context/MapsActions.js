@@ -1,6 +1,8 @@
 import { ActionTypes } from './MapsReducer'
 import { fetchData, loadData } from '../share/services'
 import { pickBy, identity, some, map, isNumber, max, min, get } from 'lodash'
+import bbox from '@turf/bbox'
+
 import { roundYearDown, roundYearUp } from './utils'
 
 // Geolookups
@@ -84,13 +86,23 @@ export function getMapsWithin ({ center, radius = 2, placeName = '' }) {
         placeName,
         filtered: {
           data: near,
+          ids: map(near || [], 'properties.asset_id'),
           maxYear: max(years),
-          minYear: min(years)
+          minYear: min(years),
+          bbox: bbox({
+            type: 'FeatureCollection',
+            features: near
+          })
         },
         all: {
           data: nearAll,
+          ids: map(nearAll || [], 'properties.asset_id'),
           maxYear: max(yearsAll),
-          minYear: min(yearsAll)
+          minYear: min(yearsAll),
+          bbox: bbox({
+            type: 'FeatureCollection',
+            features: nearAll
+          })
         }
       }
 
