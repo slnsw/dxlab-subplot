@@ -61,11 +61,11 @@ class DXMapsData(MixinGeoJsonUtils, MongoLoader):
 
             data.update(self.parse_discard_asset(asset_id, data))
 
-            data.update(self.find_near_assets(asset_id, data))
-
             data.update(self.parse_slnsw_title_links(asset_id, data))
 
             data.update(self.parse_slnsw_collection_website(asset_id, data))
+
+            data.update(self.find_near_assets(asset_id, data))
 
             # select year prefer year_subdivision over year_title if exits
             year = data.get('year_subdivision', None)
@@ -287,11 +287,13 @@ class DXMapsData(MixinGeoJsonUtils, MongoLoader):
         """Find near assets base on centroid of the shape."""
 
         query = {'center': {'$near': {'$geometry': data['center'], '$maxDistance': 500}}}
-        qs = self.collection.find(query, {'asset_id': 1, 'year': 1})
+        qs = self.collection.find(query, {'asset_id': 1, 'year': 1, 'iiif_identifier': 1})
 
         # Merge with similar and set distance as 0
         similar = data.get('similar', [])
-        similar = similar + [py_.pick(i, 'asset_id', 'year') for i in qs]
+        similar = similar + [
+            py_.pick(i, 'asset_id', 'year', 'iiif_identifier') for i in qs if i.get('year', None) is not None
+        ]
         out = {'similar': similar}
 
         return out

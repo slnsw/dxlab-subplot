@@ -139,7 +139,7 @@ export const ModalWindow = ({ onRequestClose = () => {} }) => {
             >
 
               {related.map((value, index) => {
-                const image = getImageUrl(value.asset_id, 'uncrop', '256')
+                const image = `https://files02.sl.nsw.gov.au/fotoweb/thumbnails/300_0/${value.iiif_identifier}` // getImageUrl(value.asset_id, 'uncrop', '256')
                 return (
                   <div key={`rel${index}`}>
                     <div className={styles.container}>
