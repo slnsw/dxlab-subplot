@@ -33,9 +33,11 @@ body, html{
 
 
 // Fix timeline not clickable in kiosk mode 
-
 .chartjs-size-monitor {
   pointer-events: auto !important;
   visibility: visible !important;
   z-index: auto !important;
 }
+
+// Remove openseadragon focus line
+.openseadragon-container :focus { outline: none; }

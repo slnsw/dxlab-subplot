@@ -9,11 +9,9 @@ import IdleTimer from 'react-idle-timer'
 import ReactModal from 'react-modal'
 import Zoomable from './Zoomable'
 import Slider from 'react-slick'
-
+import CancelIcon from '@material-ui/icons/Cancel'
 import { getImageUrl } from '../../../share/utils/helpers'
-
 import { get, isEmpty, find } from 'lodash'
-
 import styles from './ModalWindow.module.scss'
 
 const slideRef = React.createRef()
@@ -94,23 +92,24 @@ export const ModalWindow = ({ onRequestClose = () => {} }) => {
       >
         <>
 
-          <button className={styles.close} onClick={handleCloseModal}>X</button>
+          <div className={styles.headerContainer}>
+            <button className={styles.close} onClick={handleCloseModal}><CancelIcon /></button>
 
-          <div className={styles.header}>
-            <h1 className={styles.title}>
-              <a href={url} target='_blank' rel='noopener noreferrer'>
-                {title}
-              </a>
-            </h1>
+            <div className={styles.header}>
 
-            <h3 className={styles.info}>{year} - {location_name}</h3>
+              <h1 className={styles.title}>
+                <a href={url} target='_blank' rel='noopener noreferrer'>
+                  {title}
+                </a>
+              </h1>
+              <h3 className={styles.info}>{year} - {location_name}</h3>
+              <h3 className={styles.imageInfo}> {asset_id} | ({width} x {height})</h3>
+
+            </div>
           </div>
 
           <div className={styles.zoomable}>
             <Zoomable assetId={asset_id} iiifIdentifier={iiif_identifier} id='mapZoom' />
-            <div className={styles.imageInfo}>
-              <span> {asset_id} | ({width} x {height})</span>
-            </div>
           </div>
 
           <div className={styles.related}>

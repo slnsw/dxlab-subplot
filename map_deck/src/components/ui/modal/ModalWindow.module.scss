@@ -18,50 +18,53 @@ $CONTENT_MARGIN: 30px;
         outline: 0;
     }
 
-    .header {
-        margin: $CONTENT_MARGIN;
+    .headerContainer {
+        position: absolute;
+        bottom: 0;
+        // margin: $CONTENT_MARGIN;
+        background-color: rgba(0, 0, 0, 0.8);
+        width: 100%;
+        z-index: 20;
 
-        .title {
-            color: $PRIMARY_COLOR;
-            text-align: left;
-            font-size: $FONT_SIZE_LG;
-            line-height: $LINE_HEIGHT_MD;
+        .header {
+            padding-left: $CONTENT_MARGIN;
+            padding-top: $CONTENT_MARGIN;
+            max-width: 90%;
 
-            max-width: 95%;
-            font-weight: bolder;
-            margin-bottom: 0;
-            display: block;
+            .title {
+                color: $PRIMARY_COLOR;
+                text-align: left;
+                font-size: $FONT_SIZE_MD;
+                line-height: $LINE_HEIGHT_XS;
 
+                max-width: 80%;
+                font-weight: bolder;
+                margin-bottom: 0;
+                display: block;
+            }
+
+            .info {
+                font-size: $FONT_SIZE_MD;
+                display: block;
+                color: $ACCENT_COLOR;
+                font-family: $FONT_SECONDARY;
+                margin-top: 5px;
+            }
+
+            .imageInfo {
+                font-size: $FONT_SIZE_SM;
+                text-align: right;
+                margin-bottom: 20px;
+            }
 
         }
-
-        .info {
-            // font-size: 20px;
-            font-size: $FONT_SIZE_SM;
-            // float: left;
-            // width: 49%;
-            margin: 5px 0 25px 0;
-            display: block;
-            color: $ACCENT_COLOR;
-            font-family: $FONT_SECONDARY;
-        }
-
     }
-
 
     .zoomable {
         width: 100%;
-        height: 50%;
+        height: 100vh;
         background-color: #393b3acc;
-        // border: 1px solid rgba(255, 255, 255, .5);
-        
         display: block;
-
-        .imageInfo {
-            margin: 10px $CONTENT_MARGIN;
-            text-align: right;
-            color: $PRIMARY_COLOR;
-        }
     }
 
 
@@ -86,7 +89,7 @@ $CONTENT_MARGIN: 30px;
                 width: 90%;
                 height: 100%;
                 cursor: pointer;
- 
+
                 background-size: cover;
                 background-position: center;
                 background-repeat: no-repeat;
@@ -98,14 +101,19 @@ $CONTENT_MARGIN: 30px;
 
 
     .close {
+        position: absolute;
+        top: 0;
+        right: 0;
         font-weight: bolder;
         font-size: 30px;
         color: $PRIMARY_COLOR;
         background: none;
         border: none;
-        float: right;
-        margin: 30px;
+        margin-top: 30px;
+        margin-right: 10px;
+        cursor: pointer;
 
+        z-index: 20;
         &:focus {
             outline: 0;
         }
