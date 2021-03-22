@@ -121,9 +121,13 @@ export const ModalWindow = ({ onRequestClose = () => {} }) => {
               <h3 className={styles.imageInfo}> {asset_id} | ({width} x {height})</h3>
             </div>
 
-            <button className={styles.more} onClick={handleExpand}>
-              {isExpand ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-            </button>
+            {related.length > 0 && (
+              <>
+                <button className={styles.more} onClick={handleExpand}>
+                  {isExpand ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+                </button>
+              </>
+            )}
           </div>
 
           <div className={`${styles.related} ${isExpand ? styles.expand : ''}`}>
@@ -144,6 +148,7 @@ export const ModalWindow = ({ onRequestClose = () => {} }) => {
                         style={{ backgroundImage: `url(${image})` }}
                         onClick={() => handleRelateClick(value.asset_id)}
                       />
+                      <span>{value.year}</span>
                     </div>
                   </div>
                 )

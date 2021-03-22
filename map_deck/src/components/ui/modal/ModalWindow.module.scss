@@ -99,6 +99,7 @@ $CONTENT_MARGIN: 30px;
         .container {
             height: 150px;
             width: auto;
+            text-align: center;
 
             .thumb {
                 // max-width: 50%;
@@ -114,6 +115,10 @@ $CONTENT_MARGIN: 30px;
                 &:focus {
                     outline: 0;
                 }
+            }
+
+            span { 
+                font-size: $FONT_SIZE_SM;
             }
 
             &:focus {
