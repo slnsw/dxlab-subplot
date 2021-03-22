@@ -93,6 +93,10 @@ export const Search = ({ onGeoLookupSearchResult, useVirtualKeyboard = false }) 
     setScreenKeyboardValue(input)
   }, [])
 
+  const handleKeyboardClose = useCallback(input => {
+    setToggleSearch(true)
+  }, [])
+
   const updateKeyboard = (value) => {
     if (keyboardRef.current) {
       keyboardRef.current.setInput(value)
@@ -157,6 +161,7 @@ export const Search = ({ onGeoLookupSearchResult, useVirtualKeyboard = false }) 
             <ScreenKeyboard
               ref={keyboardRef}
               onChange={handleKeyboardChange}
+              onClose={handleKeyboardClose}
             />
           </div>
         </Zoom>
