@@ -7,7 +7,7 @@ import HomeIcon from '@material-ui/icons/Home'
 import ZoomIn from '@material-ui/icons/ZoomIn'
 import ZoomOut from '@material-ui/icons/ZoomOut'
 
-const Zoomable = ({ id, assetId, iiifIdentifier = '' }) => {
+const Zoomable = ({ id, assetId, showNavigator = true, iiifIdentifier = '' }) => {
   // eslint-disable-next-line no-unused-vars
   let el = null
   // eslint-disable-next-line no-unused-vars
@@ -40,9 +40,14 @@ const Zoomable = ({ id, assetId, iiifIdentifier = '' }) => {
     <>
       <div className={styles.openseadragon} ref={node => { el = node }}>
         <div id='navigator' className={styles.navigator}>
-          <div className={styles.navigationButton}><ZoomIn id='zoom-in' /></div>
-          <div className={styles.navigationButton}><ZoomOut id='zoom-out' /></div>
-          <div className={styles.navigationButton}><HomeIcon id='home' /></div>
+          {showNavigator &&
+          (
+            <>
+              <div className={styles.navigationButton}><ZoomIn id='zoom-in' /></div>
+              <div className={styles.navigationButton}><ZoomOut id='zoom-out' /></div>
+              <div className={styles.navigationButton}><HomeIcon id='home' /></div>
+            </>
+          )}
         </div>
         <div className={styles.container} id={id} />
       </div>
@@ -55,5 +60,6 @@ export default Zoomable
 Zoomable.propTypes = {
   id: PropTypes.string,
   assetId: PropTypes.string,
-  iiifIdentifier: PropTypes.string
+  iiifIdentifier: PropTypes.string,
+  showNavigator: PropTypes.bool
 }

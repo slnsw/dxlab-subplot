@@ -26,6 +26,8 @@ $CONTENT_MARGIN: 30px;
         width: 100%;
         z-index: 20;
 
+        border-bottom: 1px solid rgba($color: $PRIMARY_COLOR, $alpha: .8);
+
         .header {
             padding-left: $CONTENT_MARGIN;
             padding-top: $CONTENT_MARGIN;
@@ -58,6 +60,12 @@ $CONTENT_MARGIN: 30px;
             }
 
         }
+
+        transition: bottom 200ms ease-in-out;
+
+        &.expand {
+            bottom: 214px;
+        }
     }
 
     .zoomable {
@@ -69,20 +77,28 @@ $CONTENT_MARGIN: 30px;
 
 
 
-    .details {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        justify-content: space-between;
-        margin-bottom: 10px;
-    }
+    // .details {
+    //     display: flex;
+    //     flex-direction: row;
+    //     flex-wrap: nowrap;
+    //     justify-content: space-between;
+    //     margin-bottom: 10px;
+    // }
 
-    .related {
+    .related { 
+        position: absolute;
+        background-color: rgba(0, 0, 0, .98);
         margin-top: 25px;
-        margin: 60px $CONTENT_MARGIN + 10;
+        padding: 30px $CONTENT_MARGIN + 10;
+        bottom: -244px;
+        left: 0;
+        width: calc(100% - 80px);
+
+
 
         .container {
             height: 150px;
+            width: auto;
 
             .thumb {
                 // max-width: 50%;
@@ -94,7 +110,21 @@ $CONTENT_MARGIN: 30px;
                 background-position: center;
                 background-repeat: no-repeat;
                 background-color: rgba(255, 255, 255, .4);
+
+                &:focus {
+                    outline: 0;
+                }
             }
+
+            &:focus {
+                outline: 0;
+            }
+        }
+
+        transition: bottom 200ms ease-in-out;
+
+        &.expand {
+            bottom: 0;
         }
 
     }
@@ -119,6 +149,24 @@ $CONTENT_MARGIN: 30px;
         }
 
 
+    }
+
+    .more {
+        position: absolute;
+        bottom: -1px;
+        left: 50%;
+        background: rgba(0, 0, 0, 0.8);
+        border: 1px solid rgba($color: $PRIMARY_COLOR, $alpha: .8);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.8);
+        cursor: pointer;
+        color: $PRIMARY_COLOR;
+        transform: translateX(-50%);
+
+        z-index: 20;
+
+        &:focus {
+            outline: 0;
+        }
     }
 
     transition: left 200ms ease-in-out;

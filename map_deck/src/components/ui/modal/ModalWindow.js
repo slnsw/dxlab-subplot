@@ -10,6 +10,9 @@ import ReactModal from 'react-modal'
 import Zoomable from './Zoomable'
 import Slider from 'react-slick'
 import CancelIcon from '@material-ui/icons/Cancel'
+import ExpandLessIcon from '@material-ui/icons/ExpandLess'
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+
 import { getImageUrl } from '../../../share/utils/helpers'
 import { get, isEmpty, find } from 'lodash'
 import styles from './ModalWindow.module.scss'
@@ -18,6 +21,8 @@ const slideRef = React.createRef()
 
 export const ModalWindow = ({ onRequestClose = () => {} }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [isExpand, setIsExpand] = useState(false)
+
   const [{ title, year, width, height, location_name, asset_id, iiif_identifier, url, collection_id, related = [] }, setSelected] = useState({})
   const [uiState, uiDispatch] = useContext(UIContext)
   const [mapState] = useContext(MapDataContext)
@@ -32,6 +37,7 @@ export const ModalWindow = ({ onRequestClose = () => {} }) => {
     if (open) {
       // const { center, radius, placeName } = near
       // mapDispatch(getMapsWithin({ center, radius, placeName }))
+      setIsExpand(false)
 
       if (slideRef.current) {
         slideRef.current.slickGoTo(0)
@@ -57,6 +63,7 @@ export const ModalWindow = ({ onRequestClose = () => {} }) => {
   }, [uiState.selected])
 
   const handleCloseModal = () => {
+    setIsExpand(false)
     uiDispatch(unSelectMap())
     if (onRequestClose) {
       onRequestClose()
@@ -70,6 +77,10 @@ export const ModalWindow = ({ onRequestClose = () => {} }) => {
     if (select) {
       uiDispatch(selectMap({ ...select }))
     }
+  }
+
+  const handleExpand = () => {
+    setIsExpand(!isExpand)
   }
 
   return (
@@ -92,7 +103,11 @@ export const ModalWindow = ({ onRequestClose = () => {} }) => {
       >
         <>
 
-          <div className={styles.headerContainer}>
+          <div className={styles.zoomable}>
+            <Zoomable assetId={asset_id} iiifIdentifier={iiif_identifier} showNavigator={!isExpand} id='mapZoom' />
+          </div>
+
+          <div className={`${styles.headerContainer} ${isExpand ? styles.expand : ''}`}>
             <button className={styles.close} onClick={handleCloseModal}><CancelIcon /></button>
 
             <div className={styles.header}>
@@ -104,15 +119,14 @@ export const ModalWindow = ({ onRequestClose = () => {} }) => {
               </h1>
               <h3 className={styles.info}>{year} - {location_name}</h3>
               <h3 className={styles.imageInfo}> {asset_id} | ({width} x {height})</h3>
-
             </div>
+
+            <button className={styles.more} onClick={handleExpand}>
+              {isExpand ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+            </button>
           </div>
 
-          <div className={styles.zoomable}>
-            <Zoomable assetId={asset_id} iiifIdentifier={iiif_identifier} id='mapZoom' />
-          </div>
-
-          <div className={styles.related}>
+          <div className={`${styles.related} ${isExpand ? styles.expand : ''}`}>
             <Slider
               dots={false}
               infinite={false}
