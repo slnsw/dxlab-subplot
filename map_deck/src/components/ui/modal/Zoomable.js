@@ -11,6 +11,7 @@ const Zoomable = ({ id, assetId, iiifIdentifier = '' }) => {
 
   useEffect(() => {
     // Create an instance of OSD
+    console.log(iiifIdentifier)
     try {
       if (viewer.current) {
         viewer.current.destroy()

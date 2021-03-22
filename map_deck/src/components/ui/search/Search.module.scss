@@ -7,6 +7,7 @@
     // height: 100vh;
     width: 100vw;
     bottom: 230px;
+    pointer-events: none;
  }
 
  .keyboardContainer {
@@ -14,14 +15,17 @@
         left: 3vw;
         top: -152px;
         width: 33vw;
+        pointer-events: auto;
  }
 
  .fab {
     background-color: $ACCENT_COLOR !important;
     width: 80px !important;
     height: 80px !important; 
+    pointer-events: auto;
  }
 
  .geocoder {
     margin-top: -56px !important;
+    pointer-events: auto;
  }
