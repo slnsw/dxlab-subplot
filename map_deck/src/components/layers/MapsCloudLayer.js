@@ -34,17 +34,13 @@ export class MapsCloudLayer extends CompositeLayer {
         const { geometry, properties } = el
 
         if (geometry) {
-          const { year, asset_id } = properties
-          // elevationOffset = elevationOffset + 0.01
-
-          // const elevation = getYearElevation({ fromYear, toYear, year }) + (1 + elevationOffset)
-          const elevation = 0
+          const { year, asset_id, offsetYear } = properties
 
           result.push({
             bounds: properties.image_bounds.coordinates[0].map((c) => [...c]),
             image: properties.asset_id,
             color: [1.0, 0, 0],
-            offsetZ: elevation,
+            offsetZ: offsetYear * 10,
             opacity: 1,
             year,
             asset_id
@@ -52,7 +48,7 @@ export class MapsCloudLayer extends CompositeLayer {
         }
 
         return result
-      }, []), ['year'])
+      }, []), ['year', 'asset_id'])
 
       // Process polygons for shadows
       dummyPolygonData = data.reduce((result, el) => {
@@ -73,14 +69,13 @@ export class MapsCloudLayer extends CompositeLayer {
     }
   }
 
-  getMapElevation (year) {
+  getMapElevation (year, offsetZ) {
     const { filters } = this.props
-    // const [mapState] = mapContext
-    // const { meta } = mapState
-    // const {}
-    // console.log(meta)
+
     const { fromYear, toYear } = filters
-    return getYearElevation({ fromYear, toYear, year, offsetZ: 2 })
+    const elevation = getYearElevation({ fromYear, toYear, year, offsetZ: offsetZ })
+
+    return elevation
   }
 
   isVisible (year) {
@@ -146,11 +141,11 @@ export class MapsCloudLayer extends CompositeLayer {
         return opacity
       },
       getOffsetZ: d => {
-        const { year, bounds, asset_id } = d
+        const { year, bounds, asset_id, offsetZ } = d
         const coors = bounds || []
         let elevation = 0
         if (coors) {
-          elevation = this.getMapElevation(year)
+          elevation = this.getMapElevation(year, offsetZ)
           elevation = this.isVisible(year) ? elevation : 0
           elevation = this.inSearchRange(asset_id) ? elevation : 0
         } else {
@@ -179,7 +174,6 @@ export class MapsCloudLayer extends CompositeLayer {
 
     layers.push(sprites)
     layers.push(this.buildShadows())
-    // layers.push(shadows)
 
     return layers
   }
@@ -209,26 +203,27 @@ export class MapsCloudLayer extends CompositeLayer {
       castShadow: false,
 
       getPolygon: (d) => {
-        const { year, asset_id } = d.properties
+        const { year, asset_id, offsetYear } = d.properties
         let coors = d.geometry.coordinates || []
         if (coors) {
-          let elevation = this.getMapElevation(year)
+          let elevation = this.getMapElevation(year, (offsetYear * 10) + 15)
           elevation = this.isVisible(year) ? elevation : -1
           elevation = this.inSearchRange(asset_id) ? elevation : -1
           coors = [coors[0].map((c) => [...c, elevation])]
         } else {
           return []
         }
-        return coors || []
+        return coors
       },
       // getLineColor: (d) => this.getColor(d, 255),
       getFillColor: (d) => this.getShadowColor(d, 0),
       updateTriggers: {
-        getPolygon: [filters.fromYear, filters.toYear, near.all]
+        getPolygon: [filters.fromYear, filters.toYear, near.all],
+        getFillColor: [filters.fromYear, filters.toYear, near.all]
       },
       transitions: {
-        getPolygon: 300
-        // getFillColor: 300
+        getPolygon: 300,
+        getFillColor: 300
         // getLineColor: 100
       }
     })

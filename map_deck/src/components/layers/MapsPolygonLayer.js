@@ -36,10 +36,10 @@ export class MapsPolygonLayer extends CompositeLayer {
     }
   }
 
-  getMapElevation (year) {
+  getMapElevation (year, offsetYear) {
     const { filters } = this.props
     const { fromYear, toYear } = filters
-    return getYearElevation({ fromYear, toYear, year, offsetZ: 0 })
+    return getYearElevation({ fromYear, toYear, year, offsetZ: (offsetYear * 10) - 30 })
   }
 
   isVisible (year) {
@@ -57,7 +57,7 @@ export class MapsPolygonLayer extends CompositeLayer {
     let opacity = this.isVisible(year) ? maxOpacity : 0
     opacity = this.inSearchRange(asset_id) ? opacity : 0
     // console.log(opacity, year, fromYear, toYear)
-    return [255, 255, 255, opacity]
+    return [255, 255, 255, 0]
   }
 
   // Duplicated code
@@ -88,12 +88,14 @@ export class MapsPolygonLayer extends CompositeLayer {
       material: false,
       castShadow: false,
       pickable: true,
+      // Don't draw shadows in this layer
+      shadowEnabled: false,
 
       getPolygon: (d) => {
-        const { year, asset_id } = d.properties
+        const { year, asset_id, offsetYear } = d.properties
         let coors = d.geometry.coordinates || []
         if (coors) {
-          let elevation = this.getMapElevation(year)
+          let elevation = this.getMapElevation(year, offsetYear)
           elevation = this.isVisible(year) ? elevation : -1
           elevation = this.inSearchRange(asset_id) ? elevation : -1
           coors = [coors[0].map((c) => [...c, elevation])]
@@ -106,13 +108,13 @@ export class MapsPolygonLayer extends CompositeLayer {
       // getLineColor: (d) => this.getColor(d, 255),
       getFillColor: (d) => this.getColor(d),
       updateTriggers: {
-        getPolygon: [filters.fromYear, filters.toYear, near.all],
-        getFillColor: [filters.fromYear, filters.toYear, near.all]
+        getPolygon: [filters.fromYear, filters.toYear, near.all]
+        // getFillColor: [filters.fromYear, filters.toYear, near.all]
 
       },
       transitions: {
-        getPolygon: 300,
-        getFillColor: 300
+        getPolygon: 300
+        // getFillColor: 300
         // getLineColor: 100
       }
     })

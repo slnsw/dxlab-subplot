@@ -1,6 +1,6 @@
 import { ActionTypes } from './MapsReducer'
 import { fetchData, loadData } from '../share/services'
-import { pickBy, identity, some, map, isNumber, max, min, get } from 'lodash'
+import { pickBy, identity, some, map, isNumber, max, min, get, sortBy } from 'lodash'
 import bbox from '@turf/bbox'
 
 import { roundYearDown, roundYearUp } from './utils'
@@ -18,6 +18,21 @@ export function getMaps ({ ...query }) {
           data = (data) || []
           // Clean data exclude maps with out year
           data = data.filter((d) => get(d, 'properties.year', 0) > 0)
+
+          // Sort
+          data = sortBy(data, ['properties.year', 'properties.asset_id'])
+
+          // append year offset
+          const groupByYear = {}
+          data = data.map((m) => {
+            const year = get(m, 'properties.year', 0)
+            const asset_id = get(m, 'properties.asset_id', '')
+            const group = groupByYear[year] ? groupByYear[year] : groupByYear[year] = []
+            group.push(asset_id)
+
+            m.properties.offsetYear = group.length
+            return m
+          })
 
           // Get a list of years
           const years = map(data, 'properties.year').filter(d => isNumber(d) || !isNaN(d))

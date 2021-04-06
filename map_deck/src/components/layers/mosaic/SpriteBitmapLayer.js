@@ -322,7 +322,7 @@ export class SpriteBitmapLayer extends Layer {
     const { gl } = this.context
     withParameters(gl, {
       blend: true,
-      depthMask: false,
+      // depthMask: false,
       depthTest: true,
       blendFunc: [GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA, GL.ONE, GL.ONE_MINUS_SRC_ALPHA],
       blendEquation: GL.FUNC_ADD
@@ -345,7 +345,7 @@ export class SpriteBitmapLayer extends Layer {
     textures.forEach(({ image, index }) => {
       sprites[`uTexture${index}`] = new Texture2D(gl, {
         data: image,
-        mipmaps: false,
+        mipmaps: true,
         parameters: DEFAULT_TEXTURE_PARAMETERS
       })
     })
