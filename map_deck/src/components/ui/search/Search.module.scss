@@ -11,14 +11,17 @@
  }
 
  .keyboardContainer {
-        position: absolute;
-        left: 2vw; // Kiosk fixes
-        top: -152px; // Kiosk fixes
-        width: 30vw;
+      //   position: absolute;
+      //   left: 2vw; // Kiosk fixes
+      //   top: -152px; // Kiosk fixes
+        width: 40vw;
         pointer-events: auto;
+        margin-bottom: -120px;
  }
 
  .fab {
+    position: absolute;
+    bottom: 0;
     background-color: $ACCENT_COLOR !important;
     width: 80px !important;
     height: 80px !important; 
@@ -26,6 +29,6 @@
  }
 
  .geocoder {
-    margin-top: -56px !important;
+   //  margin-bottom: -58px !important;
     pointer-events: auto;
  }

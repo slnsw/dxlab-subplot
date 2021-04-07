@@ -113,7 +113,7 @@ export const Search = ({ onGeoLookupSearchResult, useVirtualKeyboard = false }) 
     <>
       <Grid
         container
-        direction='column'
+        direction='column-reverse'
         justify='flex-end'
         alignItems='center'
         className={styles.container}
@@ -131,13 +131,31 @@ export const Search = ({ onGeoLookupSearchResult, useVirtualKeyboard = false }) 
             </Fab>
           </Grid>
         </Zoom>
+        {useVirtualKeyboard &&
+          <Zoom in={!toggleKeyboard}>
+            <div
+              ref={keyboardWrapperRef}
+              className={styles.keyboardContainer}
+            >
+              <ScreenKeyboard
+                ref={keyboardRef}
+                onChange={handleKeyboardChange}
+                onClose={handleKeyboardClose}
+              />
+            </div>
+          </Zoom>}
         <Zoom
           in={!toggleSearch} onEntered={() => {
             // Set focus to Geocoder when transition finish
             if (!useVirtualKeyboard) geocoderRef.current.focus()
           }}
         >
-          <Grid item id='geocoder' className={styles.geocoder}>
+          <Grid
+            item id='geocoder' className={styles.geocoder}
+            style={{
+              marginBottom: (!useVirtualKeyboard) ? '-58px' : (!toggleSearch && !toggleKeyboard) ? '10px' : '-200px'
+            }}
+          >
             <Geocoder
               ref={geocoderRef}
               accessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
@@ -152,18 +170,6 @@ export const Search = ({ onGeoLookupSearchResult, useVirtualKeyboard = false }) 
               onBlur={handleOnBlur}
             />
           </Grid>
-        </Zoom>
-        <Zoom in={!toggleKeyboard}>
-          <div
-            ref={keyboardWrapperRef}
-            className={styles.keyboardContainer}
-          >
-            <ScreenKeyboard
-              ref={keyboardRef}
-              onChange={handleKeyboardChange}
-              onClose={handleKeyboardClose}
-            />
-          </div>
         </Zoom>
       </Grid>
 
