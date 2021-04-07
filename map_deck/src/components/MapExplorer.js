@@ -42,12 +42,13 @@ import { UIContext } from '../context/UIContext'
 
 // Utils
 import { get, sample, isEmpty, find } from 'lodash'
-import distance from '@turf/distance'
-import { point } from '@turf/helpers'
+import calculate_bbox from '@turf/bbox'
+import calculate_center from '@turf/center'
 
 export const MapExplorer = ({ mode = 'kiosk' }) => {
   const [ready, setReady] = useState(false)
   const [idleId, setIdleId] = useState(null)
+  const [restoreViewState, setRestoreViewState] = useState({})
   const [rangeStyle, setRangeStyle] = useState({})
   const [showSearch, setShowSearch] = useState(true)
   const [mapState, mapDispatch] = useContext(MapDataContext)
@@ -185,9 +186,65 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
     if (!isEmpty(selected)) {
       setRangeStyle({ width: '50vw' })
       setShowSearch(false)
+
+      // center selected
+      // Fit to view
+      try {
+        const viewState = {
+          ...uiState.viewState
+        }
+
+        // Store point of return
+        if (isEmpty(restoreViewState)) {
+          setRestoreViewState({ ...viewState })
+        }
+
+        const { width, height } = viewState
+        // If width or height not found it means we just initialize the app
+        if (!width || !height) {
+          viewState.width = window.innerWidth
+          viewState.height = window.innerHeight
+        }
+
+        const halfWindowWidth = viewState.width * 0.5
+        const halfWindowHeight = viewState.height * 0.5
+
+        const image_bounds = get(selected, 'properties.image_bounds')
+        const bbox = calculate_bbox(image_bounds)
+        const center = get(calculate_center(image_bounds), 'geometry.coordinates')
+        let viewport = new WebMercatorViewport(viewState)
+        const selectedViewState = viewport.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]])
+
+        viewport = new WebMercatorViewport(selectedViewState)
+        const mapCenter = viewport.getMapCenterByLngLatPosition({
+          lngLat: center, // [selectedViewState.longitude, selectedViewState.latitude],
+          pos: [halfWindowWidth + (halfWindowWidth * 0.5), halfWindowHeight]
+        })
+
+        UIDispatch(goToViewState({
+          ...viewState,
+          ...selectedViewState,
+          transitionInterpolator: new FlyToInterpolator(),
+          transitionDuration: 1000,
+          pitch: viewState.pitch,
+          longitude: mapCenter[0],
+          latitude: mapCenter[1]
+        }))
+      } catch (e) {
+        console.warn('can\'t calculate zoom')
+      }
     } else {
       setRangeStyle({ })
       setShowSearch(true)
+      // Go back to viewstate before map selection
+      if (!isEmpty(restoreViewState)) {
+        UIDispatch(goToViewState({
+          ...restoreViewState,
+          transitionInterpolator: new FlyToInterpolator(),
+          transitionDuration: 1000
+        }))
+        setRestoreViewState({})
+      }
     }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -208,9 +265,10 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
         // Update map context to keep track with the selected map
         // Find map from MapState because the data in Object is been
         // Modify to properly render polygons
-        const asset_id = get(object, 'properties.asset_id')
-        const select = find(get(mapState, 'data', []), ['properties.asset_id', asset_id])
-        UIDispatch(selectMap({ ...select }))
+        // const asset_id = get(object, 'properties.asset_id')
+        // const select = find(get(mapState, 'data', []), ['properties.asset_id', asset_id])
+        // console.log(object, select)
+        UIDispatch(selectMap({ ...object }))
       }
     },
     onHover: ({ object, x, y }) => {
@@ -232,9 +290,8 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
   const layers = [
     [SearchAreaLayer, { view: 'master' }],
     [LandmarksLayer, { view: 'master', material: false }],
-    // [MapsPolygonLayerOld, { view: 'master', ...handlers }],
-    [MapsPolygonLayer, { view: 'master', ...handlers }],
-    [MapsCloudLayer, { view: 'master' }]
+    // [MapsPolygonLayer, { view: 'master', ...handlers }],
+    [MapsCloudLayer, { view: 'master', ...handlers }]
 
     // [MapsDistributionLayer, { view: 'master' }]
     // [MapsLabelLayer, { view: 'master' }],

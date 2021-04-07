@@ -34,7 +34,8 @@ const defaultProps = {
   // alpha is not effective when blending the bitmap layers with the base map.
   // Instead we need to manually dim/blend rgb values with a background color.
   transparentColor: { type: 'color', value: [0, 0, 0, 0] },
-  tintColor: { type: 'color', value: [255, 255, 255] }
+  tintColor: { type: 'color', value: [255, 255, 255] },
+  pickable: false
 }
 
 /*
@@ -73,7 +74,7 @@ export class SpriteBitmapLayer extends Layer {
       `
     }
 
-    return super.getShaders({ vs, fs, modules: [project32, picking, textureShaderModule] }) // 'picking'
+    return super.getShaders({ vs, fs, modules: [project32, picking, textureShaderModule] })
   }
 
   initializeState () {
@@ -165,8 +166,10 @@ export class SpriteBitmapLayer extends Layer {
       pickingColors: {
         size: 3,
         type: GL.UNSIGNED_BYTE,
-        accessor: (object, { index, target: value }) => {
-          return this.encodePickingColor(object && object.__source ? object.__source.index : index, value)
+        accessor: (object, { index, target }) => {
+          // const v = this.encodePickingColor(object && object.__source ? object.__source.index : index, value)
+          const v = this.encodePickingColor(index, target)
+          return v
         },
         divisor: 1
       }
@@ -322,9 +325,9 @@ export class SpriteBitmapLayer extends Layer {
     const { gl } = this.context
     withParameters(gl, {
       blend: true,
-      // depthMask: false,
+      // // depthMask: false,
       depthTest: true,
-      blendFunc: [GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA, GL.ONE, GL.ONE_MINUS_SRC_ALPHA],
+      // blendFunc: [GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA, GL.ONE, GL.ONE_MINUS_SRC_ALPHA] // Breaks picking
       blendEquation: GL.FUNC_ADD
     }, () => {
       model

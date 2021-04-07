@@ -39,7 +39,7 @@ export class MapsPolygonLayer extends CompositeLayer {
   getMapElevation (year, offsetYear) {
     const { filters } = this.props
     const { fromYear, toYear } = filters
-    return getYearElevation({ fromYear, toYear, year, offsetZ: (offsetYear * 10) - 30 })
+    return getYearElevation({ fromYear, toYear, year, offsetZ: (offsetYear * 10) - 0 })
   }
 
   isVisible (year) {

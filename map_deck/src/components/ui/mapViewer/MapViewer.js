@@ -177,7 +177,7 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
         controller={{ inertia: true, touchRotate: true }}
         useDevicePixels={false}
         _animate
-        far={20}
+        far={10000}
 
       >
         <InteractiveMap

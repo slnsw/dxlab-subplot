@@ -59,6 +59,7 @@ void main() {
     geometry.uv = texCoords;
     geometry.pickingColor = pickingColors;
 
+
     gl_Position = project_position_to_clipspace(position, vec3(0.0), vec3(0.0), geometry.position);
     DECKGL_FILTER_GL_POSITION(gl_Position, geometry);
 
@@ -78,12 +79,13 @@ void main() {
     vUV = mix(imageFrame.xy, imageFrame.xy + imageFrame.zw, uv) / uTextureDim;
     vColor = color;
     
-    vec4 color = vec4(0.0);
-    DECKGL_FILTER_COLOR(color, geometry);
 
     // Instance opacity
     vOpacities = opacities;
     vImageIndex = imageIndex;
 
+    vec4 color = vec4(0.0);
+    DECKGL_FILTER_COLOR(color, geometry);
+    
 }
 `
