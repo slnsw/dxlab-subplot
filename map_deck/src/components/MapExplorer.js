@@ -217,7 +217,7 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
 
         viewport = new WebMercatorViewport(selectedViewState)
         const mapCenter = viewport.getMapCenterByLngLatPosition({
-          lngLat: center, // [selectedViewState.longitude, selectedViewState.latitude],
+          lngLat: center,
           pos: [halfWindowWidth + (halfWindowWidth * 0.5), halfWindowHeight]
         })
 
@@ -226,7 +226,6 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
           ...selectedViewState,
           transitionInterpolator: new FlyToInterpolator(),
           transitionDuration: 1000,
-          pitch: viewState.pitch,
           longitude: mapCenter[0],
           latitude: mapCenter[1]
         }))

@@ -10,6 +10,7 @@ import { Geocoder } from '../geocoder/Geocoder'
 import { ScreenKeyboard } from '../screenKeyboard/ScreenKeyboard'
 import { MapDataContext } from '../../../context/MapsContext'
 import { clearMapsWithin } from '../../../context/MapsActions'
+import { UIContext } from '../../../context/UIContext'
 
 // Geocoder, execute geo-search around sydney
 const proximity = { longitude: 151.21065829636484, latitude: -33.86631790142455 }
@@ -23,6 +24,7 @@ export const Search = ({ onGeoLookupSearchResult, useVirtualKeyboard = false }) 
   const geocoderRef = useRef()
 
   const [mapState, mapDispatch] = useContext(MapDataContext)
+  const [uiState] = useContext(UIContext)
 
   const handleToggle = useCallback(() => {
     setToggleSearch(!toggleSearch)
@@ -113,37 +115,14 @@ export const Search = ({ onGeoLookupSearchResult, useVirtualKeyboard = false }) 
     <>
       <Grid
         container
-        direction='column-reverse'
+        direction='column'
         justify='flex-end'
         alignItems='center'
         className={styles.container}
+        style={{
+          opacity: !isEmpty(get(uiState.selected, 'properties')) ? 0 : 1
+        }}
       >
-        <Zoom in={toggleSearch}>
-          <Grid item>
-            <Fab
-              color='primary'
-              aria-label='add'
-              disableRipple
-              onClick={handleToggle}
-              className={styles.fab}
-            >
-              <SearchIcon fontSize='large' />
-            </Fab>
-          </Grid>
-        </Zoom>
-        {useVirtualKeyboard &&
-          <Zoom in={!toggleKeyboard}>
-            <div
-              ref={keyboardWrapperRef}
-              className={styles.keyboardContainer}
-            >
-              <ScreenKeyboard
-                ref={keyboardRef}
-                onChange={handleKeyboardChange}
-                onClose={handleKeyboardClose}
-              />
-            </div>
-          </Zoom>}
         <Zoom
           in={!toggleSearch} onEntered={() => {
             // Set focus to Geocoder when transition finish
@@ -153,7 +132,7 @@ export const Search = ({ onGeoLookupSearchResult, useVirtualKeyboard = false }) 
           <Grid
             item id='geocoder' className={styles.geocoder}
             style={{
-              marginBottom: (!useVirtualKeyboard) ? '-58px' : (!toggleSearch && !toggleKeyboard) ? '10px' : '-200px'
+              marginBottom: (!useVirtualKeyboard) ? '-58px' : (!toggleSearch && !toggleKeyboard) ? '10px' : '-100px'
             }}
           >
             <Geocoder
@@ -169,6 +148,32 @@ export const Search = ({ onGeoLookupSearchResult, useVirtualKeyboard = false }) 
               onChange={handleOnChange}
               onBlur={handleOnBlur}
             />
+          </Grid>
+        </Zoom>
+        {useVirtualKeyboard &&
+          <Zoom in={!toggleKeyboard}>
+            <div
+              ref={keyboardWrapperRef}
+              className={styles.keyboardContainer}
+            >
+              <ScreenKeyboard
+                ref={keyboardRef}
+                onChange={handleKeyboardChange}
+                onClose={handleKeyboardClose}
+              />
+            </div>
+          </Zoom>}
+        <Zoom in={toggleSearch}>
+          <Grid item>
+            <Fab
+              color='primary'
+              aria-label='add'
+              disableRipple
+              onClick={handleToggle}
+              className={styles.fab}
+            >
+              <SearchIcon fontSize='large' />
+            </Fab>
           </Grid>
         </Zoom>
       </Grid>

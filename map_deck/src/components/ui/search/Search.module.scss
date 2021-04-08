@@ -4,19 +4,18 @@
     z-index: 5000;
     position: absolute;
     display: block;
-    // height: 100vh;
     width: 100vw;
-    bottom: 230px;
+    bottom: 180px;
     pointer-events: none;
+
+    transition: opacity 200ms ease-in-out;
  }
 
  .keyboardContainer {
-      //   position: absolute;
-      //   left: 2vw; // Kiosk fixes
-      //   top: -152px; // Kiosk fixes
         width: 40vw;
+        height: 180px;
         pointer-events: auto;
-        margin-bottom: -120px;
+        margin-bottom: -180px;
  }
 
  .fab {

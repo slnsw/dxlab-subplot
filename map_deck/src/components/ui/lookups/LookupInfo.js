@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { MapDataContext } from '../../../context/MapsContext'
-import { get, isEmpty, map } from 'lodash'
+import { UIContext } from '../../../context/UIContext'
+import { get, isEmpty } from 'lodash'
 import styles from './LookupInfo.module.scss'
 
 export const LookupInfo = (props) => {
@@ -12,6 +13,7 @@ export const LookupInfo = (props) => {
   })
   const [show, setShow] = useState(false)
   const [mapState] = useContext(MapDataContext)
+  const [uiState] = useContext(UIContext)
 
   const getData = (source) => {
     const data = get(source, 'data', [])
@@ -37,12 +39,17 @@ export const LookupInfo = (props) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapState.near])
 
-  const { filteredInfo, allInfo, placeNameShort, radius } = state
+  const { filteredInfo, allInfo, radius } = state
 
   return (
     <>
       {show &&
-        <div className={styles.container}>
+        <div
+          className={styles.container}
+          style={{
+            opacity: !isEmpty(get(uiState.selected, 'properties')) ? 0 : 1
+          }}
+        >
           <div className={styles.info}>
 
             <p>Total <span>{allInfo.count}</span> maps from <span>{allInfo.minYear}</span> to <span>{allInfo.maxYear}</span>.</p>

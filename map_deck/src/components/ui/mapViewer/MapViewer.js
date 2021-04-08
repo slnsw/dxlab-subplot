@@ -164,6 +164,12 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
     return false
   }
 
+  const handleWebGLInitialized = (gl) => {
+    gl.enable(gl.DEPTH_TEST)
+    gl.depthFunc(gl.LEQUAL)
+    // gl.enable(gl.CULL_FACE)
+  }
+
   return (
     <>
       <DeckGL
@@ -174,6 +180,7 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
         layers={preparedLayers}
         // onViewStateChange={e => setViewState(e.viewState)}
         onViewStateChange={handleViewStateChange}
+        onWebGLInitialized={handleWebGLInitialized}
         controller={{ inertia: true, touchRotate: true }}
         useDevicePixels={false}
         _animate
