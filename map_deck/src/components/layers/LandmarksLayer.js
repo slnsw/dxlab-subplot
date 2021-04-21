@@ -65,7 +65,8 @@ export class LandmarksLayer extends CompositeLayer {
   loadModel ({ sceneURL, name, data: { position, orientation, translation, color, scale }, useTexture, ...args }) {
     const testScene = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Avocado/glTF-Binary/Avocado.glb'
     const { id } = this.props
-    sceneURL = (sceneURL) ? `/models/${sceneURL}` : testScene
+    sceneURL = (sceneURL) ? `${process.env.PUBLIC_URL}/models/${sceneURL}` : testScene
+    sceneURL = sceneURL.replace('//', '/')
     useTexture = useTexture || false
 
     return new ScenegraphLayer({
