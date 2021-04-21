@@ -16,7 +16,7 @@ import { get, isEmpty, debounce } from 'lodash'
 import bearing from '@turf/bearing'
 
 import lightingEffect from './lights'
-import styles from './MapViewer.module.scss'
+// import styles from './MapViewer.module.scss'
 
 const mapRef = React.createRef()
 

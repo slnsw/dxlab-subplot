@@ -39,10 +39,9 @@ import { getMapsWithin, clearMapsWithin, applyFilters } from '../context/MapsAct
 import { UIContext } from '../context/UIContext'
 
 // Utils
-import { get, sample, isEmpty, find } from 'lodash'
+import { get, sample, isEmpty } from 'lodash'
 import calculate_bbox from '@turf/bbox'
 import calculate_center from '@turf/center'
-import { green } from '@material-ui/core/colors'
 
 export const MapExplorer = ({ mode = 'web' }) => {
   const [ready, setReady] = useState(false)
@@ -85,6 +84,10 @@ export const MapExplorer = ({ mode = 'web' }) => {
     startYear = (endYear - sizeRange > startYear) ? startYear - sizeRange : startYear
 
     const { data } = mapDispatch(applyFilters({ fromYear: startYear, toYear: endYear }))
+
+    if (data.length === 0) {
+      runIdle()
+    }
 
     // Get current filtered data and
     // select a random map from current range
