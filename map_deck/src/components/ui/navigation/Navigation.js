@@ -7,7 +7,7 @@ import { UIContext } from '../../../context/UIContext'
 import { goToViewState } from '../../../context/UIActions'
 
 import { EventManager } from 'mjolnir.js'
-import { isNumber } from 'lodash'
+import { isNumber, debounce } from 'lodash'
 const eventManager = new EventManager()
 
 export const NavigationControl = ({ style }) => {
@@ -22,7 +22,7 @@ export const NavigationControl = ({ style }) => {
 
   const _uiDispatch = useCallback((...args) => uiDispatch(...args), [uiDispatch])
 
-  const updateMapViewState = useCallback(
+  const updateMapViewState = useCallback(debounce(
     () => {
       if (isNumber(bearing) && !isNaN(bearing) && isNumber(pitch) && !isNaN(pitch)) {
         _uiDispatch(goToViewState({
@@ -31,8 +31,8 @@ export const NavigationControl = ({ style }) => {
           pitch
         }))
       }
-    }
-    , [bearing, pitch, _uiDispatch, viewState])
+    }, 50)
+  , [bearing, pitch, _uiDispatch, viewState])
 
   useEffect(() => {
     if (!dragging) {
