@@ -1,0 +1,55 @@
+@import '../../../global';
+
+.container {
+  z-index: 5010;
+  position: absolute;
+  display: block;
+  padding: 40px 80px 20px 80px;
+  margin: 20px;
+  right: 0;
+  width: calc(50vw - 40px) !important;
+  bottom: 140px;
+  pointer-events: none;
+  text-align: center;
+  background-color: rgba(0, 0, 0, .2);
+
+  transition: opacity 200ms ease-in-out;
+
+  .root {
+    color: $ACCENT_COLOR;
+  }
+  
+  .slider {
+    pointer-events: auto;
+  }
+  .track {
+    background-color: $ACCENT_COLOR;
+  }
+
+  .rail {
+    background-color: $PRIMARY_COLOR;
+  }
+
+  .thumb {
+    // background-color: $ACCENT_COLOR ;
+    border-radius: 0%;
+
+    &:hover{
+      box-shadow: none;
+    }
+
+    &.active {
+      box-shadow: none;
+    }
+
+    &.focusVisible  {
+      box-shadow: none;
+    }
+    
+  }
+
+  .label {
+    width: 100%;
+    color: $PRIMARY_COLOR;
+  }
+}

@@ -10,6 +10,7 @@ import { LookupInfo } from './ui/lookups/LookupInfo'
 import { Search } from './ui/search/Search'
 import { Fog } from './ui/fog/Fog'
 import { NavigationControl } from './ui/navigation/Navigation'
+import { OpacityControl } from './ui/opacity/Opacity'
 import { MapViewer } from './ui/mapViewer/MapViewer'
 
 // Idle
@@ -19,10 +20,7 @@ import { FlyToInterpolator, WebMercatorViewport } from 'deck.gl'
 
 // Data visualization and info layers
 import { LandmarksLayer } from './layers/LandmarksLayer'
-import { FootprintShadowLayer } from './layers/FootprintShadowLayer'
 import { SearchAreaLayer } from './layers/SearchAreaLayer'
-import { MapsPolygonLayerOld } from './layers/MapsPolygonLayerOld'
-import { MapsPolygonLayer } from './layers/MapsPolygonLayer'
 import { MapsCloudLayer } from './layers/MapsCloudLayer'
 
 // Use only on development
@@ -44,12 +42,15 @@ import { UIContext } from '../context/UIContext'
 import { get, sample, isEmpty, find } from 'lodash'
 import calculate_bbox from '@turf/bbox'
 import calculate_center from '@turf/center'
+import { green } from '@material-ui/core/colors'
 
 export const MapExplorer = ({ mode = 'web' }) => {
   const [ready, setReady] = useState(false)
   const [idleId, setIdleId] = useState(null)
   const [restoreViewState, setRestoreViewState] = useState({})
   const [rangeStyle, setRangeStyle] = useState({})
+  const [opacityStyle, setOpacityStyle] = useState({ opacity: 0 })
+  const [navigatorStyle, setNavigatorStyle] = useState({})
   const [showSearch, setShowSearch] = useState(true)
   const [mapState, mapDispatch] = useContext(MapDataContext)
   const [uiState, UIDispatch] = useContext(UIContext)
@@ -185,6 +186,8 @@ export const MapExplorer = ({ mode = 'web' }) => {
 
     if (!isEmpty(selected)) {
       setRangeStyle({ width: '50vw' })
+      setOpacityStyle({ opacity: 1 })
+      setNavigatorStyle({ bottom: '300px' })
       setShowSearch(false)
 
       // center selected
@@ -234,6 +237,9 @@ export const MapExplorer = ({ mode = 'web' }) => {
       }
     } else {
       setRangeStyle({ })
+      setOpacityStyle({ opacity: 0 })
+      setNavigatorStyle({ })
+
       setShowSearch(true)
       // Go back to viewstate before map selection
       if (!isEmpty(restoreViewState)) {
@@ -325,7 +331,8 @@ export const MapExplorer = ({ mode = 'web' }) => {
         showSearch={showSearch}
       />
 
-      <NavigationControl />
+      <NavigationControl style={navigatorStyle} />
+      <OpacityControl style={opacityStyle} />
       <Fog />
 
     </>)

@@ -52,6 +52,7 @@ export const Search = ({ onGeoLookupSearchResult, useVirtualKeyboard = false }) 
     if (isEmpty(mapState.near)) {
       reset()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapState.near])
 
   const handleOnBlur = useCallback((value) => {

@@ -114,6 +114,7 @@ export class MapsCloudLayer extends CompositeLayer {
     const inFocus = get(uiState, 'focus.properties.asset_id', null)
     const isIdle = get(uiState, 'isIdle', false)
     const selected = get(uiState, 'selected.properties.asset_id', null)
+    const selectedOpacity = get(uiState, 'selectedOpacity', 1)
 
     const [mapState] = mapContext
     const { near } = mapState
@@ -140,7 +141,7 @@ export class MapsCloudLayer extends CompositeLayer {
         opacity = this.inSearchRange(asset_id) ? opacity : 0
 
         if (selected) {
-          opacity = (selected === asset_id) ? opacity : 0
+          opacity = (selected === asset_id) ? selectedOpacity : 0
         }
 
         return opacity
@@ -170,7 +171,7 @@ export class MapsCloudLayer extends CompositeLayer {
       shadowEnabled: false,
 
       updateTriggers: {
-        getOpacity: [inFocus, isIdle, filters.fromYear, filters.toYear, near.all, selected],
+        getOpacity: [inFocus, isIdle, filters.fromYear, filters.toYear, near.all, selected, selectedOpacity],
         getOffsetZ: [filters.fromYear, filters.toYear, near.all, selected]
       },
       transitions: {

@@ -183,7 +183,7 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
         onWebGLInitialized={handleWebGLInitialized}
         controller={{ inertia: true, touchRotate: true }}
         useDevicePixels={false}
-        _animate
+        // _animate
         far={10000}
 
       >

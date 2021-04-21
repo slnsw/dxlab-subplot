@@ -7,6 +7,7 @@
   bottom: 200px;
   z-index: 6020;
 
+  transition: bottom 100ms ease-in-out;
   
   .container {
     cursor: grab;

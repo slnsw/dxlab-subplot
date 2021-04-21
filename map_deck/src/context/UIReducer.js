@@ -1,6 +1,7 @@
 export const ActionTypes = {
 
   UI_MAP_SELECT: 'UI_MAP_SELECT',
+  UI_MAP_SELECT_OPACITY: 'UI_MAP_SELECT_OPACITY',
   UI_MAP_UNSELECT: 'UI_MAP_UNSELECT',
 
   UI_MAP_FOCUS: 'UI_MAP_FOCUS',
@@ -16,7 +17,8 @@ export function UIReducer (state, action) {
     case ActionTypes.UI_MAP_SELECT: {
       return {
         ...state,
-        selected: action.selected
+        selected: action.selected,
+        selectedOpacity: parseFloat(process.env.REACT_APP_SELECT_MAP_INITIAL_OPACITY)
       }
     }
 
@@ -24,6 +26,13 @@ export function UIReducer (state, action) {
       return {
         ...state,
         selected: {}
+      }
+    }
+
+    case ActionTypes.UI_MAP_SELECT_OPACITY: {
+      return {
+        ...state,
+        selectedOpacity: action.opacity
       }
     }
 

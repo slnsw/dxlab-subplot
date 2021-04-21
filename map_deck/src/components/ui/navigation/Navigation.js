@@ -1,4 +1,6 @@
 import React, { useContext, useRef, useEffect, useState, useCallback } from 'react'
+import PropTypes from 'prop-types'
+
 import styles from './Navigation.module.scss'
 
 import { UIContext } from '../../../context/UIContext'
@@ -8,7 +10,7 @@ import { EventManager } from 'mjolnir.js'
 import { isNumber } from 'lodash'
 const eventManager = new EventManager()
 
-export const NavigationControl = () => {
+export const NavigationControl = ({ style }) => {
   const ref = useRef(null)
   const [bearing, setBearing] = useState(0)
   const [rotateX, setRotateX] = useState(0)
@@ -86,7 +88,7 @@ export const NavigationControl = () => {
 
   return (
     <>
-      <div className={styles.root} ref={ref}>
+      <div className={styles.root} ref={ref} style={style}>
         <div
           className={styles.container}
           style={{
@@ -99,4 +101,8 @@ export const NavigationControl = () => {
       </div>
     </>
   )
+}
+
+NavigationControl.propTypes = {
+  style: PropTypes.object
 }

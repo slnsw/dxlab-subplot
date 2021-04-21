@@ -9,6 +9,15 @@ export function selectMap (object) {
   }
 }
 
+export function setSelectedMapOpacity (opacity) {
+  return (dispatch, state) => {
+    dispatch({
+      type: ActionTypes.UI_MAP_SELECT_OPACITY,
+      opacity
+    })
+  }
+}
+
 export function unSelectMap () {
   return (dispatch, state) => {
     dispatch({
