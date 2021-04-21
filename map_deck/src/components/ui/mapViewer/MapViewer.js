@@ -141,28 +141,28 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
   }, [handleViewStateChange, viewState])
 
   // Layer visibility
-  const getParent = (layer) => {
-    let parent = null
-    if (layer) {
-      parent = layer.parent
-      if (parent && parent.parent) {
-        parent = getParent(parent)
-      }
-    }
-    return parent
-  }
+  // const getParent = (layer) => {
+  //   let parent = null
+  //   if (layer) {
+  //     parent = layer.parent
+  //     if (parent && parent.parent) {
+  //       parent = getParent(parent)
+  //     }
+  //   }
+  //   return parent
+  // }
 
-  const layerViewVisibility = ({ layer, viewport }) => {
-    const container = getParent(layer)
-    if (container) {
-      const { view } = container.props
-      if (view === mode || view === 'all' || mode === 'kiosk') {
-        return true
-      }
-    }
+  // const layerViewVisibility = ({ layer, viewport }) => {
+  //   const container = getParent(layer)
+  //   if (container) {
+  //     const { view } = container.props
+  //     if (view === mode || view === 'all' || mode === 'kiosk') {
+  //       return true
+  //     }
+  //   }
 
-    return false
-  }
+  //   return false
+  // }
 
   const handleWebGLInitialized = (gl) => {
     gl.enable(gl.DEPTH_TEST)
@@ -200,7 +200,7 @@ export const MapViewer = ({ mode, layers, showSearch = true, ...props }) => {
 }
 
 MapViewer.propTypes = {
-  mode: PropTypes.oneOf(['kiosk', 'master', 'slave']),
+  mode: PropTypes.oneOf(['kiosk', 'web']),
   layers: PropTypes.array,
   onViewChange: PropTypes.func,
   uiContext: PropTypes.array,

@@ -45,7 +45,7 @@ import { get, sample, isEmpty, find } from 'lodash'
 import calculate_bbox from '@turf/bbox'
 import calculate_center from '@turf/center'
 
-export const MapExplorer = ({ mode = 'kiosk' }) => {
+export const MapExplorer = ({ mode = 'web' }) => {
   const [ready, setReady] = useState(false)
   const [idleId, setIdleId] = useState(null)
   const [restoreViewState, setRestoreViewState] = useState({})
@@ -311,7 +311,7 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
           <Header />
           <LookupInfo />
           <Search
-            useVirtualKeyboard
+            useVirtualKeyboard={mode === 'kiosk'}
             onGeoLookupSearchResult={handleGeoSearchResult}
           />
           <Range style={rangeStyle} />
@@ -332,5 +332,5 @@ export const MapExplorer = ({ mode = 'kiosk' }) => {
 }
 
 MapExplorer.propTypes = {
-  mode: PropTypes.oneOf(['kiosk', 'master', 'slave'])
+  mode: PropTypes.oneOf(['kiosk', 'web'])
 }

@@ -15,9 +15,10 @@ import { find, debounce } from 'lodash'
  */
 export const MapRoutes = () => {
   const [init, setInit] = useState(false)
+  const [appMode, setAppMode] = useState('web')
   const [mapState, mapDispatch] = useContext(MapDataContext)
   const [uiState, uiDispatch] = useContext(UIContext)
-  const { range, location, id } = useParams()
+  const { mode, range, location, id } = useParams()
   const history = useHistory()
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -38,6 +39,12 @@ export const MapRoutes = () => {
   useEffect(() => {
     // :/ refactor this only execute ones.
     if (!init) {
+      const validModes = ['kiosk', 'web', '']
+      if (validModes.includes(mode)) {
+        const _mode = mode === '' ? 'web' : mode
+        setAppMode(_mode)
+      }
+
       let rangeQuery = {}
       if (range) {
         const years = range.split('-').map(y => parseInt(y))
@@ -70,7 +77,7 @@ export const MapRoutes = () => {
         _uiDispatch(goToViewState(viewState))
       }
     }
-  }, [range, id, location, _mapDispatch, _uiDispatch, init])
+  }, [mode, range, id, location, _mapDispatch, _uiDispatch, init])
 
   //   Update URL path
   useEffect(() => {
@@ -88,16 +95,17 @@ export const MapRoutes = () => {
       const { properties: { asset_id } = {} } = uiState.selected || {}
 
       // Build final URL
-      const urlParts = [newRange, newLocation, asset_id]
+      const urlParts = [...(appMode !== 'web' ? [appMode] : []), newRange, newLocation, asset_id]
       const newUrl = `/${urlParts.filter(p => p).join('/')}`
-      // history.replace(newUrl)
+      // console.log(newUrl)
+
       updateHistory(newUrl)
     }
-  }, [mapState.filters, uiState.viewState, uiState.selected, init, history, id, location, updateHistory])
+  }, [mapState.filters, uiState.viewState, uiState.selected, init, history, id, appMode, location, updateHistory])
 
   return (
     <>
-      <MapExplorer />
+      <MapExplorer mode={appMode} />
     </>
   )
 }
