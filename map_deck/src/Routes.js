@@ -40,8 +40,10 @@ export const MapRoutes = () => {
     // :/ refactor this only execute ones.
     if (!init) {
       const validModes = ['kiosk', 'web', '']
-      if (validModes.includes(mode)) {
-        const _mode = mode === '' ? 'web' : mode
+      let _mode = mode === undefined ? '' : mode
+      if (validModes.includes(_mode)) {
+        _mode = _mode === '' ? process.env.REACT_APP_DEFAULT_MODE : mode
+        console.log(mode, _mode, 'h')
         setAppMode(_mode)
       }
 
