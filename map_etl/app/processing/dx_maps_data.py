@@ -368,8 +368,10 @@ class DXMapsData(MixinGeoJsonUtils, MongoLoader):
 
         valid = True
         cutline_coords = py_.get(data, 'cutline.coordinates.0', [])
+        year = py_.get(data, 'year', None)
+        year = 0 if year is None else year
 
-        if len(cutline_coords) == 0:
+        if len(cutline_coords) == 0 or year <= 0:
             valid = False
 
         return valid
