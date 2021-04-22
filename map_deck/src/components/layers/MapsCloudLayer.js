@@ -104,6 +104,14 @@ export class MapsCloudLayer extends CompositeLayer {
     return true
   }
 
+  handleOnSpriteLoaded () {
+    this.setState({ spritesLoaded: true })
+    const { onSpritesLoaded } = this.props
+    if (onSpritesLoaded) {
+      onSpritesLoaded()
+    }
+  }
+
   buildSprites () {
     const { id, filters } = this.props
     const { mapSpriteData } = this.state
@@ -127,6 +135,7 @@ export class MapsCloudLayer extends CompositeLayer {
       path: process.env.REACT_APP_SPRITE_PATH,
       pickable: true,
       autoHighlight: false,
+      onSpriteLoaded: this.handleOnSpriteLoaded.bind(this),
 
       getOpacity: d => {
         const { year, asset_id } = d
@@ -259,9 +268,10 @@ export class MapsCloudLayer extends CompositeLayer {
   }
 
   renderLayers () {
+    const { spritesLoaded = false } = this.state
     return [
       this.buildSprites(),
-      this.buildShadows()
+      ...((spritesLoaded) ? [this.buildShadows()] : [])
     ]
   }
 }

@@ -35,7 +35,8 @@ const defaultProps = {
   // Instead we need to manually dim/blend rgb values with a background color.
   transparentColor: { type: 'color', value: [0, 0, 0, 0] },
   tintColor: { type: 'color', value: [255, 255, 255] },
-  pickable: false
+  pickable: false,
+  onSpriteLoaded: () => {}
 }
 
 /*
@@ -182,6 +183,7 @@ export class SpriteBitmapLayer extends Layer {
       boundZ: [],
       bounds: [],
       calculatePositions: true,
+      spritesLoaded: false,
       spriteManager: new SpriteManager(this.context.gl, { onUpdate: (images) => this.onManagerUpdate(images) })
     })
   }
@@ -318,7 +320,11 @@ export class SpriteBitmapLayer extends Layer {
 
   draw (opts) {
     const { uniforms } = opts
-    const { model, sprites = [], spriteSize = new Float32Array([0, 0]) } = this.state
+    const { model, sprites = [], spriteSize = new Float32Array([0, 0]), spritesLoaded } = this.state
+
+    if (!spritesLoaded) {
+      return
+    }
 
     // Temporally disable depthMask to help to prevent zFighting of
     // overlapping images with alpha channels. eg PNG
@@ -360,10 +366,16 @@ export class SpriteBitmapLayer extends Layer {
       spriteSize = new Float32Array([texture.width, texture.height])
     }
 
-    this.setState({ sprites, spriteSize, spriteUpdated: true })
+    this.setState({ sprites, spriteSize, spriteUpdated: true, spritesLoaded: true })
     // console.log('ready', textures.length)
     // Force update model
     this.setNeedsUpdate()
+
+    // Tell out site of this layer that all sprites are ready
+    const { onSpriteLoaded } = this.props
+    if (onSpriteLoaded) {
+      onSpriteLoaded()
+    }
   }
 
   loadTexture (imageAtlas) {
