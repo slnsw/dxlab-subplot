@@ -42,6 +42,7 @@ import { UIContext } from '../context/UIContext'
 import { get, sample, isEmpty } from 'lodash'
 import calculate_bbox from '@turf/bbox'
 import calculate_center from '@turf/center'
+import { About } from './ui/about/About'
 
 export const MapExplorer = ({ mode = 'web' }) => {
   const [ready, setReady] = useState(false)
@@ -314,6 +315,7 @@ export const MapExplorer = ({ mode = 'web' }) => {
   return (
     <>
       <ModalWindow />
+      <About />
 
       {ready > 0 &&
         <>

@@ -1,0 +1,55 @@
+@import '../../../global';
+
+.btnAbout {
+  position: absolute;
+  z-index: 6000;
+  right: 40px;
+  top: 32px;
+  color: $PRIMARY_COLOR !important;
+  font-size: $FONT_SIZE_LG;
+  cursor: pointer;
+  
+  svg {
+    height: 30px;
+    width:  30px;
+  }
+}
+
+.modal {
+  z-index: 9000  !important;
+  color: $PRIMARY_COLOR;
+  text-align: left;
+  font-size: $FONT_SIZE_MD;
+  line-height: $LINE_HEIGHT_MD;
+
+
+  a{
+    text-decoration: underline;
+    font-weight: bold;
+    pointer-events: visible;
+  }
+
+
+  .container {
+    margin-top: -70px;
+    outline: 0;
+    height: 100vh;
+    pointer-events: none;
+
+    .close {
+      width: 100%;
+      text-align: right;
+      display: block;
+      margin-bottom: -50px;
+
+      svg {
+        height: 35px;
+        width:  35px;
+      }
+    }
+
+  }
+  
+
+
+}

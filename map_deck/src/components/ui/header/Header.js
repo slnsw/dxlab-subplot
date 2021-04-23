@@ -36,6 +36,7 @@ export const Header = ({ uiContext }) => {
       <div className={styles.containerInfo}>
         <h1 className={styles.range}> {fromYear} - {toYear} | {data.length}</h1>
         {title && <p className={styles.info}>[{year}] {title}</p>}
+
       </div>
 
     </div>
