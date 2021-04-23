@@ -104,6 +104,19 @@ export const MapRoutes = () => {
     }
   }, [mapState.filters, uiState.viewState, uiState.selected, init, history, id, appMode, location, updateHistory])
 
+  useEffect(() => {
+    if (appMode === 'kiosk') {
+      const anchors = document.getElementsByTagName('a')
+      for (var i = 0; i < anchors.length; i++) {
+        const el = anchors[i]
+        if (!el.getAttribute('block')) {
+          el.setAttribute('block', true)
+          el.onclick = () => { console.log('Kiosk mode'); return false }
+        }
+      }
+    }
+  }, [appMode, uiState])
+
   return (
     <>
       <MapExplorer mode={appMode} />
