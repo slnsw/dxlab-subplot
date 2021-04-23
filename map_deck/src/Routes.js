@@ -104,7 +104,10 @@ export const MapRoutes = () => {
     }
   }, [mapState.filters, uiState.viewState, uiState.selected, init, history, id, appMode, location, updateHistory])
 
-  useEffect(() => {
+  /**
+   * Function to block all a tag links if app is in mode kiosk
+   */
+  const blockLinks = useCallback(() => {
     if (appMode === 'kiosk') {
       const anchors = document.getElementsByTagName('a')
       for (var i = 0; i < anchors.length; i++) {
@@ -115,7 +118,35 @@ export const MapRoutes = () => {
         }
       }
     }
-  }, [appMode, uiState])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appMode])
+
+  /**
+   * block links when application starts
+   */
+  useEffect(() => {
+    // When app mode set check and block links if necessary
+    blockLinks()
+  }, [appMode, blockLinks])
+
+  /**
+   * Monitor html changes and block new links
+   */
+  useEffect(() => {
+    const callback = (mutationRecord) => {
+      blockLinks()
+    }
+    const [target] = document.getElementsByTagName('body')
+    const observer = new MutationObserver(callback)
+
+    const config = {
+      attributes: true,
+      attributeOldValue: true
+      // attributeFilter: ['class']
+    }
+
+    observer.observe(target, config)
+  }, [blockLinks])
 
   return (
     <>
