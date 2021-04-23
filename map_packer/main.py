@@ -65,10 +65,22 @@ class SpritePacker:
             max_width=settings.SPRITE_MAX_WIDTH,
             max_height=settings.SPRITE_MAX_HEIGHT,
             bg_color=0x00000000,
-            trim_mode=True,
+            trim_mode=False,
             enable_rotated=True,
         )
         packer.pack(files, f"./{settings.SPRITE_TILE_SIZE}/subdivisions_%d")
+
+    def post_process_atlas(self):
+        directory = f"./{settings.SPRITE_TILE_SIZE}"
+        json_files = (f for f in Path(directory).glob("*") if f.suffix == ".json")
+        for path in json_files:
+            try:
+                with path.open() as data:
+                    # txt = data.read()
+                    atlas = json.load(data)
+            except:
+                print(path)
+                ...
 
     def plist_to_json(self):
         # Silly but PyTexturePacker only exports .plist and we need a json file
@@ -89,18 +101,31 @@ class SpritePacker:
                     key = key.split("_")[0]
 
                     frame = self.parse_dimesions(data["frame"], Rect)
+                    source_frame = self.parse_dimesions(data["sourceColorRect"], Rect)
+                    source_size = self.parse_dimesions(data["sourceSize"], Dimensions)
+                    offset = self.parse_dimesions(data["offset"], Point)
+
                     rotated = data["rotated"]
+                    # trimmed = data["trimmed"]
 
                     # There is a bug in the coordinates of PyTexturePacker
                     # when a texture is rotate the frame width and height are inverted
                     if rotated:
                         frame = Rect(frame[0], frame[1], frame[3], frame[2])
+                    #     source_frame = Rect(
+                    #         source_frame[0],
+                    #         source_frame[1],
+                    #         source_frame[3],
+                    #         source_frame[2],
+                    #     )
 
                     item = {
-                        **frame._asdict(),
-                        # "size": parse_dimesions(data["sourceSize"], Dimensions)._asdict(),
+                        "frame": frame._asdict(),
+                        "spriteSourceSize": source_frame._asdict(),
+                        "sourceSize": source_size._asdict(),
                         "rotated": rotated,
-                        # "offset": parse_dimesions(data["offset"], Point)._asdict(),
+                        # "trimmed": trimmed,
+                        "offset": offset._asdict(),
                     }
                     out["frames"][key] = item
 
