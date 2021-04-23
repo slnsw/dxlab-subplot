@@ -138,12 +138,18 @@ export class SpriteBitmapLayer extends Layer {
         divisor: 1,
         transform: this.getImageFrame
       },
-      // imageFrameSize: {
-      //   size: 2,
-      //   accessor: 'getImage',
-      //   divisor: 1,
-      //   transform: this.getImageFrameSize
-      // },
+      imageSource: {
+        size: 4,
+        accessor: 'getImage',
+        divisor: 1,
+        transform: this.getImageSource
+      },
+      imageSize: {
+        size: 2,
+        accessor: 'getImage',
+        divisor: 1,
+        transform: this.getImageSize
+      },
       imageRotated: {
         size: 1,
         accessor: 'getImage',
@@ -264,6 +270,8 @@ export class SpriteBitmapLayer extends Layer {
       attributeManager.invalidate('imageFrame')
       attributeManager.invalidate('imageRotated')
       attributeManager.invalidate('imageIndex')
+      attributeManager.invalidate('imageSource')
+      attributeManager.invalidate('imageSize')
       this.setState({ spriteUpdated: false })
     }
 
@@ -339,7 +347,7 @@ export class SpriteBitmapLayer extends Layer {
       model
         .setUniforms({
           ...uniforms,
-          debugging: false,
+          debugging: true,
           ...sprites,
           uTextureDim: spriteSize
 
@@ -390,8 +398,8 @@ export class SpriteBitmapLayer extends Layer {
   }
 
   getImageFrame (imageId) {
-    const rect = this.state.spriteManager.getImageMapping(imageId)
-    return [rect.x || 0, rect.y || 0, rect.w || 0, rect.h || 0]
+    const { frame = [] } = this.state.spriteManager.getImageMapping(imageId)
+    return [frame.x || 0, frame.y || 0, frame.w || 0, frame.h || 0]
   }
 
   getImageRotated (imageId) {
@@ -401,14 +409,18 @@ export class SpriteBitmapLayer extends Layer {
 
   getImageIndex (imageId) {
     const { filenameIndex } = this.state.spriteManager.getImageMapping(imageId)
-    // console.log(filenameIndex)
     return filenameIndex || 0
   }
 
-  // getImageFrameSize (imageId) {
-  //   const { spriteSize } = this.state.spriteManager.getImageMapping(imageId)
-  //   return spriteSize || [0, 0]
-  // }
+  getImageSource (imageId) {
+    const { spriteSourceSize = {} } = this.state.spriteManager.getImageMapping(imageId)
+    return [spriteSourceSize.x || 0, spriteSourceSize.y || 0, spriteSourceSize.w || 0, spriteSourceSize.h || 0]
+  }
+
+  getImageSize (imageId) {
+    const { sourceSize = {} } = this.state.spriteManager.getImageMapping(imageId)
+    return [sourceSize.w || 0, sourceSize.h || 0]
+  }
 }
 
 SpriteBitmapLayer.layerName = 'SpriteBitmapLayer'

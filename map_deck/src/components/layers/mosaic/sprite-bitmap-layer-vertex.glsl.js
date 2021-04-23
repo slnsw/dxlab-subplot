@@ -19,6 +19,8 @@ attribute vec4 boundZ;
 
 attribute float offsetZ;
 attribute vec4 imageFrame;
+attribute vec4 imageSource;
+attribute vec2 imageSize;
 attribute float imageRotated;
 attribute float imageIndex;
 
@@ -70,13 +72,24 @@ void main() {
     if (imageRotated == 1.0) {
         radAngle = radians(-90.0);
     }
-    
+
     uv = texCoords + vec2(-0.5, -0.5);
     uv = mat2(cos(radAngle), sin(radAngle), -sin(radAngle), cos(radAngle)) * uv;
-    uv = uv + vec2(0.5, 0.5);
+    uv = uv + vec2(0.5, 0.5);    
     
+    // uv = uv / vec2(.5, .5); // scale
+    //  uv = uv + vec2(.1, .1); 
 
-    vUV = mix(imageFrame.xy, imageFrame.xy + imageFrame.zw, uv) / uTextureDim;
+
+    // Offset
+    // uv = mix(imageSource.xy,  imageSource.xy + imageSource.zw, uv) / imageSize; 
+    // uv = uv * (imageSource.xy + imageSource.zw); 
+    // uv = uv + vec2(1.0, 0);
+
+    uv = mix(imageFrame.xy, imageFrame.xy + imageFrame.zw, uv) / uTextureDim;
+    // uv = mix(imageSource.xy,  imageSource.xy + imageSource.zw, uv) / imageSize; 
+
+    vUV = uv;
     vColor = color;
     
 

@@ -42,9 +42,11 @@ import { UIContext } from '../context/UIContext'
 import { get, sample, isEmpty } from 'lodash'
 import calculate_bbox from '@turf/bbox'
 import calculate_center from '@turf/center'
+import { Loading } from './ui/loading/Loading'
 
 export const MapExplorer = ({ mode = 'web' }) => {
-  const [ready, setReady] = useState(false)
+  const [dataReady, setDataReady] = useState(false)
+  const [spriteReady, setSpriteReady] = useState(false)
   const [idleId, setIdleId] = useState(null)
   const [restoreViewState, setRestoreViewState] = useState({})
   const [rangeStyle, setRangeStyle] = useState({})
@@ -55,7 +57,7 @@ export const MapExplorer = ({ mode = 'web' }) => {
   const [uiState, UIDispatch] = useContext(UIContext)
 
   useEffect(() => {
-    setReady(true)
+    setDataReady(true)
   }, [mapState.dataSet])
 
   // Idle logic
@@ -64,12 +66,12 @@ export const MapExplorer = ({ mode = 'web' }) => {
     timeout: idleTimeout,
     onIdle: (_) => {
       // Run actually idle action in timeout loop
-      setIdleId(runIdle())
+      // setIdleId(runIdle())
     },
     onActive: (_) => {
-      clearTimeout(idleId)
+      // clearTimeout(idleId)
       // User no longer inactive
-      UIDispatch(removeFocusMap())
+      // UIDispatch(removeFocusMap())
     }
   })
 
@@ -291,6 +293,9 @@ export const MapExplorer = ({ mode = 'web' }) => {
       } else {
         UIDispatch(removeFocusMap())
       }
+    },
+    onSpritesLoaded: () => {
+      setSpriteReady(true)
     }
 
   }
@@ -314,16 +319,18 @@ export const MapExplorer = ({ mode = 'web' }) => {
   return (
     <>
       <ModalWindow />
-
-      {ready > 0 &&
+      <Header />
+      {(dataReady) &&
         <>
-          <Header />
           <LookupInfo />
           <Search
             useVirtualKeyboard={mode === 'kiosk'}
             onGeoLookupSearchResult={handleGeoSearchResult}
           />
           <Range style={rangeStyle} />
+
+          <NavigationControl style={navigatorStyle} />
+          <OpacityControl style={opacityStyle} />
         </>}
 
       <MapViewer
@@ -334,9 +341,9 @@ export const MapExplorer = ({ mode = 'web' }) => {
         showSearch={showSearch}
       />
 
-      <NavigationControl style={navigatorStyle} />
-      <OpacityControl style={opacityStyle} />
       <Fog />
+      {!spriteReady &&
+        <Loading />}
 
     </>)
 }
