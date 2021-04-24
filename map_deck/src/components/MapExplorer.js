@@ -12,6 +12,8 @@ import { Fog } from './ui/fog/Fog'
 import { NavigationControl } from './ui/navigation/Navigation'
 import { OpacityControl } from './ui/opacity/Opacity'
 import { MapViewer } from './ui/mapViewer/MapViewer'
+import { About } from './ui/about/About'
+import { Loading } from './ui/loading/Loading'
 
 // Idle
 import { useIdleTimer } from 'react-idle-timer'
@@ -42,11 +44,12 @@ import { UIContext } from '../context/UIContext'
 import { get, sample, isEmpty } from 'lodash'
 import calculate_bbox from '@turf/bbox'
 import calculate_center from '@turf/center'
-import { Loading } from './ui/loading/Loading'
 
 export const MapExplorer = ({ mode = 'web' }) => {
   const [dataReady, setDataReady] = useState(false)
   const [spriteReady, setSpriteReady] = useState(false)
+  const [spriteTotal, setSpriteTotal] = useState(0)
+  const [spriteLoaded, setSpriteLoaded] = useState(0)
   const [idleId, setIdleId] = useState(null)
   const [restoreViewState, setRestoreViewState] = useState({})
   const [rangeStyle, setRangeStyle] = useState({})
@@ -66,12 +69,12 @@ export const MapExplorer = ({ mode = 'web' }) => {
     timeout: idleTimeout,
     onIdle: (_) => {
       // Run actually idle action in timeout loop
-      // setIdleId(runIdle())
+      setIdleId(runIdle())
     },
     onActive: (_) => {
-      // clearTimeout(idleId)
+      clearTimeout(idleId)
       // User no longer inactive
-      // UIDispatch(removeFocusMap())
+      UIDispatch(removeFocusMap())
     }
   })
 
@@ -268,6 +271,7 @@ export const MapExplorer = ({ mode = 'web' }) => {
   // MapExplorer layers structure. [ Layer class, {props} ]
   // view == main or minimap or all
   // TODO: define a prop structure for this.
+
   const handlers = {
     onClick: ({ object }) => {
       // console.log(object)
@@ -294,8 +298,12 @@ export const MapExplorer = ({ mode = 'web' }) => {
         UIDispatch(removeFocusMap())
       }
     },
-    onSpritesLoaded: () => {
+    onAllSpritesLoaded: () => {
       setSpriteReady(true)
+    },
+    onSpriteLoaded: ({ total, index }) => {
+      setSpriteTotal(total)
+      setSpriteLoaded(index)
     }
 
   }
@@ -318,17 +326,20 @@ export const MapExplorer = ({ mode = 'web' }) => {
 
   return (
     <>
-      <ModalWindow />
+
       <Header />
-      {(dataReady) &&
+      <Loading open={!spriteReady || !dataReady} total={spriteTotal} loaded={spriteLoaded} />
+
+      {dataReady &&
         <>
+          <ModalWindow />
+          <About />
           <LookupInfo />
           <Search
             useVirtualKeyboard={mode === 'kiosk'}
             onGeoLookupSearchResult={handleGeoSearchResult}
           />
           <Range style={rangeStyle} />
-
           <NavigationControl style={navigatorStyle} />
           <OpacityControl style={opacityStyle} />
         </>}
@@ -342,8 +353,6 @@ export const MapExplorer = ({ mode = 'web' }) => {
       />
 
       <Fog />
-      {!spriteReady &&
-        <Loading />}
 
     </>)
 }

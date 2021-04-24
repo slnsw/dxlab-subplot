@@ -4,7 +4,7 @@ import { useParams, useHistory } from 'react-router-dom'
 import { MapDataContext } from './context/MapsContext'
 import { UIContext } from './context/UIContext'
 import { getMaps } from './context/MapsActions'
-import { selectMap, goToViewState } from './context/UIActions'
+import { selectMap, goToViewState, setAppMode as setContextAppMode } from './context/UIActions'
 import { MapExplorer } from './components/MapExplorer'
 
 import { find, debounce } from 'lodash'
@@ -100,9 +100,54 @@ export const MapRoutes = () => {
       const newUrl = `/${urlParts.filter(p => p).join('/')}`
       // console.log(newUrl)
 
+      _uiDispatch(setContextAppMode(appMode))
       updateHistory(newUrl)
     }
-  }, [mapState.filters, uiState.viewState, uiState.selected, init, history, id, appMode, location, updateHistory])
+  }, [mapState.filters, uiState.viewState, uiState.selected, init, history, id, appMode, location, updateHistory, _uiDispatch])
+
+  /**
+   * Function to block all a tag links if app is in mode kiosk
+   */
+  const blockLinks = useCallback(() => {
+    if (appMode === 'kiosk') {
+      const anchors = document.getElementsByTagName('a')
+      for (var i = 0; i < anchors.length; i++) {
+        const el = anchors[i]
+        if (!el.getAttribute('block')) {
+          el.setAttribute('block', true)
+          el.onclick = () => { console.log('Kiosk mode'); return false }
+        }
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appMode])
+
+  /**
+   * block links when application starts
+   */
+  useEffect(() => {
+    // When app mode set check and block links if necessary
+    blockLinks()
+  }, [appMode, blockLinks])
+
+  /**
+   * Monitor html changes and block new links
+   */
+  useEffect(() => {
+    const callback = (mutationRecord) => {
+      blockLinks()
+    }
+    const [target] = document.getElementsByTagName('body')
+    const observer = new MutationObserver(callback)
+
+    const config = {
+      attributes: true,
+      attributeOldValue: true
+      // attributeFilter: ['class']
+    }
+
+    observer.observe(target, config)
+  }, [blockLinks])
 
   return (
     <>
