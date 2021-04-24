@@ -22,6 +22,13 @@ except:
         "Please install crunch for PNG optimization"
     )
 
+try:
+    from sh import cwebp
+except:
+    cwebp = lambda *args, **kwargs: logger.critical(
+        "Please install cwebp for WEBP compression"
+    )
+
 
 RE_DIM = re.compile(r"\d+")
 
@@ -36,6 +43,7 @@ class SpritePacker:
         self.pack()
         self.plist_to_json()
         self.optimize_sheets()
+        self.create_webp_sheets()
         self.cleaning()
 
     def get_exclude_assets(self):
@@ -156,6 +164,19 @@ class SpritePacker:
             ):
                 if line != errno.EWOULDBLOCK:
                     logger.info(line[:-1])
+
+        except ErrorReturnCode as e:
+            logger.error(f"Crunch -> {e.stderr}")
+
+    def create_webp_sheets(self):
+        try:
+            logger.info("Creating webp files...")
+
+            directory = f"./{settings.SPRITE_TILE_SIZE}"
+            plist_files = (f for f in Path(directory).glob("*.png"))
+            for path in plist_files:
+                out = str(path).replace(".png", ".webp")
+                cwebp(path, o=out)
 
         except ErrorReturnCode as e:
             logger.error(f"Crunch -> {e.stderr}")
