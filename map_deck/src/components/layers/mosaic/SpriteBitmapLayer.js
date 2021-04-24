@@ -139,18 +139,18 @@ export class SpriteBitmapLayer extends Layer {
         divisor: 1,
         transform: this.getImageFrame
       },
-      imageSource: {
-        size: 4,
-        accessor: 'getImage',
-        divisor: 1,
-        transform: this.getImageSource
-      },
-      imageSize: {
-        size: 2,
-        accessor: 'getImage',
-        divisor: 1,
-        transform: this.getImageSize
-      },
+      // imageSource: {
+      //   size: 4,
+      //   accessor: 'getImage',
+      //   divisor: 1,
+      //   transform: this.getImageSource
+      // },
+      // imageSize: {
+      //   size: 2,
+      //   accessor: 'getImage',
+      //   divisor: 1,
+      //   transform: this.getImageSize
+      // },
       imageRotated: {
         size: 1,
         accessor: 'getImage',
@@ -274,8 +274,8 @@ export class SpriteBitmapLayer extends Layer {
       attributeManager.invalidate('imageFrame')
       attributeManager.invalidate('imageRotated')
       attributeManager.invalidate('imageIndex')
-      attributeManager.invalidate('imageSource')
-      attributeManager.invalidate('imageSize')
+      // attributeManager.invalidate('imageSource')
+      // attributeManager.invalidate('imageSize')
       this.setState({ spriteUpdated: false })
     }
 
@@ -351,7 +351,7 @@ export class SpriteBitmapLayer extends Layer {
       model
         .setUniforms({
           ...uniforms,
-          debugging: true,
+          debugging: false,
           ...sprites,
           uTextureDim: spriteSize
 
