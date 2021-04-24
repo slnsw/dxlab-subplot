@@ -41,3 +41,9 @@ body, html{
 
 // Remove openseadragon focus line
 .openseadragon-container :focus { outline: none; }
+
+
+// Material ui
+.MuiBackdrop-root {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}

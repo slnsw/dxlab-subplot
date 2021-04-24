@@ -71,3 +71,12 @@ export function goToViewState ({ ...viewState }) {
     })
   }
 }
+
+export function setAppMode (mode) {
+  return (dispatch, state) => {
+    dispatch({
+      type: ActionTypes.UI_APP_MODE,
+      mode
+    })
+  }
+}
