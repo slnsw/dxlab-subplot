@@ -1,9 +1,10 @@
 import { loadImage } from '@loaders.gl/images'
 
 export default class SpriteManager {
-  constructor (gl, { onUpdate = () => { } }) {
+  constructor (gl, { onUpdate = () => { }, onSpriteLoaded = () => {} }) {
     this.gl = gl
     this.onUpdate = onUpdate
+    this.onSpriteLoaded = onSpriteLoaded
     this.state = {
       atlas: {},
       images: [],
@@ -47,9 +48,21 @@ export default class SpriteManager {
     })
 
     // 4. Load all sprites
+    let imageLoadedCount = 0
     const sprites = await Promise.all(
       images.map(async ({ path, ...args }) => {
-        const image = await loadImage(path)
+        const image = await loadImage(path).then((img) => {
+          if (this.onSpriteLoaded) {
+            imageLoadedCount = imageLoadedCount + 1
+            this.onSpriteLoaded({
+              total: images.length,
+              path,
+              index: imageLoadedCount
+            })
+          }
+          return img
+        })
+
         return { image, ...args }
       })
     )

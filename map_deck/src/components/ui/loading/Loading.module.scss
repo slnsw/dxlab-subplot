@@ -1,11 +1,29 @@
-.loading {
-    z-index: 7000;
-    position: absolute;
-    display: block;
-    height: 100vh;
-    width: 100vw;
-    top:0;
-    left: 0;
-    background: transparent;
+@import '../../../global';
 
+.loading {
+    z-index: 9000 !important;
+    flex-direction: column;
+    color: $PRIMARY_COLOR;
+
+
+
+    .progressContainer {
+        width: 30vw
+    }
+
+    .message {
+        margin-top: 10px;
+    }
+
+    .progressBarColor {
+        background-color: $PRIMARY_COLOR;
+    }
+
+    .progressColorBuffer {
+        background-color: transparent;
+    }
+
+    .progressDashedColor {
+        background-image: radial-gradient($PRIMARY_COLOR 0%, $PRIMARY_COLOR 16%, transparent 42%);
+    }
 }

@@ -4,7 +4,6 @@ import Backdrop from '@material-ui/core/Backdrop'
 import Fade from '@material-ui/core/Fade'
 import Grid from '@material-ui/core/Grid'
 import Link from '@material-ui/core/Link'
-import { get } from 'lodash'
 
 import styles from './About.module.scss'
 
@@ -24,7 +23,6 @@ export const About = () => {
   const [uiState] = useContext(UIContext)
 
   const { appMode } = uiState
-  console.log(appMode)
 
   const handleOpen = () => {
     setOpen(true)
@@ -56,10 +54,6 @@ export const About = () => {
         aria-labelledby='transition-modal-title'
         aria-describedby='transition-modal-description'
         className={styles.modal}
-        classes={{
-          // root: styles.root
-
-        }}
         open={open}
         onClose={handleClose}
         closeAfterTransition
@@ -85,7 +79,7 @@ export const About = () => {
 
                 <h2>Subplot</h2>
 
-                <p>SubPlot is the latest DX Lab experiment and uses a significant collection of <a href='https://www.sl.nsw.gov.au/research-and-collections/significant-collections/subdivision-plans' target='_blank' rel='noopener'>subdivision plans</a>, also known as estate maps that are part of the Library's extensive map collection. The Library has acquired over 40,000 of these ephemeral advertising posters. Mostly produced from the 1860s to the 1930s, these popular posters advertised new subdivisions and the sale of land.</p>
+                <p>SubPlot is the latest DX Lab experiment and uses a significant collection of <a href='https://www.sl.nsw.gov.au/research-and-collections/significant-collections/subdivision-plans' target='_blank' rel='noopener noreferrer'>subdivision plans</a>, also known as estate maps that are part of the Library's extensive map collection. The Library has acquired over 40,000 of these ephemeral advertising posters. Mostly produced from the 1860s to the 1930s, these popular posters advertised new subdivisions and the sale of land.</p>
 
                 <p>They were originally produced by real estate agents to promote the merits of newly created estates and subdivisions.  Printed in both colour and black &amp; white, these advertising materials illustrate the early development of the real estate industry in Australia, highlight changes in the way land was subdivided, streets were named and properties were valued and reflect the spread of suburbs across Sydney and regional areas. Subdivision plans were fleeting items, not meant to last beyond the land auction and many would have been discarded by real estate agencies once a property was sold.</p>
 

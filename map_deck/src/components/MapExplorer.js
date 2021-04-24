@@ -12,6 +12,8 @@ import { Fog } from './ui/fog/Fog'
 import { NavigationControl } from './ui/navigation/Navigation'
 import { OpacityControl } from './ui/opacity/Opacity'
 import { MapViewer } from './ui/mapViewer/MapViewer'
+import { About } from './ui/about/About'
+import { Loading } from './ui/loading/Loading'
 
 // Idle
 import { useIdleTimer } from 'react-idle-timer'
@@ -42,10 +44,12 @@ import { UIContext } from '../context/UIContext'
 import { get, sample, isEmpty } from 'lodash'
 import calculate_bbox from '@turf/bbox'
 import calculate_center from '@turf/center'
-import { About } from './ui/about/About'
 
 export const MapExplorer = ({ mode = 'web' }) => {
-  const [ready, setReady] = useState(false)
+  const [dataReady, setDataReady] = useState(false)
+  const [spriteReady, setSpriteReady] = useState(false)
+  const [spriteTotal, setSpriteTotal] = useState(0)
+  const [spriteLoaded, setSpriteLoaded] = useState(0)
   const [idleId, setIdleId] = useState(null)
   const [restoreViewState, setRestoreViewState] = useState({})
   const [rangeStyle, setRangeStyle] = useState({})
@@ -56,7 +60,7 @@ export const MapExplorer = ({ mode = 'web' }) => {
   const [uiState, UIDispatch] = useContext(UIContext)
 
   useEffect(() => {
-    setReady(true)
+    setDataReady(true)
   }, [mapState.dataSet])
 
   // Idle logic
@@ -267,6 +271,7 @@ export const MapExplorer = ({ mode = 'web' }) => {
   // MapExplorer layers structure. [ Layer class, {props} ]
   // view == main or minimap or all
   // TODO: define a prop structure for this.
+
   const handlers = {
     onClick: ({ object }) => {
       // console.log(object)
@@ -292,6 +297,13 @@ export const MapExplorer = ({ mode = 'web' }) => {
       } else {
         UIDispatch(removeFocusMap())
       }
+    },
+    onAllSpritesLoaded: () => {
+      setSpriteReady(true)
+    },
+    onSpriteLoaded: ({ total, index }) => {
+      setSpriteTotal(total)
+      setSpriteLoaded(index)
     }
 
   }
@@ -314,18 +326,22 @@ export const MapExplorer = ({ mode = 'web' }) => {
 
   return (
     <>
-      <ModalWindow />
-      <About />
 
-      {ready > 0 &&
+      <Header />
+      <Loading open={!spriteReady || !dataReady} total={spriteTotal} loaded={spriteLoaded} />
+
+      {dataReady &&
         <>
-          <Header />
+          <ModalWindow />
+          <About />
           <LookupInfo />
           <Search
             useVirtualKeyboard={mode === 'kiosk'}
             onGeoLookupSearchResult={handleGeoSearchResult}
           />
           <Range style={rangeStyle} />
+          <NavigationControl style={navigatorStyle} />
+          <OpacityControl style={opacityStyle} />
         </>}
 
       <MapViewer
@@ -336,8 +352,6 @@ export const MapExplorer = ({ mode = 'web' }) => {
         showSearch={showSearch}
       />
 
-      <NavigationControl style={navigatorStyle} />
-      <OpacityControl style={opacityStyle} />
       <Fog />
 
     </>)

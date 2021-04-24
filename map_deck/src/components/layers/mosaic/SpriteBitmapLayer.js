@@ -36,7 +36,8 @@ const defaultProps = {
   transparentColor: { type: 'color', value: [0, 0, 0, 0] },
   tintColor: { type: 'color', value: [255, 255, 255] },
   pickable: false,
-  onSpriteLoaded: () => {}
+  onSpriteLoaded: () => {},
+  onAllSpriteLoaded: () => {}
 }
 
 /*
@@ -184,7 +185,10 @@ export class SpriteBitmapLayer extends Layer {
       bounds: [],
       calculatePositions: true,
       spritesLoaded: false,
-      spriteManager: new SpriteManager(this.context.gl, { onUpdate: (images) => this.onManagerUpdate(images) })
+      spriteManager: new SpriteManager(this.context.gl, {
+        onUpdate: (images) => this.handleManagerUpdate(images),
+        onSpriteLoaded: ({ ...args }) => this.handleSpriteLoaded(args)
+      })
     })
   }
 
@@ -348,7 +352,7 @@ export class SpriteBitmapLayer extends Layer {
     })
   }
 
-  onManagerUpdate (textures) {
+  handleManagerUpdate (textures) {
     const { gl } = this.context
     const sprites = {}
     textures.forEach(({ image, index }) => {
@@ -372,9 +376,17 @@ export class SpriteBitmapLayer extends Layer {
     this.setNeedsUpdate()
 
     // Tell out site of this layer that all sprites are ready
+    const { onAllSpriteLoaded } = this.props
+    if (onAllSpriteLoaded) {
+      onAllSpriteLoaded()
+    }
+  }
+
+  handleSpriteLoaded ({ ...args }) {
+    // Tell out site of this layer that an sprites is been loaded
     const { onSpriteLoaded } = this.props
     if (onSpriteLoaded) {
-      onSpriteLoaded()
+      onSpriteLoaded(args)
     }
   }
 
