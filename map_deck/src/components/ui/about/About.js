@@ -24,6 +24,7 @@ export const About = () => {
   const [uiState] = useContext(UIContext)
 
   const { appMode } = uiState
+  console.log(appMode)
 
   const handleOpen = () => {
     setOpen(true)
@@ -36,14 +37,21 @@ export const About = () => {
   return (
     <>
 
-      <Link
-        component='a'
-        variant='body2'
-        onClick={handleOpen}
-        className={styles.btnAbout}
-      >
-        <InfoOutlinedIcon />
-      </Link>
+      {appMode &&
+      (
+        <Link
+          component='a'
+          variant='body2'
+          onClick={handleOpen}
+          className={[
+            styles.btnAbout,
+            ...(appMode === 'kiosk' ? [styles.kiosk] : [])
+          ].join(' ')}
+        >
+          <InfoOutlinedIcon />
+        </Link>
+      )}
+
       <Modal
         aria-labelledby='transition-modal-title'
         aria-describedby='transition-modal-description'
