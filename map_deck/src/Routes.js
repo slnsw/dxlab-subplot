@@ -4,7 +4,7 @@ import { useParams, useHistory } from 'react-router-dom'
 import { MapDataContext } from './context/MapsContext'
 import { UIContext } from './context/UIContext'
 import { getMaps } from './context/MapsActions'
-import { selectMap, goToViewState } from './context/UIActions'
+import { selectMap, goToViewState, setAppMode as setContextAppMode } from './context/UIActions'
 import { MapExplorer } from './components/MapExplorer'
 
 import { find, debounce } from 'lodash'
@@ -100,9 +100,10 @@ export const MapRoutes = () => {
       const newUrl = `/${urlParts.filter(p => p).join('/')}`
       // console.log(newUrl)
 
+      _uiDispatch(setContextAppMode(appMode))
       updateHistory(newUrl)
     }
-  }, [mapState.filters, uiState.viewState, uiState.selected, init, history, id, appMode, location, updateHistory])
+  }, [mapState.filters, uiState.viewState, uiState.selected, init, history, id, appMode, location, updateHistory, _uiDispatch])
 
   /**
    * Function to block all a tag links if app is in mode kiosk
