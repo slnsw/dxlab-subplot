@@ -42,8 +42,8 @@ class SpritePacker:
         print("Run")
         self.pack()
         self.plist_to_json()
-        self.optimize_sheets()
         self.create_webp_sheets()
+        self.optimize_sheets()
         self.cleaning()
 
     def get_exclude_assets(self):
@@ -176,10 +176,10 @@ class SpritePacker:
             plist_files = (f for f in Path(directory).glob("*.png"))
             for path in plist_files:
                 out = str(path).replace(".png", ".webp")
-                cwebp(path, o=out)
+                cwebp(path, "-alpha_q", "10", o=out, q=90)
 
         except ErrorReturnCode as e:
-            logger.error(f"Crunch -> {e.stderr}")
+            logger.error(f"cwebp -> {e.stderr}")
 
     def cleaning(self):
         directory = f"./{settings.SPRITE_TILE_SIZE}"
