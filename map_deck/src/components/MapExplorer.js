@@ -91,7 +91,8 @@ export const MapExplorer = ({ mode = 'web' }) => {
     const { data } = mapDispatch(applyFilters({ fromYear: startYear, toYear: endYear }))
 
     if (data.length === 0) {
-      runIdle()
+      if (idleId) clearTimeout(idleId)
+      setIdleId(runIdle())
     }
 
     // Get current filtered data and

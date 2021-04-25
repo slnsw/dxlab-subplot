@@ -1,4 +1,5 @@
 
+import GL from '@luma.gl/constants'
 import { CompositeLayer, SolidPolygonLayer } from 'deck.gl'
 import { SpriteBitmapLayer } from './mosaic/SpriteBitmapLayer'
 
@@ -130,16 +131,35 @@ export class MapsCloudLayer extends CompositeLayer {
     const isIdle = get(uiState, 'isIdle', false)
     const selected = get(uiState, 'selected.properties.asset_id', null)
     const selectedOpacity = get(uiState, 'selectedOpacity', 1)
+    const appMode = get(uiState, 'appMode', '')
 
     const [mapState] = mapContext
     const { near } = mapState
+
+    const spriteConf = {
+      web: {
+        count: process.env.REACT_APP_WEB_SPRITE_COUNT,
+        path: process.env.REACT_APP_WEB_SPRITE_PATH
+      },
+      kiosk: {
+        count: process.env.REACT_APP_KIOSK_SPRITE_COUNT,
+        path: process.env.REACT_APP_KIOSK_SPRITE_PATH
+      }
+    }
+
+    const spCount = get(spriteConf, `${appMode}.count`, null)
+    const spPath = get(spriteConf, `${appMode}.path`, null)
+
+    if (!spCount && !spPath) {
+      return null
+    }
 
     // Render sprite maps
     const sprites = new SpriteBitmapLayer({
       id: `${id}-sprite-bitmap-layer`,
       data: mapSpriteData,
-      sprites: process.env.REACT_APP_SPRITE_COUNT,
-      path: process.env.REACT_APP_SPRITE_PATH,
+      sprites: spCount,
+      path: spPath,
       pickable: true,
       autoHighlight: false,
       onAllSpriteLoaded: this.handleAllSpriteLoaded.bind(this),
@@ -181,11 +201,11 @@ export class MapsCloudLayer extends CompositeLayer {
       },
 
       // This layer don't cast shadows
-      castShadow: false,
+      castShadow: true,
       // Ignore material in lighting effect
-      material: false,
+      // material: false,
       // Don't draw shadows in this layer
-      shadowEnabled: false,
+      // shadowEnabled: false,
 
       updateTriggers: {
         getOpacity: [inFocus, isIdle, filters.fromYear, filters.toYear, near.all, selected, selectedOpacity],
@@ -207,7 +227,7 @@ export class MapsCloudLayer extends CompositeLayer {
     const { year } = d.properties
     const opacity = (year >= fromYear && year <= toYear) ? maxOpacity : 0
     // console.log(opacity, year, fromYear, toYear)
-    return [255, 255, 255, opacity]
+    return [0, 0, 0, opacity]
   }
 
   buildShadows () {
