@@ -431,7 +431,7 @@ class ComasterImageProcessLoader(BaseComasterLoader, MongoLoader):
                 # Create cutline crop
                 doc['has_cutline_crop'] = self.crop_image(**doc)
 
-                sizes = [8, 16, 32, 64, 128, 256, 512, 1024]
+                sizes = [128, 256, 512, 768, 1024]
 
                 params = py_.pick(doc, ['filename', 'asset_id'])
                 self.derivatives(suffix='uncrop', process=self.process_thumbnail, sizes=sizes, **params)
