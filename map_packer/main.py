@@ -176,7 +176,7 @@ class SpritePacker:
             plist_files = (f for f in Path(directory).glob("*.png"))
             for path in plist_files:
                 out = str(path).replace(".png", ".webp")
-                cwebp(path, "-alpha_q", "50", o=out, q=90)
+                cwebp(path, "-alpha_q", "10", o=out, q=90)
 
         except ErrorReturnCode as e:
             logger.error(f"cwebp -> {e.stderr}")
