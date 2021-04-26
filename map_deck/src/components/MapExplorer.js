@@ -64,7 +64,7 @@ export const MapExplorer = ({ mode = 'web' }) => {
   }, [mapState.dataSet])
 
   // Idle logic
-  const idleTimeout = 1000 * 10 // 60 * 0.4,
+  const idleTimeout = 1000 * 30 // 60 * 0.4,
   const { isIdle } = useIdleTimer({
     timeout: idleTimeout,
     onIdle: (_) => {
@@ -90,8 +90,7 @@ export const MapExplorer = ({ mode = 'web' }) => {
 
     const { data } = mapDispatch(applyFilters({ fromYear: startYear, toYear: endYear }))
 
-    const chosenValue = Math.random() < 0.5 ? 1 : 0
-    if (data.length === 0 || chosenValue === 1) {
+    if (data.length === 0) {
       if (idleId) clearTimeout(idleId)
       return runIdle()
     }
