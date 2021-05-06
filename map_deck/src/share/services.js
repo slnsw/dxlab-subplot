@@ -12,7 +12,6 @@ export function fetchData ({ around, aroundRadius, fromYear, toYear, assetIds })
     }
   }
 
-  // assetIds = 'a1367540';
   if (assetIds) {
     const ids = assetIds.split(',').map((e) => {
       return e.trim()
@@ -39,20 +38,13 @@ export function fetchData ({ around, aroundRadius, fromYear, toYear, assetIds })
 }
 
 export function loadAPIData () {
-  // Temporal query
+  // base query
   const query = {
     'properties.year': { $ne: null }
   }
   return fetch(`${process.env.REACT_APP_API_DATA_URL}?query=${JSON.stringify(query)}`)
   // We get the API response and receive data in JSON format...
     .then(response => response.json())
-  // TODO: Wrap response around FeatureCollection structure
-  // .then(data => {
-  //   return {
-  //       'type': 'FeatureCollection',
-  //       'features': data
-  //   }
-  // })
 }
 
 export function loadData () {

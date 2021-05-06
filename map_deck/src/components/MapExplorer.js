@@ -314,15 +314,6 @@ export const MapExplorer = ({ mode = 'web' }) => {
     [LandmarksLayer, { view: 'master', material: false }],
     // [MapsPolygonLayer, { view: 'master', ...handlers }],
     [MapsCloudLayer, { view: 'master', ...handlers }]
-
-    // [MapsDistributionLayer, { view: 'master' }]
-    // [MapsLabelLayer, { view: 'master' }],
-    // [FootprintMapsLayer, { view: 'all' }],
-    // [MapsClusterCounts, { view: 'master' }]
-    // [MapsBitmapLayer, { id: 'crop', name: 'crop', suffix: 'crop', view: 'all', ...handlers }]
-    // [MapsBitmapLayer, { id: 'edge', name: 'edge', suffix: '_edge.png', view: 'slave', ...handlers }]
-    // [TileImagesLayer, { id: 'tile_crop', view: 'master', suffix: 'crop', ...handlers, material: false }],
-
   ]
 
   return (

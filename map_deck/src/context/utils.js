@@ -17,7 +17,6 @@ export const thunkDispatch = (dispatch, state) => {
   }
 }
 
-// TODO: move this out this file
 // Year manipulations
 export const roundYearDown = (year) => {
   return parseInt(Math.floor(year / 10.0)) * 10

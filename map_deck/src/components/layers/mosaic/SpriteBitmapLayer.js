@@ -28,13 +28,6 @@ const defaultProps = {
   getOpacity: { type: 'accessor', value: x => x.opacity || 1 },
   getOffsetZ: { type: 'accessor', value: x => x.offsetZ || 0 },
 
-  desaturate: { type: 'number', min: 0, max: 1, value: 0 },
-  // Inspired by  Deck.gl BitmapLayer implementation
-  // More context: because of the blending mode we're using for ground imagery,
-  // alpha is not effective when blending the bitmap layers with the base map.
-  // Instead we need to manually dim/blend rgb values with a background color.
-  transparentColor: { type: 'color', value: [0, 0, 0, 0] },
-  tintColor: { type: 'color', value: [255, 255, 255] },
   pickable: false,
   onSpriteLoaded: () => {},
   onAllSpriteLoaded: () => {}
@@ -43,8 +36,6 @@ const defaultProps = {
 /*
  * @class
  * @param {object} props
- * @param {number} props.transparentColor - color to interpret transparency to
- * @param {number} props.tintColor - color bias
  */
 export class SpriteBitmapLayer extends Layer {
   getShaders () {
@@ -175,7 +166,6 @@ export class SpriteBitmapLayer extends Layer {
         size: 3,
         type: GL.UNSIGNED_BYTE,
         accessor: (object, { index, target }) => {
-          // const v = this.encodePickingColor(object && object.__source ? object.__source.index : index, value)
           const v = this.encodePickingColor(index, target)
           return v
         },
@@ -379,7 +369,6 @@ export class SpriteBitmapLayer extends Layer {
     }
 
     this.setState({ sprites, spriteSize, spriteUpdated: true, spritesLoaded: true })
-    // console.log('ready', textures.length)
     // Force update model
     this.setNeedsUpdate()
 
