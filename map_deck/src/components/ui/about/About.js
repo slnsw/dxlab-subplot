@@ -14,6 +14,9 @@ import TwitterIcon from '@material-ui/icons/Twitter'
 import YouTubeIcon from '@material-ui/icons/YouTube'
 import RssFeedIcon from '@material-ui/icons/RssFeed'
 
+// Idle
+import { useIdleTimer } from 'react-idle-timer'
+
 // Custom icons
 import { Facebook as FacebookIcon, Flickr as FlickrIcon, Pinterest as PinterestIcon } from '../icons/icons'
 import { UIContext } from '../../../context/UIContext'
@@ -23,6 +26,13 @@ export const About = () => {
   const [uiState] = useContext(UIContext)
 
   const { appMode } = uiState
+
+  useIdleTimer({
+    timeout: process.env.REACT_APP_IDLE_TIMEOUT_ABOUT,
+    onIdle: (_) => {
+      setOpen(false)
+    }
+  })
 
   const handleOpen = () => {
     setOpen(true)

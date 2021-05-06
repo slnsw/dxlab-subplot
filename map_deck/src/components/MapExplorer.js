@@ -64,7 +64,7 @@ export const MapExplorer = ({ mode = 'web' }) => {
   }, [mapState.dataSet])
 
   // Idle logic
-  const idleTimeout = 1000 * 30 // 60 * 0.4,
+  const idleTimeout = process.env.REACT_APP_IDLE_TIMEOUT_MAPS
   const { isIdle } = useIdleTimer({
     timeout: idleTimeout,
     onIdle: (_) => {
